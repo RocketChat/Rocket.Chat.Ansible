@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Calum MacRae
-  description: Deploy [Rocket.Chat](http://rocket.chat)
+  description: Deploy Rocket.Chat
   #company: your company (optional)
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
