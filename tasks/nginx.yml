@@ -18,7 +18,6 @@
       src: "{{ item.src }}"
       dest: "{{ item.dest }}"
     when: not rocket_chat_ssl_generate_certs
-          and rocket_chat_ssl_reverse_proxy
     with_items:
       - src: "{{ rocket_chat_ssl_key_file }}"
         dest: "{{ rocket_chat_ssl_key_path }}"
@@ -35,7 +34,6 @@
       -out {{ rocket_chat_ssl_cert_path }}
       -days 3650
     when: rocket_chat_ssl_generate_certs
-          and rocket_chat_ssl_reverse_proxy
     args:
       creates: "{{ rocket_chat_ssl_key_path }}"
     notify: Reload the Nginx service

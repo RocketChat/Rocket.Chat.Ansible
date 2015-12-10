@@ -38,7 +38,6 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 | `rocket_chat_mongodb_server` | 127.0.0.1 | The IP/FQDN of the [MongoDB](http://mongodb.com) host |
 | `rocket_chat_mongodb_port` | 27017 | The TCP port to contact the [MongoDB](http://mongodb.com) host host via |
 | `rocket_chat_include_nginx`| True | A boolean value that determines whether or not to deploy [Nginx](https://www.nginx.com/) |
-| `rocket_chat_ssl_reverse_proxy` | True | A boolean value that determines whether or not to use SSL for the [Nginx](https://www.nginx.com/) reverse proxy |
 | `rocket_chat_ssl_key_path` | `/etc/nginx/rocket_chat.key` | The destination path for the [Nginx](https://www.nginx.com/) SSL private key |
 | `rocket_chat_ssl_cert_path` | `/etc/nginx/rocket_chat.crt` | The destination path for the [Nginx](https://www.nginx.com/) SSL certificate |
 | `rocket_chat_ssl_key_file` | `~` | If not using SSL cert generation, this is the path to the [Nginx](https://www.nginx.com/) SSL private key on the Ansible control node, for deployment |

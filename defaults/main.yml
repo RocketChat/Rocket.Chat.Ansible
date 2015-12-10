@@ -18,7 +18,6 @@ rocket_chat_mongodb_port: 27017
 
 # nginx settings
 rocket_chat_include_nginx: True
-rocket_chat_ssl_reverse_proxy: True
 rocket_chat_ssl_key_path: /etc/nginx/rocket_chat.key
 rocket_chat_ssl_cert_path: /etc/nginx/rocket_chat.crt
 rocket_chat_ssl_key_file: ~
