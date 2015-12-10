@@ -1,0 +1,9 @@
+---
+# handlers/main.yml: Handlers for cmacrae.rocket_chat
+  - name: Reload the Nginx service
+    service: name=nginx state=reloaded
+
+  - name: Upgrade Rocket.Chat
+    include: ../tasks/upgrade.yml
+    tags:
+      - upgrade

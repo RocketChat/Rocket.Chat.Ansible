@@ -1,0 +1,23 @@
+---
+# tasks/upgrade.yml: Rocket.Chat upgrade procedures for cmacrae.rocket_chat
+
+  - name: Ensure automatic upgrades are permitted
+    fail:
+      msg: >-
+        It doesn't look like you've permitted automatic upgrades.
+        There was a change to the Rocket.Chat source code.
+        To permit automatic upgrades set 'rocket_chat_automatic_upgrades' to true
+    when: ! rocket_chat_automatic_upgrades
+
+  - name: Build the Rocket.Chat application using Meteor [ Upgrade ]
+    shell: /opt/meteor/bin/meteor build --server {{ rocket_chat_service_host }} --directory /var/www/rocket.chat
+    args:
+      chdir: /var/www/rocket.chat
+
+  - name: Install Rocket.Chat via NPM [ Upgrade ]
+    npm: state=present path=/var/www/rocket.chat/bundle/programs/server
+
+  - name: Restart Rocket.Chat via PM2 [ Upgrade ]
+    shell: pm2 restart rocket.chat
+    args:
+      chdir: /var/www/rocket.chat

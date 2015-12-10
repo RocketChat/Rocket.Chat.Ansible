@@ -1,0 +1,26 @@
+---
+# defaults/main.yml: Defaults for cmacrae.rocket_chat
+rocket_chat_automatic_upgrades: False
+rocket_chat_build_version: v0.8.0
+rocket_chat_service_host: "{{ ansible_fqdn }}"
+rocket_chat_service_port: 3000
+
+# Meteor settings
+rocket_chat_meteor_version: 1.2.1
+rocket_chat_meteor_platform: os.linux.x86_64
+rocket_chat_meteor_tarball_remote: https://d3sqy0vbqsdhku.cloudfront.net/packages-bootstrap/{{ rocket_chat_meteor_version }}/meteor-bootstrap-{{ rocket_chat_meteor_platform }}.tar.gz
+
+
+# MongoDB settings
+rocket_chat_include_mongodb: True
+rocket_chat_mongodb_server: 127.0.0.1
+rocket_chat_mongodb_port: 27017
+
+# nginx settings
+rocket_chat_include_nginx: True
+rocket_chat_ssl_reverse_proxy: True
+rocket_chat_ssl_key_path: /etc/nginx/rocket_chat.key
+rocket_chat_ssl_cert_path: /etc/nginx/rocket_chat.crt
+rocket_chat_ssl_key_file: ~
+rocket_chat_ssl_cert_file: ~
+rocket_chat_ssl_generate_certs: True

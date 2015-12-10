@@ -1,0 +1,44 @@
+---
+# tasks/nginx.yml: Nginx management tasks for cmacrae.rocket_chat
+  - name: Ensure Nginx is present
+    yum: name=nginx state=present
+    when: ansible_os_family == "RedHat"
+
+  - name: Deploy Nginx configuration
+    template:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+    with_items:
+      - { src: nginx.conf.j2, dest: /etc/nginx/nginx.conf }
+      - { src: rocket_chat.conf.j2, dest: /etc/nginx/conf.d/rocket_chat.conf }
+    notify: Reload the Nginx service
+
+  - name: Ensure provided SSL certs have been deployed
+    copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+    when: not rocket_chat_ssl_generate_certs
+          and rocket_chat_ssl_reverse_proxy
+    with_items:
+      - src: "{{ rocket_chat_ssl_key_file }}"
+        dest: "{{ rocket_chat_ssl_key_path }}"
+      - src: "{{ rocket_chat_ssl_cert_file }}"
+        dest: "{{ rocket_chat_ssl_cert_path }}"
+    notify: Reload the Nginx service
+
+  - name: Ensure SSL certs have been generated
+    shell: >-
+      openssl req -x509 -newkey rsa:2048 -nodes
+      -subj "/CN={{ rocket_chat_service_host }}/
+      /C=NA/ST=NA/L=NA/O=NA/OU=NA"
+      -keyout {{ rocket_chat_ssl_key_path }}
+      -out {{ rocket_chat_ssl_cert_path }}
+      -days 3650
+    when: rocket_chat_ssl_generate_certs
+          and rocket_chat_ssl_reverse_proxy
+    args:
+      creates: "{{ rocket_chat_ssl_key_path }}"
+    notify: Reload the Nginx service
+
+  - name: Ensure the Nginx service is running/enabled
+    service: name=nginx state=started enabled=true

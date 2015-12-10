@@ -1,0 +1,46 @@
+upstream rocket_chat {
+        server 127.0.0.1:3000;
+}
+{% if rocket_chat_ssl_reverse_proxy %}
+server {
+        listen  80;
+        server_name  {{ rocket_chat_service_host }};
+
+        # tell users to go to SSL version this time
+        if ($ssl_protocol = "") {
+        rewrite     ^   https://$server_name$request_uri? permanent;
+        }
+}
+{% endif %}
+
+server {
+{% if rocket_chat_ssl_reverse_proxy %}
+        listen 443 ssl;
+{% else %}
+        listen 80;
+{% endif %}
+        server_name {{ rocket_chat_service_host }};
+{% if rocket_chat_ssl_reverse_proxy %}
+        ssl_certificate {{ rocket_chat_ssl_cert_path }};
+        ssl_certificate_key {{ rocket_chat_ssl_key_path }};
+        error_page 497  https://$host:$server_port$request_uri;
+{% endif %}
+        location / {
+            proxy_pass http://rocket_chat;
+            proxy_http_version 1.1;
+            proxy_set_header Host $http_host;
+
+            proxy_set_header Host $host:$server_port;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Nginx-Proxy true;
+
+{% if rocket_chat_ssl_reverse_proxy %}
+            proxy_set_header X-Forwarded-Ssl on;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+{% endif %}
+
+            proxy_redirect off;
+        }
+}

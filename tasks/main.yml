@@ -1,0 +1,173 @@
+---
+# tasks/main.yml: Main tasks for cmacrae.rocket_chat
+
+  - name: Ensure the EPEL repository is present
+    yum: name=epel-release state=present
+    when: ansible_os_family == "RedHat"
+
+  - name: Ensure the EPEL repository GPG key is imported
+    rpm_key: key=/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7 state=present
+    when: ansible_os_family == "RedHat"
+
+  - name: Ensure Rocket.Chat dependencies are installed
+    yum: name={{ item }} state=present
+    with_items:
+      - git
+      - GraphicsMagick
+      - nodejs
+      - npm
+    when: ansible_os_family == "RedHat"
+
+  - name: Ensure MongoDB Server is present
+    yum: name={{ item }} state=present
+    with_items:
+      - mongodb
+      - mongodb-server
+    when: rocket_chat_include_mongodb and (ansible_os_family == "RedHat")
+    tags: mongodb
+
+  - name: Ensure link /bin/node -> /bin/nodejs exists
+    file:
+      src: /bin/node
+      dest: /bin/nodejs
+      state: link
+
+  - name: Ensure Nave & PM2 (NodeJS) are installed
+    npm: name={{ item }} global=yes
+    with_items:
+      - nave
+      - pm2
+
+  - name: Register running processes
+    shell: 'ps aux'
+    register: rocket_chat_running_processes
+    changed_when: False
+
+  - name: Ensure PM2 is running
+    shell: 'pm2 startup systemd'
+    when: rocket_chat_running_processes.stdout.find('PM2') == -1
+    register: pm2_startup
+
+  - name: Use the 0.10 NodeJS environment via Nave
+    shell: nave usemain 0.10
+             creates=/root/.nave/installed
+
+  - name: Ensure the Meteor directory environment exists
+    file: name=/opt/{{ item.dest }} state=directory
+    with_items:
+      - dest: meteor
+      - dest: meteor/bin
+
+  - name: Fetch Meteor tarball
+    get_url:
+      url: "{{ rocket_chat_meteor_tarball_remote }}"
+      dest: /opt/meteor/meteor-{{ rocket_chat_meteor_version }}.tar.gz
+
+  - name: Unarchive the Meteor tarball
+    shell: >
+      tar xf
+      /opt/meteor/meteor-{{ rocket_chat_meteor_version }}.tar.gz
+    args:
+      chdir: /opt/meteor
+      creates: /opt/meteor/.meteor
+
+  - name: "Register the Meteor executable's real path"
+    command: readlink /opt/meteor/.meteor/meteor
+    register: rocket_chat_meteor_bin_path
+    changed_when: False
+
+  - name: Link the Meteor environment data to more sensible destinations
+    file:
+      src: /opt/meteor/.meteor/{{ item }}
+      dest: /opt/meteor/bin/meteor
+      state: link
+    with_items: rocket_chat_meteor_bin_path.stdout_lines
+
+  - name: "Configure /etc/hosts as detailed in Rocket.Chat's docs"
+    lineinfile:
+      dest: /etc/hosts
+      line:  "127.0.0.1    {{ ansible_fqdn }}    {{ ansible_hostname }}"
+      regexp: '^127.0.0.1'
+
+  - name: Ensure MongoDB replication has been set correctly
+    lineinfile:
+      line: "replSet=001-rs"
+      dest: /etc/mongod.conf
+    when: rocket_chat_include_mongodb
+    tags: mongodb
+
+  - name: Ensure the MongoDB service is started/enabled
+    service: name=mongod state=started enabled=yes
+    when: rocket_chat_include_mongodb
+    tags: mongodb
+
+  - name: Ensure the MongoDB shell replSet script has been deployed
+    template:
+      src: mongo_rs_initiate.js.j2
+      dest: /var/lib/mongodb/mongo_rs_initiate.js
+    when: rocket_chat_include_mongodb
+    tags: mongodb
+
+  - name: Ensure the MongoDB replSets have been initiated
+    shell: >-
+      mongo mongo_rs_initiate.js &&
+      mongo --eval 'rs.initiate()' &&
+      touch .mongo_rs_initialised
+    args:
+      chdir: /var/lib/mongodb
+      creates: /var/lib/mongodb/.mongo_rs_initialised
+    when: rocket_chat_include_mongodb
+    tags: mongodb
+
+  - name: Ensure Rocket.Chat log directory exists
+    file: name=/var/log/rocket.chat state=directory
+    tags: build
+
+  - name: Check to see if this is the initial deployment
+    stat: path=/var/log/rocket.chat/app-0.log
+    register: rocket_chat_deploy_state
+    tags: build
+
+  - name: Ensure Rocket.Chat source code is present
+    git:
+      repo: https://github.com/RocketChat/Rocket.Chat
+      dest: /var/www/rocket.chat
+      version: "{{ rocket_chat_build_version }}"
+    # This doesn't currently work due to a bug in Ansible 1.8 onwards:
+    # https://github.com/ansible/ansible/issues/13182
+    # This has been fixed in Ansible 2.0
+    #notify: Upgrade Rocket.Chat
+    tags: build
+
+  - name: Build the Rocket.Chat application using Meteor
+    shell: /opt/meteor/bin/meteor build --server {{ rocket_chat_service_host }} --directory /var/www/rocket.chat
+    args:
+      chdir: /var/www/rocket.chat
+      creates: /var/www/rocket.chat/bundle
+    tags: build
+
+  - name: Install Rocket.Chat via NPM
+    npm: state=present path=/var/www/rocket.chat/bundle/programs/server
+    tags: build
+
+  - name: Ensure the Rocket.Chat configuration is present
+    template:
+      src: pm2-rocket-chat.json.j2
+      dest: /var/www/rocket.chat/pm2-rocket-chat.json
+    tags: build
+
+  - name: Register Rocket.Chat service status
+    shell: pm2 show rocket.chat
+    ignore_errors: True
+    changed_when: False
+    register: rocketchat_service_status
+
+  - name: Ensure Rocket.Chat is running via PM2
+    shell: pm2 start pm2-rocket-chat.json
+    args:
+      chdir: /var/www/rocket.chat
+    when: rocketchat_service_status.stdout.find('online') == -1
+
+  - include: nginx.yml
+    when: rocket_chat_include_nginx
+    tags: nginx
