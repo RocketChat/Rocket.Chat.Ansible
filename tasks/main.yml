@@ -54,37 +54,6 @@
     shell: nave usemain 0.10
              creates=/root/.nave/installed
 
-  - name: Ensure the Meteor directory environment exists
-    file: name=/opt/{{ item.dest }} state=directory
-    with_items:
-      - dest: meteor
-      - dest: meteor/bin
-
-  - name: Fetch Meteor tarball
-    get_url:
-      url: "{{ rocket_chat_meteor_tarball_remote }}"
-      dest: /opt/meteor/meteor-{{ rocket_chat_meteor_version }}.tar.gz
-
-  - name: Unarchive the Meteor tarball
-    shell: >
-      tar xf
-      /opt/meteor/meteor-{{ rocket_chat_meteor_version }}.tar.gz
-    args:
-      chdir: /opt/meteor
-      creates: /opt/meteor/.meteor
-
-  - name: "Register the Meteor executable's real path"
-    command: readlink /opt/meteor/.meteor/meteor
-    register: rocket_chat_meteor_bin_path
-    changed_when: False
-
-  - name: Link the Meteor environment data to more sensible destinations
-    file:
-      src: /opt/meteor/.meteor/{{ item }}
-      dest: /opt/meteor/bin/meteor
-      state: link
-    with_items: rocket_chat_meteor_bin_path.stdout_lines
-
   - name: "Configure /etc/hosts"
     lineinfile:
       dest: /etc/hosts
@@ -100,26 +69,28 @@
     register: rocket_chat_deploy_state
     tags: build
 
-  - name: Ensure Rocket.Chat source code is present
-    git:
-      repo: https://github.com/RocketChat/Rocket.Chat
-      dest: /var/www/rocket.chat
-      version: "{{ rocket_chat_build_version }}"
-    # This doesn't currently work due to a bug in Ansible 1.8 onwards:
-    # https://github.com/ansible/ansible/issues/13182
-    # This has been fixed in Ansible 2.0
-    #notify: Upgrade Rocket.Chat
-    tags: build
+  - name: Fetch the Rocket.Chat binary tarball
+    get_url:
+      url: "{{ rocket_chat_tarball_remote }}"
+      sha256sum: "{{ rocket_chat_tarball_sha256sum }}"
+      dest: /root
 
-  - name: Build the Rocket.Chat application using Meteor
-    shell: /opt/meteor/bin/meteor build --server {{ rocket_chat_service_host }} --directory /var/www/rocket.chat
-    args:
-      chdir: /var/www/rocket.chat
-      creates: /var/www/rocket.chat/bundle
-    tags: build
+  - name: Ensure the Rocket.Chat application path exists
+    file:
+      path: "{{ rocket_chat_application_path }}"
+      state: directory
 
+  - name: Unpack the Rocket.Chat binary tarball
+    unarchive:
+      copy: no
+      src: /root/rocket.chat-{{ rocket_chat_version }}.tgz
+      dest: "{{ rocket_chat_application_path }}"
+      creates: "{{ rocket_chat_application_path }}/bundle"
+      
   - name: Install Rocket.Chat via NPM
-    npm: state=present path=/var/www/rocket.chat/bundle/programs/server
+    npm:
+      state: present
+      path: "{{ rocket_chat_application_path }}/bundle/programs/server"
     tags: build
 
   - name: Ensure the Rocket.Chat configuration is present

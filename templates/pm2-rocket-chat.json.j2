@@ -1,7 +1,7 @@
 {
   "apps": [{
     "name": "rocket.chat",
-    "script": "/var/www/rocket.chat/bundle/main.js",
+    "script": "{{ rocket_chat_application_path }}/bundle/main.js",
     "out_file": "/var/log/rocket.chat/app.log",
     "error_file": "/var/log/rocket.chat/err.log",
     "port": "{{ rocket_chat_service_port }}",

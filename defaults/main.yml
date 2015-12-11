@@ -1,15 +1,12 @@
 ---
 # defaults/main.yml: Defaults for cmacrae.rocket_chat
 rocket_chat_automatic_upgrades: False
-rocket_chat_build_version: v0.8.0
+rocket_chat_application_path: /var/www/rocket.chat
+rocket_chat_version: master
+rocket_chat_tarball_remote: https://s3.amazonaws.com/rocketchatbuild/rocket.chat-{{ rocket_chat_version }}.tgz
+rocket_chat_tarball_sha256sum: f39bcf8c1769dfdd86bb66fe68cc9cdd5b49325aadce9ca5f1d3c0f1c230d319
 rocket_chat_service_host: "{{ ansible_fqdn }}"
 rocket_chat_service_port: 3000
-
-# Meteor settings
-rocket_chat_meteor_version: 1.2.1
-rocket_chat_meteor_platform: os.linux.x86_64
-rocket_chat_meteor_tarball_remote: https://d3sqy0vbqsdhku.cloudfront.net/packages-bootstrap/{{ rocket_chat_meteor_version }}/meteor-bootstrap-{{ rocket_chat_meteor_platform }}.tar.gz
-
 
 # MongoDB settings
 rocket_chat_mongodb_packages: mongodb
