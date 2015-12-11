@@ -4,6 +4,10 @@
     yum: name=nginx state=present
     when: ansible_os_family == "RedHat"
 
+  - name: Ensure Nginx is present
+    apt: name=nginx state=present
+    when: ansible_os_family == "Debian"
+
   - name: Deploy Nginx configuration
     template:
       src: "{{ item.src }}"

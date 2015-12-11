@@ -12,6 +12,7 @@ rocket_chat_meteor_tarball_remote: https://d3sqy0vbqsdhku.cloudfront.net/package
 
 
 # MongoDB settings
+rocket_chat_mongodb_packages: mongodb
 rocket_chat_include_mongodb: True
 rocket_chat_mongodb_server: 127.0.0.1
 rocket_chat_mongodb_port: 27017

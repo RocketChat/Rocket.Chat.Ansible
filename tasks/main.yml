@@ -1,13 +1,14 @@
 ---
 # tasks/main.yml: Main tasks for cmacrae.rocket_chat
 
-  - name: Ensure the EPEL repository is present
-    yum: name=epel-release state=present
+  - include_vars: "{{ ansible_distribution }}.yml"
+
+  - include: repo_RedHat.yml
     when: ansible_os_family == "RedHat"
 
-  - name: Ensure the EPEL repository GPG key is imported
-    rpm_key: key=/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7 state=present
-    when: ansible_os_family == "RedHat"
+  - include: mongodb.yml
+    when: rocket_chat_include_mongodb
+    tags: mongodb
 
   - name: Ensure Rocket.Chat dependencies are installed
     yum: name={{ item }} state=present
@@ -18,13 +19,14 @@
       - npm
     when: ansible_os_family == "RedHat"
 
-  - name: Ensure MongoDB Server is present
-    yum: name={{ item }} state=present
+  - name: Ensure Rocket.Chat dependencies are installed
+    apt: name={{ item }} state=present
     with_items:
-      - mongodb
-      - mongodb-server
-    when: rocket_chat_include_mongodb and (ansible_os_family == "RedHat")
-    tags: mongodb
+      - git
+      - GraphicsMagick
+      - nodejs
+      - npm
+    when: ansible_os_family == "Debian"
 
   - name: Ensure link /bin/node -> /bin/nodejs exists
     file:
@@ -83,41 +85,11 @@
       state: link
     with_items: rocket_chat_meteor_bin_path.stdout_lines
 
-  - name: "Configure /etc/hosts as detailed in Rocket.Chat's docs"
+  - name: "Configure /etc/hosts"
     lineinfile:
       dest: /etc/hosts
       line:  "127.0.0.1    {{ ansible_fqdn }}    {{ ansible_hostname }}"
       regexp: '^127.0.0.1'
-
-  - name: Ensure MongoDB replication has been set correctly
-    lineinfile:
-      line: "replSet=001-rs"
-      dest: /etc/mongod.conf
-    when: rocket_chat_include_mongodb
-    tags: mongodb
-
-  - name: Ensure the MongoDB service is started/enabled
-    service: name=mongod state=started enabled=yes
-    when: rocket_chat_include_mongodb
-    tags: mongodb
-
-  - name: Ensure the MongoDB shell replSet script has been deployed
-    template:
-      src: mongo_rs_initiate.js.j2
-      dest: /var/lib/mongodb/mongo_rs_initiate.js
-    when: rocket_chat_include_mongodb
-    tags: mongodb
-
-  - name: Ensure the MongoDB replSets have been initiated
-    shell: >-
-      mongo mongo_rs_initiate.js &&
-      mongo --eval 'rs.initiate()' &&
-      touch .mongo_rs_initialised
-    args:
-      chdir: /var/lib/mongodb
-      creates: /var/lib/mongodb/.mongo_rs_initialised
-    when: rocket_chat_include_mongodb
-    tags: mongodb
 
   - name: Ensure Rocket.Chat log directory exists
     file: name=/var/log/rocket.chat state=directory

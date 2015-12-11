@@ -1,0 +1,4 @@
+---
+rocket_chat_mongodb_packages:
+  - mongodb
+  - mongodb-server
