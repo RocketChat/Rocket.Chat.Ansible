@@ -6,6 +6,7 @@
 
   - include: repo_RedHat.yml
     when: ansible_os_family == "RedHat"
+    tags: repo
 
   - include: mongodb.yml
     when: rocket_chat_include_mongodb

@@ -13,6 +13,7 @@ rocket_chat_mongodb_packages: mongodb
 rocket_chat_include_mongodb: True
 rocket_chat_mongodb_server: 127.0.0.1
 rocket_chat_mongodb_port: 27017
+rocket_chat_mongodb_config_template: mongod.conf.j2
 
 # nginx settings
 rocket_chat_include_nginx: True

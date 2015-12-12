@@ -10,5 +10,9 @@ rocket_chat_mongodb_packages:
   - mongodb-server
 
 rocket_chat_mongodb_repl_lines: 'replSet=001-rs'
+rocket_chat_mongodb_pidfile_path: /var/run/mongodb/mongodb.pid
+rocket_chat_mongodb_logpath: /var/log/mongodb/mongod.log
+rocket_chat_mongodb_unixsocketprefix: /var/run/mongodb
+rocket_chat_mongodb_dbpath: /var/lib/mongodb
 
 rocket_chat_nginx_process_user: nginx

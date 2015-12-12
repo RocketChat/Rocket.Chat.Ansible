@@ -6,12 +6,14 @@
       keyserver: keyserver.ubuntu.com
       id: 7F0CEB10
     when: ansible_distribution == "Ubuntu"
+    tags: repo
 
   - name: Ensure the MongoDB repository is present
     apt_repository:
       repo: deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse
       state: present
     when: ansible_distribution == "Ubuntu"
+    tags: repo
 
   - name: Ensure MongoDB Server is present
     yum: name={{ item }} state=present
@@ -23,23 +25,20 @@
     with_items: "{{ rocket_chat_mongodb_packages }}"
     when: ansible_os_family == "Debian"
 
-  - name: Ensure MongoDB replication has been set correctly
-    lineinfile:
-      line: "{{ rocket_chat_mongodb_repl_lines }}"
+  - name: Deploy MongoDB service configuration
+    template:
+      src: "{{ rocket_chat_mongodb_config_template }}"
       dest: /etc/mongod.conf
-    tags: mongodb
 
   - name: Ensure the MongoDB service is started/enabled
     service: name=mongod state=started enabled=yes
     when: rocket_chat_include_mongodb
-    tags: mongodb
 
   - name: Ensure the MongoDB shell replSet script has been deployed
     template:
       src: mongo_rs_initiate.js.j2
       dest: /var/lib/mongodb/mongo_rs_initiate.js
     when: rocket_chat_include_mongodb
-    tags: mongodb
 
   - name: Ensure the MongoDB replSets have been initiated
     shell: >-
@@ -50,4 +49,3 @@
       chdir: /var/lib/mongodb
       creates: /var/lib/mongodb/.mongo_rs_initialised
     when: rocket_chat_include_mongodb
-    tags: mongodb
