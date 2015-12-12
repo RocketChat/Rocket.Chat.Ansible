@@ -7,3 +7,7 @@ rocket_chat_dep_packages:
 
 rocket_chat_mongodb_packages:
   - mongodb-org
+
+rocket_chat_mongodb_repl_lines: >-
+  replication:
+      replSetName:  "001-rs"

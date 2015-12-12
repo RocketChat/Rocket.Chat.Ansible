@@ -25,7 +25,7 @@
 
   - name: Ensure MongoDB replication has been set correctly
     lineinfile:
-      line: "replSet=001-rs"
+      line: "{{ rocket_chat_mongodb_repl_lines }}"
       dest: /etc/mongod.conf
     tags: mongodb
 
