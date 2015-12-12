@@ -1,3 +1,9 @@
 ---
+rocket_chat_dep_packages:
+  - git
+  - graphicsmagick
+  - nodejs
+  - npm
+
 rocket_chat_mongodb_packages:
   - mongodb-org

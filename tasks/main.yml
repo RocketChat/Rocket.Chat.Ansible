@@ -12,20 +12,12 @@
 
   - name: Ensure Rocket.Chat dependencies are installed
     yum: name={{ item }} state=present
-    with_items:
-      - git
-      - GraphicsMagick
-      - nodejs
-      - npm
+    with_items: "{{ rocket_chat_dep_packages }}"
     when: ansible_os_family == "RedHat"
 
   - name: Ensure Rocket.Chat dependencies are installed
-    apt: name={{ item }} state=present
-    with_items:
-      - git
-      - GraphicsMagick
-      - nodejs
-      - npm
+    apt: name={{ item }} state=present cache_valid_time=3600
+    with_items: "{{ rocket_chat_dep_packages }}"
     when: ansible_os_family == "Debian"
 
   - name: Ensure link /bin/node -> /bin/nodejs exists
