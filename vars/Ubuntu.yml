@@ -7,3 +7,6 @@ rocket_chat_dep_packages:
 
 rocket_chat_mongodb_packages:
   - mongodb-org
+
+rocket_chat_node_path: /usr/bin/node
+rocket_chat_nodejs_path: /usr/bin/nodejs

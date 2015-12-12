@@ -20,11 +20,19 @@
     with_items: "{{ rocket_chat_dep_packages }}"
     when: ansible_os_family == "Debian"
 
-  - name: Ensure link /bin/node -> /bin/nodejs exists
+  - name: "Ensure 'node' binary is linked to 'nodejs'"
     file:
-      src: /bin/node
-      dest: /bin/nodejs
+      src: "{{ rocket_chat_node_path }}"
+      dest: "{{ rocket_chat_nodejs_path }}" 
       state: link
+    when: ansible_os_family == "RedHat"
+
+  - name: "Ensure 'nodejs' binary is linked to 'node'"
+    file:
+      src: "{{ rocket_chat_nodejs_path }}"
+      dest: "{{ rocket_chat_node_path }}" 
+      state: link
+    when: ansible_os_family == "Debian"
 
   - name: Ensure Nave & PM2 (NodeJS) are installed
     npm: name={{ item }} global=yes
