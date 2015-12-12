@@ -92,11 +92,8 @@ License
 -------
 MIT
 
-Author Information
-------------------
-Created by [Calum MacRae](http://cmacr.ae)
-
+Issues/Contributions
+--------------------
 Feel free to:  
-Contact me - [@calumacrae](https://twitter.com/calumacrae), [mailto:calum0macrae@gmail.com](mailto:calum0macrae@gmail.com)  
-[Raise an issue](https://github.com/cmacrae/ansible-rocket_chat/issues)  
-[Contribute](https://github.com/cmacrae/ansible-rocket_chat/pulls)  
+[Raise an issue](https://github.com/RocketChat/Rocket.Chat.Ansible/issues)  
+[Contribute](https://github.com/RocketChat/Rocket.Chat.Ansible/pulls)  
