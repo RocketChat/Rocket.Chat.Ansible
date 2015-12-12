@@ -3,8 +3,10 @@
 # for documentation of all options, see:
 #   http://docs.mongodb.org/manual/reference/configuration-options/
 
+{% if rocket_chat_mongodb_fork is defined %}
 # whether to fork the process or not
-fork = true
+fork = {{ rocket_chat_mongodb_fork }}
+{% endif %}  
 {% if rocket_chat_mongodb_pidfile_path is defined %}
 
 pidfilepath = {{ rocket_chat_mongodb_pidfile_path }}
