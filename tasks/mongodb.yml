@@ -3,7 +3,7 @@
 
   - name: Ensure the MongoDB repository key has been imported
     apt_key:
-      server: keyserver.ubuntu.com
+      keyserver: keyserver.ubuntu.com
       id: 7F0CEB10
     when: ansible_distribution == "Ubuntu"
 
