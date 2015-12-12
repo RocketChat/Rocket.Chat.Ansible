@@ -1,5 +1,5 @@
 ---
-# tasks/nginx.yml: Nginx management tasks for cmacrae.rocket_chat
+# tasks/nginx.yml: Nginx management tasks for RocketChat.Ansible
   - name: Ensure Nginx is present
     yum: name=nginx state=present
     when: ansible_os_family == "RedHat"

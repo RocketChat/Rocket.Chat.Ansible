@@ -52,7 +52,7 @@ A simple playbook to run this role on all `chat_servers` systems:
 
     - hosts: chat_servers
       roles:
-         - cmacrae.rocket_chat
+         - RocketChat.Ansible
 
 A playbook to deploy Rocket.Chat to `chat_servers` but exclude the deployment of MongoDB and use an external instance. Also permit automatic upgrades of Rocket.Chat:
 
@@ -64,7 +64,7 @@ A playbook to deploy Rocket.Chat to `chat_servers` but exclude the deployment of
         rocket_chat_mongodb_server: 10.19.3.24
   
       roles:
-        - cmacrae.rocket_chat
+        - RocketChat.Ansible
 
 Available tags
 --------------

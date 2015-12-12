@@ -1,5 +1,5 @@
 ---
-# tasks/repo_RedHat.yml: RedHat based distro repository configuration for cmacrae.rocket_chat
+# tasks/repo_RedHat.yml: RedHat based distro repository configuration for RocketChat.Ansible
 
   - name: Ensure the EPEL repository is present
     yum: name=epel-release state=present

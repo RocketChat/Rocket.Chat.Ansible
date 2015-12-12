@@ -1,5 +1,5 @@
 ---
-# tasks/main.yml: Main tasks for cmacrae.rocket_chat
+# tasks/main.yml: Main tasks for RocketChat.Ansible
 
   - include_vars: "{{ ansible_distribution }}.yml"
 

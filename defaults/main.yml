@@ -1,5 +1,5 @@
 ---
-# defaults/main.yml: Defaults for cmacrae.rocket_chat
+# defaults/main.yml: Defaults for RocketChat.Ansible
 rocket_chat_automatic_upgrades: False
 rocket_chat_application_path: /var/www/rocket.chat
 rocket_chat_version: master

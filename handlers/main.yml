@@ -1,5 +1,5 @@
 ---
-# handlers/main.yml: Handlers for cmacrae.rocket_chat
+# handlers/main.yml: Handlers for RocketChat.Ansible
   - name: Reload the Nginx service
     service: name=nginx state=reloaded
 

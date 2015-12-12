@@ -1,5 +1,5 @@
 ---
-# tasks/upgrade.yml: Rocket.Chat upgrade procedures for cmacrae.rocket_chat
+# tasks/upgrade.yml: Rocket.Chat upgrade procedures for RocketChat.Ansible
 
   - name: Ensure automatic upgrades are permitted
     fail:
