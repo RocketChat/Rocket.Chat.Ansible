@@ -2,6 +2,7 @@
 # tasks/main.yml: Main tasks for RocketChat.Ansible
 
   - include_vars: "{{ ansible_distribution }}.yml"
+    tags: vars
 
   - include: repo_RedHat.yml
     when: ansible_os_family == "RedHat"
@@ -72,6 +73,7 @@
     file:
       path: "{{ rocket_chat_application_path }}"
       state: directory
+    tags: build
 
   - name: Unpack the Rocket.Chat binary tarball
     unarchive:
@@ -79,6 +81,7 @@
       src: /root/rocket.chat-{{ rocket_chat_version }}.tgz
       dest: "{{ rocket_chat_application_path }}"
       creates: "{{ rocket_chat_application_path }}/bundle"
+    tags: build
       
   - name: Install Rocket.Chat via NPM
     npm:

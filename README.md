@@ -69,6 +69,7 @@ A playbook to deploy Rocket.Chat to `chat_servers` but exclude the deployment of
 Available tags
 --------------
 To run a specific set of plays, with the `--tags` flag, the available tags are:
+- `vars`
 - `build`
 - `mongodb`
 - `nginx`
