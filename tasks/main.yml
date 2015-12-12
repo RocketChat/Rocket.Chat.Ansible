@@ -25,6 +25,7 @@
       src: /bin/node
       dest: /bin/nodejs
       state: link
+    when: ansible_os_family == "RedHat"
 
   - name: Ensure Nave & PM2 (NodeJS) are installed
     npm: name={{ item }} global=yes
