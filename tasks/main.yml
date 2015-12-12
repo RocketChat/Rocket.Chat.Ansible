@@ -39,14 +39,14 @@
     register: rocket_chat_running_processes
     changed_when: False
 
+  - name: Use the 0.10 NodeJS environment via Nave
+    shell: nave usemain 0.10
+             creates=/root/.nave/installed
+
   - name: Ensure PM2 is running
     shell: 'pm2 startup systemd'
     when: rocket_chat_running_processes.stdout.find('PM2') == -1
     register: pm2_startup
-
-  - name: Use the 0.10 NodeJS environment via Nave
-    shell: nave usemain 0.10
-             creates=/root/.nave/installed
 
   - name: "Configure /etc/hosts"
     lineinfile:
