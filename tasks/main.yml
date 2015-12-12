@@ -99,7 +99,7 @@
     register: rocketchat_service_status
 
   - name: Ensure Rocket.Chat is running via PM2
-    shell: pm2 start pm2-rocket-chat.json
+    shell: pm2 start pm2-rocket-chat.json --watch
     args:
       chdir: /var/www/rocket.chat
     when: rocketchat_service_status.stdout.find('online') == -1
