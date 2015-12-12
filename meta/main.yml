@@ -78,8 +78,8 @@ galaxy_info:
   #  - 9.1
   #  - 9.1
   #  - 9.2
-  #- name: Ubuntu
-  #  versions:
+  - name: Ubuntu
+    versions:
   #  - all
   #  - lucid
   #  - maverick
@@ -91,7 +91,7 @@ galaxy_info:
   #  - saucy
   #  - trusty
   #  - utopic
-  #  - vivid
+    - vivid
   #- name: SLES
   #  versions:
   #  - all
