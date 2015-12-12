@@ -11,3 +11,5 @@ rocket_chat_mongodb_packages:
 rocket_chat_mongodb_repl_lines: >-
   replication:
       replSetName:  "001-rs"
+
+rocket_chat_nginx_process_user: www-data

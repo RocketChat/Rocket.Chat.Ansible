@@ -10,3 +10,5 @@ rocket_chat_mongodb_packages:
   - mongodb-server
 
 rocket_chat_mongodb_repl_lines: 'replSet=001-rs'
+
+rocket_chat_nginx_process_user: nginx

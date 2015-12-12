@@ -1,4 +1,4 @@
-user nginx;
+user {{ rocket_chat_nginx_process_user }};
 worker_processes auto;
 error_log /var/log/nginx/error.log;
 pid /run/nginx.pid;
