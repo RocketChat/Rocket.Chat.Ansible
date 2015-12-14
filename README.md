@@ -26,6 +26,9 @@ Supported Platforms
 ### EL
 - 7
 
+Support for other distributions/operating systems is planned for the near future.
+If you'd like to see your distribution/operating system supported, please [raise an issue](https://github.com/RocketChat/Rocket.Chat.Ansible/issues)!
+
 Role Variables
 --------------
 All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
