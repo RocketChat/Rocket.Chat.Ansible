@@ -35,18 +35,30 @@
       - nave
       - pm2
 
+  - name: Register the NodeJS version currently in use
+    shell: node --version
+    changed_when: False
+    register: node_version
+
+  - name: Use the 0.10.40 NodeJS environment via Nave
+    shell: nave usemain 0.10.40
+    when: node_version.stdout != "v0.10.40"
+
   - name: Register running processes
     shell: 'ps aux'
     register: rocket_chat_running_processes
     changed_when: False
 
-  - name: Use the 0.10 NodeJS environment via Nave
-    shell: nave usemain 0.10
-             creates=/root/.nave/installed
+  - name: Ensure PM2 is running
+    shell: 'pm2 startup'
+    when: (rocket_chat_running_processes.stdout.find('PM2') == -1)
+          and (ansible_distribution_release == "trusty")
+    register: pm2_startup
 
   - name: Ensure PM2 is running
     shell: 'pm2 startup systemd'
-    when: rocket_chat_running_processes.stdout.find('PM2') == -1
+    when: (rocket_chat_running_processes.stdout.find('PM2') == -1)
+          and (ansible_distribution_release != "trusty")
     register: pm2_startup
 
   - name: "Configure /etc/hosts"
@@ -97,7 +109,7 @@
     tags: build
 
   - name: Register Rocket.Chat service status
-    shell: pm2 show rocket.chat
+    shell: pm2 show rocket.chat | fgrep online
     ignore_errors: True
     changed_when: False
     register: rocketchat_service_status
@@ -106,7 +118,7 @@
     shell: pm2 start pm2-rocket-chat.json --watch
     args:
       chdir: /var/www/rocket.chat
-    when: rocketchat_service_status.stdout.find('online') == -1
+    when: rocketchat_service_status.rc != 0
 
   - include: nginx.yml
     when: rocket_chat_include_nginx

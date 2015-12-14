@@ -1,6 +1,5 @@
 ---
 # tasks/mongodb.yml: MongoDB configuration for RocketChat.Ansible
-
   - name: Ensure the MongoDB repository key has been imported
     apt_key:
       keyserver: keyserver.ubuntu.com
@@ -24,6 +23,16 @@
     apt: name={{ item }} state=present
     with_items: "{{ rocket_chat_mongodb_packages }}"
     when: ansible_os_family == "Debian"
+
+  - name: Check to see if this is the intial MongoDB setup
+    stat: path=/var/log/rocket.chat/app-0.log
+    register: rocket_chat_log
+    when: ansible_distribution_release == "trusty"
+
+  - name: Ensure the autostarted MongoDB server is stopped
+    shell: /usr/sbin/service mongod stop
+    when: (ansible_distribution_release == "trusty")
+          and not (rocket_chat_log.stat.exists)
 
   - name: Deploy MongoDB service configuration
     template:

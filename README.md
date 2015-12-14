@@ -17,10 +17,14 @@ Features
     If there's a change to the code deployed to your [Rocket.Chat](http://rocket.chat) server (either because of a remote change on the branch you're following, or because you set a new release to fetch), this role will handle the upgrade and redeployment of the [Rocket.Chat](http://rocket.chat) service, keeping your data in tact.  
 	_Note: Although this functionality has been written, there is [currently a bug in Ansible 1.8 onwards](https://github.com/ansible/ansible/issues/13182) (since fixed in 2.0) that will cause this to fail. As such, the current handler that takes care of this has been commented out, until the release of Ansible 2.0 (soon!)_
 
-Requirements
-------------
-Currently, only CentOS 7 & Ubuntu 15.04 are supported.
-Support for other platforms is planned for the near future.
+Supported Platforms
+-------------------
+### Ubuntu
+- 14.04
+- 15.04
+
+### EL
+- 7
 
 Role Variables
 --------------
