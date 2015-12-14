@@ -1,6 +1,6 @@
 Rocket.Chat
 ===========
-Deploy [Rocket.Chat](http://rocket.chat)
+Deploy [Rocket.Chat](http://rocket.chat), the ultimate open source web chat platform, with [Ansible](http://ansible.com)!
 
 Features
 --------
