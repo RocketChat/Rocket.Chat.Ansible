@@ -1,4 +1,4 @@
-Rocket.Chat [![Ansible Galaxy][https://img.shields.io/badge/galaxy-RocketChat.Server-blue.svg?style=flat](https://galaxy.ansible.com/detail#/role/6478)
+Rocket.Chat [![Ansible Galaxy](https://img.shields.io/badge/galaxy-RocketChat.Server-blue.svg?style=flat)](https://galaxy.ansible.com/detail#/role/6478)
 ===========
 Deploy [Rocket.Chat](http://rocket.chat), the ultimate open source web chat platform, with [Ansible](http://ansible.com)!
 
