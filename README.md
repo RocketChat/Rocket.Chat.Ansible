@@ -47,7 +47,7 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 | `rocket_chat_mongodb_server` | 127.0.0.1 | The IP/FQDN of the MongoDB host |
 | `rocket_chat_mongodb_port` | 27017 | The TCP port to contact the MongoDB host host via |
 | `rocket_chat_mongodb_packages` | `mongodb` | The name of the MongoDB package(s) to install (differs for different distros - see `vars/`) |
-| `rocket_chat_mongodb_config_template` | [`mongod.conf.j2`](templates/ mongod.conf.j2) | The `/etc/mongod.conf` template to deploy |
+| `rocket_chat_mongodb_config_template` | [`mongod.conf.j2`](templates/mongod.conf.j2) | The `/etc/mongod.conf` template to deploy |
 | `rocket_chat_include_nginx`| True | A boolean value that determines whether or not to deploy Nginx |
 | `rocket_chat_ssl_key_path` | `/etc/nginx/rocket_chat.key` | The destination path for the Nginx SSL private key |
 | `rocket_chat_ssl_cert_path` | `/etc/nginx/rocket_chat.crt` | The destination path for the Nginx SSL certificate |
