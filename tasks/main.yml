@@ -52,6 +52,7 @@
   - name: Ensure PM2 is running
     shell: 'pm2 startup'
     when: (rocket_chat_running_processes.stdout.find('PM2') == -1)
+          and (ansible_distribution == "Ubuntu")
           and (ansible_distribution_release == "trusty")
     register: pm2_startup
 

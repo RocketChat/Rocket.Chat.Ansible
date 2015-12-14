@@ -27,11 +27,13 @@
   - name: Check to see if this is the intial MongoDB setup
     stat: path=/var/log/rocket.chat/app-0.log
     register: rocket_chat_log
-    when: ansible_distribution_release == "trusty"
+    when: (ansible_distribution == "Ubuntu")
+          and (ansible_distribution_release == "trusty")
 
   - name: Ensure the autostarted MongoDB server is stopped
     shell: /usr/sbin/service mongod stop
-    when: (ansible_distribution_release == "trusty")
+    when: (ansible_distribution == "Ubuntu")
+          and (ansible_distribution_release == "trusty")
           and not (rocket_chat_log.stat.exists)
 
   - name: Deploy MongoDB service configuration
