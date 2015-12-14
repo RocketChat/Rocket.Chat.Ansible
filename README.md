@@ -92,7 +92,18 @@ Set in [`vars/Ubuntu.yml`](vars/Ubuntu.yml)
 |                                  | `    replSetName:  "001-rs"`  |                                       |
 | `rocket_chat_nginx_process_user` | `www-data` | The user for that will be used to spawn the Nginx server process |
 
+Install this role from Ansible Galaxy
+-------------------------------------
+This role is available for download from [Ansible Galaxy](http://galaxy.ansible.com).
+To install this role, and track it in your Ansible code-base, use something similar to the following in your [`requirements.yml`](http://docs.ansible.com/ansible/galaxy.html#id8):
 
+```
+- src: RocketChat.Server
+  path: roles/external/
+
+```
+
+Or, install straight from the shell, with `$ ansible-galaxy install RocketChat.Server -p path/to/ansible_roles/`  
 
 Example Playbook
 ----------------
