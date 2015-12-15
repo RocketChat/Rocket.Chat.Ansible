@@ -150,6 +150,12 @@ $ pm2 restart all               # Restart all apps
 
 Check out the [commands overview](https://github.com/Unitech/pm2#commands-overview) for PM2 for more information.
 
+TODO
+----
+* [ ] Add service user/group to run the Rocket.Chat process (for security...)
+* [ ] Move from PM2 to native service management systems
+* [ ] Support for other OS/distros
+
 License
 -------
 MIT
