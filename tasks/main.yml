@@ -46,19 +46,19 @@
 
   - name: Register running processes
     shell: 'ps aux'
-    register: rocket_chat_running_processes
+    register: rocket_chat_running_processes_1
     changed_when: False
 
   - name: Ensure PM2 is running
     shell: 'pm2 startup'
-    when: (rocket_chat_running_processes.stdout.find('PM2') == -1)
+    when: (rocket_chat_running_processes_1.stdout.find('PM2') == -1)
           and (ansible_distribution == "Ubuntu")
           and (ansible_distribution_release == "trusty")
     register: pm2_startup
 
   - name: Ensure PM2 is running
     shell: 'pm2 startup systemd'
-    when: (rocket_chat_running_processes.stdout.find('PM2') == -1)
+    when: (rocket_chat_running_processes_1.stdout.find('PM2') == -1)
           and (ansible_distribution_release != "trusty")
     register: pm2_startup
 
@@ -109,17 +109,16 @@
       dest: /var/www/rocket.chat/pm2-rocket-chat.json
     tags: build
 
-  - name: Register Rocket.Chat service status
-    shell: pm2 show rocket.chat | fgrep online
-    ignore_errors: True
+  - name: Register running processes
+    shell: 'ps aux'
+    register: rocket_chat_running_processes_2
     changed_when: False
-    register: rocketchat_service_status
 
   - name: Ensure Rocket.Chat is running via PM2
     shell: pm2 start pm2-rocket-chat.json --watch
     args:
       chdir: /var/www/rocket.chat
-    when: rocketchat_service_status.rc != 0
+    when: not rocket_chat_running_processes_2.stdout.find("{{ rocket_chat_application_path }}/bundle/main.js")
 
   - include: nginx.yml
     when: rocket_chat_include_nginx
