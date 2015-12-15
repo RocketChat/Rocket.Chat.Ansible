@@ -4,7 +4,7 @@ rocket_chat_automatic_upgrades: False
 rocket_chat_application_path: /var/www/rocket.chat
 rocket_chat_version: master
 rocket_chat_tarball_remote: https://s3.amazonaws.com/rocketchatbuild/rocket.chat-{{ rocket_chat_version }}.tgz
-rocket_chat_tarball_sha256sum: eb6509d75266d2a02d8f50364d9177c961320e442c2d74ac4dbc60c63998d573
+rocket_chat_tarball_sha256sum: 26da9ffca8afdaa2d09faf673683e0ab558f39907fb95aa4f5631a9f40bda707
 rocket_chat_service_host: "{{ ansible_fqdn }}"
 rocket_chat_service_port: 3000
 
