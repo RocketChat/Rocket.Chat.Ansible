@@ -106,6 +106,12 @@
     become_user: "{{ rocket_chat_service_user }}"
     tags: build
 
+  - name: Check to see if the Rocket.Chat log file is present
+    stat: path=/var/log/rocketchat.log
+    register: rocket_chat_log_file_state
+    when: (ansible_distribution == "Ubuntu")
+          and (ansible_distribution_major_version == "14")
+
   - name: Ensure the Rocket.Chat log file is present
     file:
       path: /var/log/rocketchat.log
@@ -114,6 +120,7 @@
       group: "{{ rocket_chat_service_group }}"
     when: (ansible_distribution == "Ubuntu")
           and (ansible_distribution_major_version == "14")
+          and not rocket_chat_log_file_state.stat.exists
 
   - name: Ensure the Rocket.Chat application data permissions are correct
     file:
