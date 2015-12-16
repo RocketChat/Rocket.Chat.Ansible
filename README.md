@@ -87,7 +87,7 @@ Set in [`vars/CentOS_7.yml`](vars/CentOS_7.yml)
 
 |     Name     |     Default Value    |    Description     |
 |---------------------------|-----------------------|------------------------------------|
-| `rocket_chat_service_update_command` | `systemctl daemon-reload` | The command to use to inform the service management system when a service manifest has changed |
+| `rocket_chat_service_update_command` | `systemctl daemon-reload ; systemctl restart rocketchat` | The command to use to inform the service management system when a service manifest has changed |
 | `rocket_chat_service_template` | | |
 | `  src` | `rocketchat.service.j2` | The source template to deploy for the Rocket.Chat service manifest |
 | `  dest` | `/usr/lib/systemd/system/rocketchat.service` | The destination to deploy the Rocket.Chat service manifest to |
@@ -114,7 +114,7 @@ Set in [`vars/Ubuntu_15.yml`](vars/Ubuntu_15.yml)
 
 |     Name     |     Default Value    |    Description     |
 |---------------------------|-----------------------|------------------------------------|
-| `rocket_chat_service_update_command` | `systemctl daemon-reload` | The command to use to inform the service management system when a service manifest has changed |
+| `rocket_chat_service_update_command` | `systemctl daemon-reload ; systemctl restart rocketchat` | The command to use to inform the service management system when a service manifest has changed |
 | `rocket_chat_service_template` | | |
 | `  src` | `rocketchat.service.j2` | The source template to deploy for the Rocket.Chat service manifest |
 | `  dest` | `/etc/systemd/system/rocketchat.service` | The destination to deploy the Rocket.Chat service manifest to |
@@ -124,7 +124,7 @@ Set in [`vars/Ubuntu_14.yml`](vars/Ubuntu_14.yml)
 
 |     Name     |     Default Value    |    Description     |
 |---------------------------|-----------------------|------------------------------------|
-| `rocket_chat_service_update_command` | `initctl reload-configuration` | The command to use to inform the service management system when a service manifest has changed |
+| `rocket_chat_service_update_command` | `initctl reload-configuration ; service rocketchat restart` | The command to use to inform the service management system when a service manifest has changed |
 | `rocket_chat_service_template` | | |
 | `  src` | `rocketchat_upstart.j2` | The source template to deploy for the Rocket.Chat service manifest |
 | `  dest` | `/etc/init/rocketchat.conf` | The destination to deploy the Rocket.Chat service manifest to |
