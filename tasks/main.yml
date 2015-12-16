@@ -85,6 +85,7 @@
       url: "{{ rocket_chat_tarball_remote }}"
       sha256sum: "{{ rocket_chat_tarball_sha256sum }}"
       dest: "{{ rocket_chat_application_path }}"
+      timeout: "{{ rocket_chat_tarball_fetch_timeout }}"
     become: True
     become_user: "{{ rocket_chat_service_user }}"
 
@@ -130,12 +131,6 @@
       group: "{{ rocket_chat_service_user }}"
       recurse: True
     tags: build
-
-  - name: Register the 'node' binary path
-    command: which node
-    changed_when: False
-    register: node_path
-    tags: service
 
   - include_vars: "{{ item }}"
     with_first_found:

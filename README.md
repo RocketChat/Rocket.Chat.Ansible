@@ -41,10 +41,12 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 | `rocket_chat_version` | `master` | The version of Rocket.Chat to deploy; should be `master` for stable, or `develop` for development releases |
 | `rocket_chat_tarball_remote` | See [`defaults/main.yml`](defaults/main.yml) | The remote URL to fetch the Rocket.Chat tarball from (uses `rocket_chat_version`) |
 | `rocket_chat_tarball_sha256sum` | See [`defaults/main.yml`](defaults/main.yml) | The SHA256 hash sum of the Rocket.Chat tarball being fetched |
+| `rocket_chat_tarball_fetch_timeout` | 100 | The time (in seconds) before the attempt to fetch the Rocket.Chat tarball fails |
 | `rocket_chat_service_user` | `rocketchat` | The name of the user that will run the Rocket.Chat server process |
 | `rocket_chat_service_group` | `rocketchat` | The name of the primary group for the `rocket_chat_service_user` user |
 | `rocket_chat_service_host` | `"{{ ansible_fqdn }}"` | The FQDN of the Rocket.Chat system |
 | `rocket_chat_service_port` | 3000 | The TCP port Rocket.Chat listens on |
+| `rocket_chat_nave_node_path` | `/usr/local/bin/nave` | The path to the `node` binary installed by Nave, which is then used to launch Rocket.Chat |
 | `rocket_chat_include_mongodb` | True | A boolean value that determines whether or not to deploy MongoDB |
 | `rocket_chat_mongodb_server` | 127.0.0.1 | The IP/FQDN of the MongoDB host |
 | `rocket_chat_mongodb_port` | 27017 | The TCP port to contact the MongoDB host host via |
