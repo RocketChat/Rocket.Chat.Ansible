@@ -82,7 +82,7 @@ Set in [`vars/CentOS.yml`](vars/CentOS.yml)
 | `rocket_chat_nginx_process_user` | `nginx` | The user for that will be used to spawn the Nginx server process |
 | `rocket_chat_node_initial_binary` | `node` | The NodeJS binary to use intially to work out the NodeJS version. This then determines if Nave needs to set the NodeJS version |
 
-### CentOS 7 variable
+### CentOS 7 variables
 Set in [`vars/CentOS_7.yml`](vars/CentOS_7.yml)
 
 |     Name     |     Default Value    |    Description     |
