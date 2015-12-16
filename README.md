@@ -37,10 +37,12 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 |     Name     |     Default Value    |    Description     |
 |---------------------------|-----------------------|------------------------------------|
 | `rocket_chat_automatic_upgrades` | False | A boolean value that determines whether or not to upgrade Rocket.Chat upon source code changes |
-| `rocket_chat_application_path` | `/var/www/rocket.chat` | The destination on the filesystem to deploy Rocket.Chat to |
+| `rocket_chat_application_path` | `/var/lib/rocket.chat` | The destination on the filesystem to deploy Rocket.Chat to |
 | `rocket_chat_version` | `master` | The version of Rocket.Chat to deploy; should be `master` for stable, or `develop` for development releases |
 | `rocket_chat_tarball_remote` | See [`defaults/main.yml`](defaults/main.yml) | The remote URL to fetch the Rocket.Chat tarball from (uses `rocket_chat_version`) |
 | `rocket_chat_tarball_sha256sum` | See [`defaults/main.yml`](defaults/main.yml) | The SHA256 hash sum of the Rocket.Chat tarball being fetched |
+| `rocket_chat_service_user` | `rocketchat` | The name of the user that will run the Rocket.Chat server process |
+| `rocket_chat_service_group` | `rocketchat` | The name of the primary group for the `rocket_chat_service_user` user |
 | `rocket_chat_service_host` | `"{{ ansible_fqdn }}"` | The FQDN of the Rocket.Chat system |
 | `rocket_chat_service_port` | 3000 | The TCP port Rocket.Chat listens on |
 | `rocket_chat_include_mongodb` | True | A boolean value that determines whether or not to deploy MongoDB |
@@ -68,6 +70,7 @@ Set in [`vars/CentOS.yml`](vars/CentOS.yml)
 |                            |   - GraphicsMagick   |                                               |
 |                            |   - nodejs           |                                               |
 |                            |   - npm              |                                               |
+|                            |   - make             |                                               |
 | `rocket_chat_mongodb_packages` |   - mongodb        | A list of MongoDB server packages to install |
 |                                |   - mongodb-server |                                              |
 | `rocket_chat_mongodb_repl_lines` | `'replSet=001-rs'` | The value for the MongoDB replica set |
@@ -77,6 +80,18 @@ Set in [`vars/CentOS.yml`](vars/CentOS.yml)
 | `rocket_chat_mongodb_unixsocketprefix` | `/var/run/mongodb` | The path for the MongoDB UNIX socket prefix |
 | `rocket_chat_mongodb_dbpath` | `/var/lib/mongodb` | The path for MongoDB to store its databases |
 | `rocket_chat_nginx_process_user` | `nginx` | The user for that will be used to spawn the Nginx server process |
+| `rocket_chat_node_initial_binary` | `node` | The NodeJS binary to use intially to work out the NodeJS version. This then determines if Nave needs to set the NodeJS version |
+
+### CentOS 7 variable
+Set in [`vars/CentOS_7.yml`](vars/CentOS_7.yml)
+
+|     Name     |     Default Value    |    Description     |
+|---------------------------|-----------------------|------------------------------------|
+| `rocket_chat_service_update_command` | `systemctl daemon-reload` | The command to use to inform the service management system when a service manifest has changed |
+| `rocket_chat_service_template` | | |
+| `  src` | `rocketchat.service.j2` | The source template to deploy for the Rocket.Chat service manifest |
+| `  dest` | `/usr/lib/systemd/system/rocketchat.service` | The destination to deploy the Rocket.Chat service manifest to |
+
 
 ### Ubuntu variables
 Set in [`vars/Ubuntu.yml`](vars/Ubuntu.yml)  
@@ -87,10 +102,33 @@ Set in [`vars/Ubuntu.yml`](vars/Ubuntu.yml)
 |                            |   - graphicsmagick   |                                               |
 |                            |   - nodejs           |                                               |
 |                            |   - npm              |                                               |
+|                            |   - make             |                                               |
 | `rocket_chat_mongodb_packages` | - mongodb-org | A list of MongoDB server packages to install |
 | `rocket_chat_mongodb_repl_lines` | `  replication:`              | The value for the MongoDB replica set |
 |                                  | `    replSetName:  "001-rs"`  |                                       |
 | `rocket_chat_nginx_process_user` | `www-data` | The user for that will be used to spawn the Nginx server process |
+| `rocket_chat_node_initial_binary` | `nodejs` | The NodeJS binary to use intially to work out the NodeJS version. This then determines if Nave needs to set the NodeJS version |
+
+### Ubuntu 15 variables
+Set in [`vars/Ubuntu_15.yml`](vars/Ubuntu_15.yml)  
+
+|     Name     |     Default Value    |    Description     |
+|---------------------------|-----------------------|------------------------------------|
+| `rocket_chat_service_update_command` | `systemctl daemon-reload` | The command to use to inform the service management system when a service manifest has changed |
+| `rocket_chat_service_template` | | |
+| `  src` | `rocketchat.service.j2` | The source template to deploy for the Rocket.Chat service manifest |
+| `  dest` | `/etc/systemd/system/rocketchat.service` | The destination to deploy the Rocket.Chat service manifest to |
+
+### Ubuntu 14 variables
+Set in [`vars/Ubuntu_14.yml`](vars/Ubuntu_14.yml)  
+
+|     Name     |     Default Value    |    Description     |
+|---------------------------|-----------------------|------------------------------------|
+| `rocket_chat_service_update_command` | `initctl reload-configuration` | The command to use to inform the service management system when a service manifest has changed |
+| `rocket_chat_service_template` | | |
+| `  src` | `rocketchat_upstart.j2` | The source template to deploy for the Rocket.Chat service manifest |
+| `  dest` | `/etc/init/rocketchat.conf` | The destination to deploy the Rocket.Chat service manifest to |
+
 
 Install this role from Ansible Galaxy
 -------------------------------------
@@ -135,25 +173,17 @@ To run a specific set of plays, with the `--tags` flag, the available tags are:
 - `repo`
 - `nginx`
 - `upgrade`
+- `service`
 
 Management of the Rocket.Chat service
 -------------------------------------
-
-The Rocket.Chat server process is launched and managed using [PM2](https://github.com/Unitech/pm2).
-Basic commands for inspecting the Rocket.Chat process are as follows:  
-```
-$ pm2 list                      # List all processes started with PM2
-$ pm2 show rocket.chat          # Shows all information about Rocket.Chat
-$ pm2 stop 0                    # Stop process with id 0
-$ pm2 restart all               # Restart all apps
-```
-
-Check out the [commands overview](https://github.com/Unitech/pm2#commands-overview) for PM2 for more information.
+This role will deploy a service named `rocketchat`.
+You can use your native service management system to start/stop/reload/restart the service.
 
 TODO
 ----
-* [ ] Add service user/group to run the Rocket.Chat process (for security...)
-* [ ] Move from PM2 to native service management systems
+* [x] Add service user/group to run the Rocket.Chat process (for security...)
+* [x] Move from PM2 to native service management systems
 * [ ] Support for other OS/distros
 
 License

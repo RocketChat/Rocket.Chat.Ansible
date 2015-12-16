@@ -1,0 +1,21 @@
+[Unit]
+Description=Rocket.Chat Server
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+StandardOutput=syslog
+SyslogIdentifier=RocketChat
+User={{ rocket_chat_service_user }}
+Group={{ rocket_chat_service_group }}
+Environment=MONGO_URL=mongodb://{{ rocket_chat_mongodb_server }}:{{ rocket_chat_mongodb_port }}/rocketchat
+Environment=MONGO_OPLOG_URL=mongodb://{{ rocket_chat_mongodb_server }}:{{ rocket_chat_mongodb_port }}/local
+Environment=ROOT_URL=http://{{ rocket_chat_service_host }}
+Environment=PORT={{ rocket_chat_service_port }}
+WorkingDirectory={{ rocket_chat_application_path }}
+ExecStart={{ node_path.stdout }} {{ rocket_chat_application_path }}/bundle/main.js
+
+[Install]
+WantedBy=multi-user.target

@@ -12,6 +12,23 @@
     when: rocket_chat_include_mongodb
     tags: mongodb
 
+  - name: Ensure the Rocket.Chat service group is present
+    group:
+      name: "{{ rocket_chat_service_group }}"
+      state: present
+      system: True
+
+  - name: Ensure the Rocket.Chat service user is present
+    user:
+      comment: Rocket.Chat Service User
+      name: "{{ rocket_chat_service_user }}"
+      group: "{{ rocket_chat_service_group }}"
+      home: "{{ rocket_chat_application_path }}"
+      createhome: True
+      shell: /bin/false
+      state: present
+      system: True
+
   - name: Ensure Rocket.Chat dependencies are installed
     yum: name={{ item }} state=present
     with_items: "{{ rocket_chat_dep_packages }}"
@@ -29,14 +46,27 @@
       state: link
     when: ansible_os_family == "RedHat"
 
-  - name: Ensure Nave & PM2 (NodeJS) are installed
-    npm: name={{ item }} global=yes
-    with_items:
-      - nave
-      - pm2
+  - name: Ensure Nave (NodeJS) is installed
+    npm: name=nave global=yes
+
+  - name: Ensure Forever (NodeJS) is installed
+    npm: name=forever global=yes
+    when: (ansible_distribution == "Ubuntu")
+          and (ansible_distribution_major_version == "14")
+
+  - name: Check to see if Nave has installed the required 'node' binary
+    stat:
+      path: /usr/local/bin/node
+    register: nave_node_bin
 
   - name: Register the NodeJS version currently in use
-    shell: node --version
+    shell: >-
+      {% if nave_node_bin.stat.exists %}
+      PATH=/usr/local/bin:$PATH
+      node --version
+      {% else %}
+      {{ rocket_chat_node_initial_binary }} --version
+      {% endif %}
     changed_when: False
     register: node_version
 
@@ -44,82 +74,81 @@
     shell: nave usemain 0.10.40
     when: node_version.stdout != "v0.10.40"
 
-  - name: Register running processes
-    shell: 'ps aux'
-    register: rocket_chat_running_processes_1
-    changed_when: False
-
-  - name: Ensure PM2 is running
-    shell: 'pm2 startup'
-    when: (rocket_chat_running_processes_1.stdout.find('PM2') == -1)
-          and (ansible_distribution == "Ubuntu")
-          and (ansible_distribution_release == "trusty")
-    register: pm2_startup
-
-  - name: Ensure PM2 is running
-    shell: 'pm2 startup systemd'
-    when: (rocket_chat_running_processes_1.stdout.find('PM2') == -1)
-          and (ansible_distribution_release != "trusty")
-    register: pm2_startup
-
   - name: "Configure /etc/hosts"
     lineinfile:
       dest: /etc/hosts
       line:  "127.0.0.1    {{ ansible_fqdn }}    {{ ansible_hostname }}"
       regexp: '^127.0.0.1'
 
-  - name: Ensure Rocket.Chat log directory exists
-    file: name=/var/log/rocket.chat state=directory
-    tags: build
-
-  - name: Check to see if this is the initial deployment
-    stat: path=/var/log/rocket.chat/app-0.log
-    register: rocket_chat_deploy_state
-    tags: build
-
   - name: Fetch the Rocket.Chat binary tarball
     get_url:
       url: "{{ rocket_chat_tarball_remote }}"
       sha256sum: "{{ rocket_chat_tarball_sha256sum }}"
-      dest: /root
-
-  - name: Ensure the Rocket.Chat application path exists
-    file:
-      path: "{{ rocket_chat_application_path }}"
-      state: directory
-    tags: build
+      dest: "{{ rocket_chat_application_path }}"
+    become: True
+    become_user: "{{ rocket_chat_service_user }}"
 
   - name: Unpack the Rocket.Chat binary tarball
     unarchive:
-      copy: no
-      src: /root/rocket.chat-{{ rocket_chat_version }}.tgz
+      copy: False
+      src: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
       dest: "{{ rocket_chat_application_path }}"
       creates: "{{ rocket_chat_application_path }}/bundle"
+    become: True
+    become_user: "{{ rocket_chat_service_user }}"
     tags: build
       
   - name: Install Rocket.Chat via NPM
     npm:
       state: present
       path: "{{ rocket_chat_application_path }}/bundle/programs/server"
+    become: True
+    become_user: "{{ rocket_chat_service_user }}"
     tags: build
 
-  - name: Ensure the Rocket.Chat configuration is present
-    template:
-      src: pm2-rocket-chat.json.j2
-      dest: /var/www/rocket.chat/pm2-rocket-chat.json
+  - name: Ensure the Rocket.Chat log file is present
+    file:
+      path: /var/log/rocketchat.log
+      state: touch
+      owner: "{{ rocket_chat_service_user }}"
+      group: "{{ rocket_chat_service_group }}"
+    when: (ansible_distribution == "Ubuntu")
+          and (ansible_distribution_major_version == "14")
+
+  - name: Ensure the Rocket.Chat application data permissions are correct
+    file:
+      path: "{{ rocket_chat_application_path }}"
+      state: directory
+      owner: "{{ rocket_chat_service_user }}"
+      group: "{{ rocket_chat_service_user }}"
+      recurse: True
     tags: build
 
-  - name: Register running processes
-    shell: 'ps aux'
-    register: rocket_chat_running_processes_2
+  - name: Register the 'node' binary path
+    command: which node
     changed_when: False
+    register: node_path
+    tags: service
 
-  - name: Ensure Rocket.Chat is running via PM2
-    shell: pm2 start pm2-rocket-chat.json --watch
-    args:
-      chdir: /var/www/rocket.chat
-    when: not rocket_chat_running_processes_2.stdout.find("{{ rocket_chat_application_path }}/bundle/main.js")
+  - include_vars: "{{ item }}"
+    with_first_found:
+      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+      - "{{ ansible_distribution }}.yml"
+    tags: service
 
+  - name: Deploy the Rocket.Chat service file
+    template:
+      src: "{{ rocket_chat_service_template.src }}"
+      dest: "{{ rocket_chat_service_template.dest }}"
+    notify: Update the Rocket.Chat service configuration
+    tags: service
+
+  - meta: flush_handlers
+
+  - name: Ensure the Rocket.Chat service is running/enabled
+    service: name=rocketchat state=started enabled=True
+    tags: service
+  
   - include: nginx.yml
     when: rocket_chat_include_nginx
     tags: nginx
