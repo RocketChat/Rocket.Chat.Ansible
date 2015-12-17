@@ -46,7 +46,8 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 | `rocket_chat_service_group` | `rocketchat` | The name of the primary group for the `rocket_chat_service_user` user |
 | `rocket_chat_service_host` | `"{{ ansible_fqdn }}"` | The FQDN of the Rocket.Chat system |
 | `rocket_chat_service_port` | 3000 | The TCP port Rocket.Chat listens on |
-| `rocket_chat_nave_node_path` | `/usr/local/bin/nave` | The path to the `node` binary installed by Nave, which is then used to launch Rocket.Chat |
+| `rocket_chat_node_10_40_path` | `/usr/local/n/versions/node/0.10.40/bin` | The path to the `node` binary directory that n installs |
+| `rocket_chat_original_npm` | `/usr/bin/npm` | The path to the original `npm` binary, before n installs any Node versions |
 | `rocket_chat_include_mongodb` | True | A boolean value that determines whether or not to deploy MongoDB |
 | `rocket_chat_mongodb_server` | 127.0.0.1 | The IP/FQDN of the MongoDB host |
 | `rocket_chat_mongodb_port` | 27017 | The TCP port to contact the MongoDB host host via |
@@ -82,7 +83,6 @@ Set in [`vars/CentOS.yml`](vars/CentOS.yml)
 | `rocket_chat_mongodb_unixsocketprefix` | `/var/run/mongodb` | The path for the MongoDB UNIX socket prefix |
 | `rocket_chat_mongodb_dbpath` | `/var/lib/mongodb` | The path for MongoDB to store its databases |
 | `rocket_chat_nginx_process_user` | `nginx` | The user for that will be used to spawn the Nginx server process |
-| `rocket_chat_node_initial_binary` | `node` | The NodeJS binary to use intially to work out the NodeJS version. This then determines if Nave needs to set the NodeJS version |
 
 ### CentOS 7 variables
 Set in [`vars/CentOS_7.yml`](vars/CentOS_7.yml)
@@ -110,7 +110,6 @@ Set in [`vars/Ubuntu.yml`](vars/Ubuntu.yml)
 | `rocket_chat_mongodb_repl_lines` | `  replication:`              | The value for the MongoDB replica set |
 |                                  | `    replSetName:  "001-rs"`  |                                       |
 | `rocket_chat_nginx_process_user` | `www-data` | The user for that will be used to spawn the Nginx server process |
-| `rocket_chat_node_initial_binary` | `nodejs` | The NodeJS binary to use intially to work out the NodeJS version. This then determines if Nave needs to set the NodeJS version |
 
 ### Ubuntu 15 variables
 Set in [`vars/Ubuntu_15.yml`](vars/Ubuntu_15.yml)  

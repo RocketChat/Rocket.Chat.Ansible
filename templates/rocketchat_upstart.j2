@@ -11,7 +11,7 @@ stop on shutdown
  
 expect fork
  
-env NODE_BIN_DIR="/usr/local/bin"
+env NODE_BIN_DIR="{{ rocket_chat_node_10_40_path }}"
 env NODE_PATH="/usr/local/lib/node_modules"
 env APPLICATION_PATH="{{ rocket_chat_application_path }}/bundle/main.js"
 env PIDFILE="/var/run/rocketchat.pid"

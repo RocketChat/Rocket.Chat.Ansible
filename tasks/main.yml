@@ -46,33 +46,28 @@
       state: link
     when: ansible_os_family == "RedHat"
 
-  - name: Ensure Nave (NodeJS) is installed
-    npm: name=nave global=yes
+  - name: Ensure n (NodeJS) is installed
+    npm:
+      name: n
+      global: True
+      executable: "{{ rocket_chat_original_npm }}"
 
   - name: Ensure Forever (NodeJS) is installed
-    npm: name=forever global=yes
+    npm:
+      name: forever
+      global: yes
+      executable: "{{ rocket_chat_original_npm }}"
     when: (ansible_distribution == "Ubuntu")
           and (ansible_distribution_major_version == "14")
 
-  - name: Check to see if Nave has installed the required 'node' binary
+  - name: Check to see if n has installed the required 'node' binary
     stat:
-      path: /usr/local/bin/node
-    register: nave_node_bin
+      path: "{{ rocket_chat_node_10_40_path }}/node"
+    register: n_10_40_node_bin
 
-  - name: Register the NodeJS version currently in use
-    shell: >-
-      {% if nave_node_bin.stat.exists %}
-      PATH=/usr/local/bin:$PATH
-      node --version
-      {% else %}
-      {{ rocket_chat_node_initial_binary }} --version
-      {% endif %}
-    changed_when: False
-    register: node_version
-
-  - name: Use the 0.10.40 NodeJS environment via Nave
-    shell: nave usemain 0.10.40
-    when: node_version.stdout != "v0.10.40"
+  - name: Install the 0.10.40 NodeJS environment via n
+    shell: n 0.10.40
+    when: not n_10_40_node_bin.stat.exists
 
   - name: "Configure /etc/hosts"
     lineinfile:
@@ -103,6 +98,7 @@
     npm:
       state: present
       path: "{{ rocket_chat_application_path }}/bundle/programs/server"
+      executable: "{{ rocket_chat_original_npm }}"
     become: True
     become_user: "{{ rocket_chat_service_user }}"
     tags: build

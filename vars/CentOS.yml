@@ -18,5 +18,3 @@ rocket_chat_mongodb_unixsocketprefix: /var/run/mongodb
 rocket_chat_mongodb_dbpath: /var/lib/mongodb
 
 rocket_chat_nginx_process_user: nginx
-
-rocket_chat_node_initial_binary: node
