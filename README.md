@@ -19,11 +19,14 @@ Features
 
 Supported Platforms
 -------------------
-### Ubuntu
-- 14.04
-- 15.04
+### Debian
+- Jessie (8)
 
-### EL
+### Ubuntu
+- Trusty: 14.04
+- Vivid: 15.04
+
+### EL (RHEL/CentOS)
 - 7
 
 Support for other distributions/operating systems is planned for the near future.
@@ -96,6 +99,32 @@ Set in [`vars/CentOS_7.yml`](vars/CentOS_7.yml)
 | `  src` | `rocketchat.service.j2` | The source template to deploy for the Rocket.Chat service manifest |
 | `  dest` | `/usr/lib/systemd/system/rocketchat.service` | The destination to deploy the Rocket.Chat service manifest to |
 
+### Debian variables
+Set in [`vars/Debian.yml`](vars/Debian.yml)  
+
+|     Name     |     Default Value    |    Description     |
+|---------------------------|-----------------------|------------------------------------|
+| `rocket_chat_dep_packages` |   - git              | A list of Rocket.Chat dependencies to install |
+|                            |   - graphicsmagick   |                                               |
+|                            |   - nodejs           |                                               |
+|                            |   - npm              |                                               |
+|                            |   - make             |                                               |
+| `rocket_chat_mongodb_packages` | - mongodb-server | A list of MongoDB server packages to install |
+|                                | - mongodb-shell  |                                              |
+| `rocket_chat_mongodb_repl_lines` | `  replication:`              | The value for the MongoDB replica set |
+|                                  | `    replSetName:  "001-rs"`  |                                       |
+| `rocket_chat_nginx_process_user` | `www-data` | The user for that will be used to spawn the Nginx server process |
+
+### Debian 8 variables
+Set in [`vars/Debian_8.yml`](vars/Debian_8.yml)  
+
+|     Name     |     Default Value    |    Description     |
+|---------------------------|-----------------------|------------------------------------|
+| `rocket_chat_service_update_command` | `systemctl daemon-reload ; systemctl restart rocketchat` | The command to use to inform the service management system when a service manifest has changed |
+| `rocket_chat_service_template` | | |
+| `  src` | `rocketchat.service.j2` | The source template to deploy for the Rocket.Chat service manifest |
+| `  dest` | `/etc/systemd/system/rocketchat.service` | The destination to deploy the Rocket.Chat service manifest to |
+| `rocket_chat_mongodb_apt_repo` | `deb http://repo.mongodb.org/apt/debian wheezy/mongodb-org/3.0 main` | The APT repository for MongoDB |
 
 ### Ubuntu variables
 Set in [`vars/Ubuntu.yml`](vars/Ubuntu.yml)  
