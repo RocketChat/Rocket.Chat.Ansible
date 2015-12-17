@@ -1,0 +1,17 @@
+---
+rocket_chat_dep_packages:
+  - git
+  - graphicsmagick
+  - nodejs
+  - npm
+  - make
+
+rocket_chat_mongodb_packages:
+  - mongodb-org-server
+  - mongodb-org-shell
+
+rocket_chat_mongodb_repl_lines: >-
+  replication:
+      replSetName:  "001-rs"
+
+rocket_chat_nginx_process_user: www-data

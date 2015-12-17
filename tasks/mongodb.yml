@@ -7,16 +7,16 @@
   
   - name: Ensure the MongoDB repository key has been imported
     apt_key:
-      keyserver: keyserver.ubuntu.com
-      id: 7F0CEB10
-    when: ansible_distribution == "Ubuntu"
+      keyserver: "{{ rocket_chat_mongodb_keyserver }}"
+      id: "{{ rocket_chat_mongodb_gpg_key }}"
+    when: ansible_os_family == "Debian"
     tags: repo
 
   - name: Ensure the MongoDB repository is present
     apt_repository:
       repo: "{{ rocket_chat_mongodb_apt_repo }}"
       state: present
-    when: ansible_distribution == "Ubuntu"
+    when: ansible_os_family == "Debian"
     tags: repo
 
   - name: Ensure MongoDB Server is present

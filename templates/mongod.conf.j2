@@ -24,7 +24,7 @@ unixSocketPrefix = {{ rocket_chat_mongodb_unixsocketprefix }}
 dbpath = {{ rocket_chat_mongodb_dbpath }}
 {% endif %}
 
-{% if ansible_distribution == "Ubuntu" %}
+{% if ansible_os_family == "Debian" %}
 # where and how to store data.
 storage:
   dbPath: /var/lib/mongodb
