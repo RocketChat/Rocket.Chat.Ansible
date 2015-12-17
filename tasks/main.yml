@@ -163,6 +163,17 @@
 
   - meta: flush_handlers
 
+  - name: Ensure the MongoDB replSets have been initiated
+    shell: >-
+      mongo --eval 'rs.initiate()' &&
+      touch .mongo_rs_initialised
+    become: yes
+    become_user: mongodb
+    args:
+      chdir: /var/lib/mongodb
+      creates: /var/lib/mongodb/.mongo_rs_initialised
+    when: rocket_chat_include_mongodb
+
   - name: Ensure the Rocket.Chat service is running/enabled
     service: name=rocketchat state=started enabled=True
     tags: service

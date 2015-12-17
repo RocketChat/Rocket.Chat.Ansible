@@ -3,6 +3,9 @@
   - name: Reload the Nginx service
     service: name=nginx state=reloaded
 
+  - name: Restart the MongoDB service
+    service: name=mongod state=restarted
+
   - name: Upgrade Rocket.Chat
     include: ../tasks/upgrade.yml
     tags:

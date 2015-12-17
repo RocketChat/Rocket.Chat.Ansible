@@ -105,7 +105,8 @@ Set in [`vars/Ubuntu.yml`](vars/Ubuntu.yml)
 |                            |   - nodejs           |                                               |
 |                            |   - npm              |                                               |
 |                            |   - make             |                                               |
-| `rocket_chat_mongodb_packages` | - mongodb-org | A list of MongoDB server packages to install |
+| `rocket_chat_mongodb_packages` | - mongodb-server | A list of MongoDB server packages to install |
+|                                | - mongodb-shell  |                                              |
 | `rocket_chat_mongodb_repl_lines` | `  replication:`              | The value for the MongoDB replica set |
 |                                  | `    replSetName:  "001-rs"`  |                                       |
 | `rocket_chat_nginx_process_user` | `www-data` | The user for that will be used to spawn the Nginx server process |
@@ -120,6 +121,7 @@ Set in [`vars/Ubuntu_15.yml`](vars/Ubuntu_15.yml)
 | `rocket_chat_service_template` | | |
 | `  src` | `rocketchat.service.j2` | The source template to deploy for the Rocket.Chat service manifest |
 | `  dest` | `/etc/systemd/system/rocketchat.service` | The destination to deploy the Rocket.Chat service manifest to |
+| `rocket_chat_mongodb_apt_repo` | `deb http://repo.mongodb.org/apt/debian wheezy/mongodb-org/3.0 main` | The APT repository for MongoDB |
 
 ### Ubuntu 14 variables
 Set in [`vars/Ubuntu_14.yml`](vars/Ubuntu_14.yml)  
@@ -130,6 +132,7 @@ Set in [`vars/Ubuntu_14.yml`](vars/Ubuntu_14.yml)
 | `rocket_chat_service_template` | | |
 | `  src` | `rocketchat_upstart.j2` | The source template to deploy for the Rocket.Chat service manifest |
 | `  dest` | `/etc/init/rocketchat.conf` | The destination to deploy the Rocket.Chat service manifest to |
+| `rocket_chat_mongodb_apt_repo` | `deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse` | The APT repository for MongoDB |
 
 
 Install this role from Ansible Galaxy
