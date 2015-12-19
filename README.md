@@ -215,6 +215,17 @@ Management of the Rocket.Chat service
 This role will deploy a service named `rocketchat`.
 You can use your native service management system to start/stop/reload/restart the service.
 
+Testing via Vagrant
+-------------------
+To test this role, you'll find a `Vagrantfile` and `provision.yml` playbook in the `tests/` directory.
+This is, as you might have guessed, for running test deployments via [Vagrant](https://vagrantup.com).
+
+If you'd like to test some changes, or simply see how the role works/provision a little play Rocket.Chat server locally,
+you can `cd` into `tests/` and run `vagrant up` (provided you have Vagrant & VirtualBox installed).
+
+If you take a look at the `Vagrantfile`, you'll see there's a deployment for each currently supported platform - simply comment out any you don't want to deploy (don't forget their Ansible config at the bottom, either!).  
+Once deployment is finished, if you want to try Rocket.Chat out, you can visit `http://localhost:4000` in your browser (the port `4000` varies here, based on which platform you're deploying, see the `forwarded_port` value for your platform).
+
 TODO
 ----
 * [x] Add service user/group to run the Rocket.Chat process (for security...)
