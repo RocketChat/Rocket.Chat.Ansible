@@ -25,7 +25,7 @@ setgid {{ rocket_chat_service_group }}
 
 env MONGO_URL="mongodb://{{ rocket_chat_mongodb_server }}:{{ rocket_chat_mongodb_port }}/rocketchat"
 env MONGO_OPLOG_URL="mongodb://{{ rocket_chat_mongodb_server }}:{{ rocket_chat_mongodb_port }}/local"
-env ROOT_URL="http://{{ rocket_chat_service_host }}"
+env ROOT_URL="https://{{ rocket_chat_service_host }}"
 env PORT="{{ rocket_chat_service_port }}"
 
 
