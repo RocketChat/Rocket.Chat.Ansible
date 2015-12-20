@@ -231,8 +231,8 @@ TODO
 * [x] Add service user/group to run the Rocket.Chat process (for security...)
 * [x] Move from PM2 to native service management systems
 * [ ] Support for other OS/distros
-* [ ] Use Let's Encrypt for SSL
-* [ ] Offer Caddy as a webserver option
+* [ ] Use Let's Encrypt for SSL  
+* [ ] Offer Caddy as a webserver option  
 License
 -------
 MIT
