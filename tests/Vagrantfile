@@ -47,6 +47,7 @@ Vagrant.configure(2) do | config |
 
     ansible.extra_vars = {
       rocket_chat_service_host: "localhost",
+      rocket_chat_automatic_upgrades: 'true',
     }
 
     ansible.sudo = true

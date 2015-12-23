@@ -9,14 +9,14 @@
     tags: repo
 
   - include: mongodb.yml
-    when: rocket_chat_include_mongodb
+    when: rocket_chat_include_mongodb|bool
     tags: mongodb
 
   - name: Ensure the Rocket.Chat service group is present
     group:
       name: "{{ rocket_chat_service_group }}"
       state: present
-      system: True
+      system: true
 
   - name: Ensure the Rocket.Chat service user is present
     user:
@@ -24,10 +24,10 @@
       name: "{{ rocket_chat_service_user }}"
       group: "{{ rocket_chat_service_group }}"
       home: "{{ rocket_chat_application_path }}"
-      createhome: True
+      createhome: true
       shell: /bin/false
       state: present
-      system: True
+      system: true
 
   - name: Ensure Rocket.Chat dependencies are installed
     yum:
@@ -52,7 +52,7 @@
   - name: Ensure n (NodeJS) is installed
     npm:
       name: n
-      global: True
+      global: true
       executable: "{{ rocket_chat_original_npm }}"
 
   - name: Ensure Forever (NodeJS) is installed
@@ -70,7 +70,7 @@
 
   - name: Install the 0.10.40 NodeJS environment via n
     shell: n 0.10.40
-    when: not n_10_40_node_bin.stat.exists
+    when: not n_10_40_node_bin.stat.exists|bool
 
   - name: "Configure /etc/hosts"
     lineinfile:
@@ -78,22 +78,32 @@
       line:  "127.0.0.1    {{ ansible_fqdn }}    {{ ansible_hostname }}"
       regexp: '^127.0.0.1'
 
+  - name: Check to see if this is the initial Rocket.Chat deployment
+    stat:
+      path: "{{ rocket_chat_application_path }}/bundle"
+    register: rocket_chat_deploy_state
+
   - name: Fetch the Rocket.Chat binary tarball
     get_url:
       url: "{{ rocket_chat_tarball_remote }}"
       sha256sum: "{{ rocket_chat_tarball_sha256sum }}"
       dest: "{{ rocket_chat_application_path }}"
       timeout: "{{ rocket_chat_tarball_fetch_timeout }}"
-    become: True
+    # This notify for automatic upgrades will be uncommented once
+    # Ansible 2.0 is officially released.
+    #notify: Upgrade Rocket.Chat
+    become: true
     become_user: "{{ rocket_chat_service_user }}"
+
+  - meta: flush_handlers
 
   - name: Unpack the Rocket.Chat binary tarball
     unarchive:
-      copy: False
+      copy: false
       src: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
       dest: "{{ rocket_chat_application_path }}"
       creates: "{{ rocket_chat_application_path }}/bundle"
-    become: True
+    become: true
     become_user: "{{ rocket_chat_service_user }}"
     tags: build
       
@@ -102,7 +112,7 @@
       state: present
       path: "{{ rocket_chat_application_path }}/bundle/programs/server"
       executable: "{{ rocket_chat_original_npm }}"
-    become: True
+    become: true
     become_user: "{{ rocket_chat_service_user }}"
     tags: build
 
@@ -144,7 +154,7 @@
       state: directory
       owner: "{{ rocket_chat_service_user }}"
       group: "{{ rocket_chat_service_user }}"
-      recurse: True
+      recurse: true
     tags: build
 
   - include_vars: "{{ item }}"
@@ -171,12 +181,12 @@
     args:
       chdir: /var/lib/mongodb
       creates: /var/lib/mongodb/.mongo_rs_initialised
-    when: rocket_chat_include_mongodb
+    when: rocket_chat_include_mongodb|bool
 
   - name: Ensure the Rocket.Chat service is running/enabled
-    service: name=rocketchat state=started enabled=True
+    service: name=rocketchat state=started enabled=true
     tags: service
   
   - include: nginx.yml
-    when: rocket_chat_include_nginx
+    when: rocket_chat_include_nginx|bool
     tags: nginx

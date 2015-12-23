@@ -1,23 +1,22 @@
 ---
 # tasks/upgrade.yml: Rocket.Chat upgrade procedures for RocketChat.Ansible
 
-  - name: Ensure automatic upgrades are permitted
+  - name: Ensure automatic upgrades are permitted [UPGRADE]
     fail:
       msg: >-
         It doesn't look like you've permitted automatic upgrades.
-        There was a change to the Rocket.Chat source code.
+        A new version of Rocket.Chat was released.
         To permit automatic upgrades set 'rocket_chat_automatic_upgrades' to true
-    when: ! rocket_chat_automatic_upgrades
+    when: not rocket_chat_automatic_upgrades|bool
 
-  - name: Build the Rocket.Chat application using Meteor [ Upgrade ]
-    shell: /opt/meteor/bin/meteor build --server {{ rocket_chat_service_host }} --directory /var/www/rocket.chat
-    args:
-      chdir: /var/www/rocket.chat
+  - name: Back up the current Rocket.Chat instance [UPGRADE]
+    shell: >-
+      mv {{ rocket_chat_application_path }}/bundle
+      {{ rocket_chat_upgrade_backup_path }}/backup_{{ ansible_date_time.date }}
+    when: rocket_chat_upgrade_backup|bool
 
-  - name: Install Rocket.Chat via NPM [ Upgrade ]
-    npm: state=present path=/var/www/rocket.chat/bundle/programs/server
-
-  - name: Restart Rocket.Chat via PM2 [ Upgrade ]
-    shell: pm2 restart rocket.chat
-    args:
-      chdir: /var/www/rocket.chat
+  - name: Delete the current Rocket.Chat instance [UPGRADE]
+    file:
+      path: "{{ rocket_chat_application_path }}/bundle"
+      state: absent
+    when: not rocket_chat_upgrade_backup|bool

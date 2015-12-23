@@ -13,7 +13,7 @@ Features
     Or, deploy your own SSL certs!  
 
 - __Optional automatic upgrades:__  
-    If a new version of [Rocket.Chat](http://rocket.chat) is released, or if you want to follow development for testing purposes, simply update the `rocket_chat_build_version` to whichever release/branch you wish to deploy, set `rocket_chat_automatic_upgrades` to `True` and let this role do the rest!
+    If a new version of [Rocket.Chat](http://rocket.chat) is released, or if you want to follow development for testing purposes, simply update the `rocket_chat_build_version` to whichever release/branch you wish to deploy, set `rocket_chat_automatic_upgrades` to `true` and let this role do the rest!
     If there's a change to the code deployed to your [Rocket.Chat](http://rocket.chat) server (either because of a remote change on the branch you're following, or because you set a new release to fetch), this role will handle the upgrade and redeployment of the [Rocket.Chat](http://rocket.chat) service, keeping your data in tact.  
 	_Note: Although this functionality has been written, there is [currently a bug in Ansible 1.8 onwards](https://github.com/ansible/ansible/issues/13182) (since fixed in 2.0) that will cause this to fail. As such, the current handler that takes care of this has been commented out, until the release of Ansible 2.0 (soon!)_
 
@@ -39,7 +39,9 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 
 |     Name     |     Default Value    |    Description     |
 |---------------------------|-----------------------|------------------------------------|
-| `rocket_chat_automatic_upgrades` | False | A boolean value that determines whether or not to upgrade Rocket.Chat upon source code changes |
+| `rocket_chat_automatic_upgrades` | false | A boolean value that determines whether or not to upgrade Rocket.Chat upon source code changes |
+| `rocket_chat_upgrade_backup` | true | A boolean value that determines whether or not to back up the current Rocket.Chat version |
+| `rocket_chat_upgrade_backup_path` | `"{{ rocket_chat_application_path }}"`| The path to store the back up of Rocket.Chat when `rocket_chat_upgrade_backup` is `true` |
 | `rocket_chat_application_path` | `/var/lib/rocket.chat` | The destination on the filesystem to deploy Rocket.Chat to |
 | `rocket_chat_version` | `master` | The version of Rocket.Chat to deploy; should be `master` for stable, or `develop` for development releases |
 | `rocket_chat_tarball_remote` | See [`defaults/main.yml`](defaults/main.yml) | The remote URL to fetch the Rocket.Chat tarball from (uses `rocket_chat_version`) |
@@ -51,19 +53,19 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 | `rocket_chat_service_port` | 3000 | The TCP port Rocket.Chat listens on |
 | `rocket_chat_node_10_40_path` | `/usr/local/n/versions/node/0.10.40/bin` | The path to the `node` binary directory that n installs |
 | `rocket_chat_original_npm` | `/usr/bin/npm` | The path to the original `npm` binary, before n installs any Node versions |
-| `rocket_chat_include_mongodb` | True | A boolean value that determines whether or not to deploy MongoDB |
+| `rocket_chat_include_mongodb` | true | A boolean value that determines whether or not to deploy MongoDB |
 | `rocket_chat_mongodb_keyserver` | keyserver.ubuntu.com | The GPG key server to use when importing the MongoDB repo key |
 | `rocket_chat_mongodb_gpg_key` | `7F0CEB10` | The GPG key fingerprint to import for the MongoDB repo |
 | `rocket_chat_mongodb_server` | 127.0.0.1 | The IP/FQDN of the MongoDB host |
 | `rocket_chat_mongodb_port` | 27017 | The TCP port to contact the MongoDB host host via |
 | `rocket_chat_mongodb_packages` | `mongodb` | The name of the MongoDB package(s) to install (differs for different distros - see `vars/`) |
 | `rocket_chat_mongodb_config_template` | [`mongod.conf.j2`](templates/mongod.conf.j2) | The `/etc/mongod.conf` template to deploy |
-| `rocket_chat_include_nginx`| True | A boolean value that determines whether or not to deploy Nginx |
+| `rocket_chat_include_nginx`| true | A boolean value that determines whether or not to deploy Nginx |
 | `rocket_chat_ssl_key_path` | `/etc/nginx/rocket_chat.key` | The destination path for the Nginx SSL private key |
 | `rocket_chat_ssl_cert_path` | `/etc/nginx/rocket_chat.crt` | The destination path for the Nginx SSL certificate |
 | `rocket_chat_ssl_key_file` | `~` | If not using SSL cert generation, this is the path to the Nginx SSL private key on the Ansible control node, for deployment |
 | `rocket_chat_ssl_cert_file` | `~` | If not using SSL cert generation, this is the path to the Nginx SSL private key on the Ansible control node, for deployment |
-| `rocket_chat_ssl_generate_certs` | True | A boolean value that determines whether or not to generate the Nginx SSL certs |
+| `rocket_chat_ssl_generate_certs` | true | A boolean value that determines whether or not to generate the Nginx SSL certs |
 
 
 Some variables differ between operating systems/distributions.
@@ -192,8 +194,8 @@ A playbook to deploy Rocket.Chat to `chat_servers` but exclude the deployment of
     - hosts: chat_servers
 
       vars:
-        rocket_chat_automatic_upgrades: True
-        rocket_chat_include_mongodb: False
+        rocket_chat_automatic_upgrades: true
+        rocket_chat_include_mongodb: false
         rocket_chat_mongodb_server: 10.19.3.24
   
       roles:

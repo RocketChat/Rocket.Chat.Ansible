@@ -1,6 +1,8 @@
 ---
 # defaults/main.yml: Defaults for RocketChat.Ansible
-rocket_chat_automatic_upgrades: False
+rocket_chat_automatic_upgrades: false
+rocket_chat_upgrade_backup: true
+rocket_chat_upgrade_backup_path: "{{ rocket_chat_application_path }}"
 rocket_chat_application_path: /var/lib/rocket.chat
 rocket_chat_version: master
 rocket_chat_tarball_remote: https://s3.amazonaws.com/rocketchatbuild/rocket.chat-{{ rocket_chat_version }}.tgz
@@ -15,7 +17,7 @@ rocket_chat_original_npm: /usr/bin/npm
 
 # MongoDB settings
 rocket_chat_mongodb_packages: mongodb
-rocket_chat_include_mongodb: True
+rocket_chat_include_mongodb: true
 rocket_chat_mongodb_keyserver: keyserver.ubuntu.com
 rocket_chat_mongodb_gpg_key: 7F0CEB10
 rocket_chat_mongodb_server: 127.0.0.1
@@ -23,9 +25,9 @@ rocket_chat_mongodb_port: 27017
 rocket_chat_mongodb_config_template: mongod.conf.j2
 
 # nginx settings
-rocket_chat_include_nginx: True
+rocket_chat_include_nginx: true
 rocket_chat_ssl_key_path: /etc/nginx/rocket_chat.key
 rocket_chat_ssl_cert_path: /etc/nginx/rocket_chat.crt
 rocket_chat_ssl_key_file: ~
 rocket_chat_ssl_cert_file: ~
-rocket_chat_ssl_generate_certs: True
+rocket_chat_ssl_generate_certs: true

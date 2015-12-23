@@ -21,7 +21,7 @@
     copy:
       src: "{{ item.src }}"
       dest: "{{ item.dest }}"
-    when: not rocket_chat_ssl_generate_certs
+    when: not rocket_chat_ssl_generate_certs|bool
     with_items:
       - src: "{{ rocket_chat_ssl_key_file }}"
         dest: "{{ rocket_chat_ssl_key_path }}"
@@ -37,7 +37,7 @@
       -keyout {{ rocket_chat_ssl_key_path }}
       -out {{ rocket_chat_ssl_cert_path }}
       -days 3650
-    when: rocket_chat_ssl_generate_certs
+    when: rocket_chat_ssl_generate_certs|bool
     args:
       creates: "{{ rocket_chat_ssl_key_path }}"
     notify: Reload the Nginx service

@@ -41,4 +41,3 @@
 
   - name: Ensure the MongoDB service is started/enabled
     service: name=mongod state=started enabled=yes
-    when: rocket_chat_include_mongodb
