@@ -232,6 +232,7 @@ TODO
 ----
 * [x] Add service user/group to run the Rocket.Chat process (for security...)
 * [x] Move from PM2 to native service management systems
+* [ ] Enable/modify Ansible "2.0 compatible" code upon Ansible 2.0 release (revert e117bd6)
 * [ ] Support for other OS/distros
 * [ ] Use Let's Encrypt for SSL
 * [ ] Offer Caddy as a webserver option
