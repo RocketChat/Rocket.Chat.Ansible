@@ -21,14 +21,16 @@
 
   - name: Ensure MongoDB Server is present
     yum:
-      name: "{{ rocket_chat_mongodb_packages }}"
+      name: "{{ item }}"
       state: present
+    with_items: "{{ rocket_chat_mongodb_packages }}"
     when: ansible_os_family == "RedHat"
 
   - name: Ensure MongoDB Server is present
     apt:
-      name: "{{ rocket_chat_mongodb_packages }}"
+      name: "{{ item }}"
       state: present
+    with_items: "{{ rocket_chat_mongodb_packages }}"
     when: ansible_os_family == "Debian"
 
   - name: Deploy MongoDB service configuration
