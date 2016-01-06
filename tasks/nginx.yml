@@ -1,5 +1,12 @@
 ---
 # tasks/nginx.yml: Nginx management tasks for RocketChat.Ansible
+
+  - name: Grant Nginx permissions to proxy requests to an upstream [SELinux]
+    shell: setsebool httpd_can_network_connect on -P
+    changed_when: false
+    when: (ansible_selinux is defined) and
+          (ansible_selinux.status != "disabled")
+
   - name: Ensure Nginx is present
     yum: name=nginx state=present
     when: ansible_os_family == "RedHat"
