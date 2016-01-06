@@ -23,6 +23,17 @@ http {
     include             /etc/nginx/mime.types;
     default_type        application/octet-stream;
 
+    gzip on;
+    gzip_vary on;
+    gzip_http_version 1.1;
+    gzip_comp_level 9;
+    gzip_proxied any;
+    gzip_min_length 1024;
+    gzip_buffers 16 8k;
+    gzip_types text/plain text/css text/javascript application/x-javascript application/xml text/xml application/json application/javascript application/xml+rss text/x-js;
+    gzip_disable "MSIE [1-6].(?!.*SV1)";
+    gzip_static on;
+
     # Load modular configuration files from the /etc/nginx/conf.d directory.
     # See http://nginx.org/en/docs/ngx_core_module.html#include
     # for more information.
