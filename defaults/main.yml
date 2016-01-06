@@ -4,9 +4,9 @@ rocket_chat_automatic_upgrades: false
 rocket_chat_upgrade_backup: true
 rocket_chat_upgrade_backup_path: "{{ rocket_chat_application_path }}"
 rocket_chat_application_path: /var/lib/rocket.chat
-rocket_chat_version: master
-rocket_chat_tarball_remote: https://s3.amazonaws.com/rocketchatbuild/rocket.chat-{{ rocket_chat_version }}.tgz
-rocket_chat_tarball_sha256sum: ae2e6603108fd1477d012f5fffda6a659db813d1a07fbee538f9a702f6f989ba
+rocket_chat_version: v0.12.1
+rocket_chat_tarball_remote: https://github.com/RocketChat/Rocket.Chat/releases/download/{{ rocket_chat_version }}/rocket.chat.tgz
+rocket_chat_tarball_sha256sum: f3bf83ee1799907e2d33b14d99d077f4cb015926e0c2fc9f2402ac689a3c63db
 rocket_chat_tarball_fetch_timeout: 100
 rocket_chat_service_user: rocketchat
 rocket_chat_service_group: rocketchat
