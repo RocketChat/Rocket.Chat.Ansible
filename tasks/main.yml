@@ -38,7 +38,7 @@
 
   - name: Ensure Rocket.Chat dependencies are installed
     apt:
-      name: 
+      name: "{{ item }}"
       state: present
       cache_valid_time: 3600
     with_items: "{{ rocket_chat_dep_packages }}"
