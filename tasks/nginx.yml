@@ -42,5 +42,21 @@
       creates: "{{ rocket_chat_ssl_key_path }}"
     notify: Reload the Nginx service
 
+  - name: Ensure provided PFS key has been deployed
+    copy:
+      src: "{{ rocket_chat_nginx_pfs_file }}"
+      dest: "{{ rocket_chat_nginx_pfs_key_path }}"
+    when: not rocket_chat_nginx_generate_pfs_key
+    notify: Reload the Nginx service
+
+  - name: Ensure the PFS key has been generated (this can take a while!)
+    shell: >-
+      openssl dhparam -out {{ rocket_chat_nginx_pfs_key_path }}
+      {{ rocket_chat_nginx_pfs_key_numbits }}
+    when: rocket_chat_nginx_generate_pfs_key|bool
+    args:
+      creates: "{{ rocket_chat_nginx_pfs_key_path }}"
+    notify: Reload the Nginx service
+
   - name: Ensure the Nginx service is running/enabled
     service: name=nginx state=started enabled=true

@@ -61,11 +61,16 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 | `rocket_chat_mongodb_packages` | `mongodb` | The name of the MongoDB package(s) to install (differs for different distros - see `vars/`) |
 | `rocket_chat_mongodb_config_template` | [`mongod.conf.j2`](templates/mongod.conf.j2) | The `/etc/mongod.conf` template to deploy |
 | `rocket_chat_include_nginx`| true | A boolean value that determines whether or not to deploy Nginx |
+| `rocket_chat_ssl_generate_certs` | true | A boolean value that determines whether or not to generate the Nginx SSL certs |
 | `rocket_chat_ssl_key_path` | `/etc/nginx/rocket_chat.key` | The destination path for the Nginx SSL private key |
 | `rocket_chat_ssl_cert_path` | `/etc/nginx/rocket_chat.crt` | The destination path for the Nginx SSL certificate |
 | `rocket_chat_ssl_key_file` | `~` | If not using SSL cert generation, this is the path to the Nginx SSL private key on the Ansible control node, for deployment |
-| `rocket_chat_ssl_cert_file` | `~` | If not using SSL cert generation, this is the path to the Nginx SSL private key on the Ansible control node, for deployment |
-| `rocket_chat_ssl_generate_certs` | true | A boolean value that determines whether or not to generate the Nginx SSL certs |
+| `rocket_chat_ssl_cert_file` | `~` | If not using SSL cert generation, this is the path to the Nginx SSL cert on the Ansible control node, for deployment |
+| `rocket_chat_nginx_enable_pfs` | true | A boolean value that determines whether or not to enable [PFS](http://en.wikipedia.org/wiki/Perfect_forward_secrecy) when deploying Nginx |
+| `rocket_chat_nginx_generate_pfs_key` | true | A boolean value that determines whether or not to generate a PFS key file |
+| `rocket_chat_nginx_pfs_key_numbits` | 2048 | Numbits to pass to OpenSSL when generating a PFS key file |
+| `rocket_chat_nginx_pfs_key_path` | `/etc/nginx/rocket_chat.pem` | The destination path for the Nginx PFS key file |
+| `rocket_chat_nginx_pfs_file` | `~` | If not using PFS key generation, this is the path to the Nginx PFS key on the Ansible control node, for deployment |
 
 
 Some variables differ between operating systems/distributions.
