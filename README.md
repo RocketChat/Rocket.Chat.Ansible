@@ -43,10 +43,11 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 | `rocket_chat_upgrade_backup` | true | A boolean value that determines whether or not to back up the current Rocket.Chat version |
 | `rocket_chat_upgrade_backup_path` | `"{{ rocket_chat_application_path }}"`| The path to store the back up of Rocket.Chat when `rocket_chat_upgrade_backup` is `true` |
 | `rocket_chat_application_path` | `/var/lib/rocket.chat` | The destination on the filesystem to deploy Rocket.Chat to |
-| `rocket_chat_version` | `0.12.1` | The version of Rocket.Chat to deploy; see the [Rocket.Chat releases page](https://github.com/RocketChat/Rocket.Chat/releases) |
+| `rocket_chat_version` | `latest` | The version of Rocket.Chat to deploy; see the [Rocket.Chat releases page](https://rocket.chat/releases) for available options |
 | `rocket_chat_tarball_remote` | See [`defaults/main.yml`](defaults/main.yml) | The remote URL to fetch the Rocket.Chat tarball from (uses `rocket_chat_version`) |
 | `rocket_chat_tarball_sha256sum` | See [`defaults/main.yml`](defaults/main.yml) | The SHA256 hash sum of the Rocket.Chat tarball being fetched |
 | `rocket_chat_tarball_fetch_timeout` | 100 | The time (in seconds) before the attempt to fetch the Rocket.Chat tarball fails |
+| `rocket_chat_tarball_validate_remote_cert` | true | A boolean value that determines wether or not to validate the SSL certs for the Rocket.Chat tarball remote |
 | `rocket_chat_service_user` | `rocketchat` | The name of the user that will run the Rocket.Chat server process |
 | `rocket_chat_service_group` | `rocketchat` | The name of the primary group for the `rocket_chat_service_user` user |
 | `rocket_chat_service_host` | `"{{ ansible_fqdn }}"` | The FQDN of the Rocket.Chat system |
@@ -106,6 +107,7 @@ Set in [`vars/CentOS_7.yml`](vars/CentOS_7.yml)
 | `rocket_chat_service_template` | | |
 | `  src` | `rocketchat.service.j2` | The source template to deploy for the Rocket.Chat service manifest |
 | `  dest` | `/usr/lib/systemd/system/rocketchat.service` | The destination to deploy the Rocket.Chat service manifest to |
+| `rocket_chat_tarball_validate_remote_cert` | false | A boolean value that determines wether or not to validate the SSL certs for the Rocket.Chat tarball remote |
 
 ### Debian variables
 Set in [`vars/Debian.yml`](vars/Debian.yml)  
@@ -171,6 +173,7 @@ Set in [`vars/Ubuntu_14.yml`](vars/Ubuntu_14.yml)
 | `  src` | `rocketchat_upstart.j2` | The source template to deploy for the Rocket.Chat service manifest |
 | `  dest` | `/etc/init/rocketchat.conf` | The destination to deploy the Rocket.Chat service manifest to |
 | `rocket_chat_mongodb_apt_repo` | `deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse` | The APT repository for MongoDB |
+| `rocket_chat_tarball_validate_remote_cert` | false | A boolean value that determines wether or not to validate the SSL certs for the Rocket.Chat tarball remote |
 
 
 Install this role from Ansible Galaxy

@@ -91,6 +91,7 @@
       sha256sum: "{{ rocket_chat_tarball_sha256sum }}"
       dest: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
       timeout: "{{ rocket_chat_tarball_fetch_timeout }}"
+      validate_certs: "{{ rocket_chat_tarball_validate_remote_cert }}"
     # This notify for automatic upgrades will be uncommented once
     # Ansible 2.0 is officially released.
     #notify: Upgrade Rocket.Chat
