@@ -29,6 +29,7 @@ rocket_chat_include_nginx: true
 rocket_chat_ssl_generate_certs: true
 rocket_chat_ssl_key_path: /etc/nginx/rocket_chat.key
 rocket_chat_ssl_cert_path: /etc/nginx/rocket_chat.crt
+rocket_chat_ssl_deploy_data: false
 rocket_chat_ssl_key_file: ~
 rocket_chat_ssl_cert_file: ~
 rocket_chat_nginx_enable_pfs: true

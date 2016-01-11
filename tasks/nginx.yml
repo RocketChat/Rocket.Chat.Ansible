@@ -28,7 +28,8 @@
     copy:
       src: "{{ item.src }}"
       dest: "{{ item.dest }}"
-    when: not rocket_chat_ssl_generate_certs|bool
+    when: not rocket_chat_ssl_generate_certs|bool and
+          rocket_chat_ssl_deploy_data|bool
     with_items:
       - src: "{{ rocket_chat_ssl_key_file }}"
         dest: "{{ rocket_chat_ssl_key_path }}"

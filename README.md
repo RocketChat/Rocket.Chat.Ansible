@@ -64,6 +64,7 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 | `rocket_chat_ssl_generate_certs` | true | A boolean value that determines whether or not to generate the Nginx SSL certs |
 | `rocket_chat_ssl_key_path` | `/etc/nginx/rocket_chat.key` | The destination path for the Nginx SSL private key |
 | `rocket_chat_ssl_cert_path` | `/etc/nginx/rocket_chat.crt` | The destination path for the Nginx SSL certificate |
+| `rocket_chat_ssl_deploy_data` | false | A boolean value that determines whether or not to deploy custom SSL data (cert/key files) |
 | `rocket_chat_ssl_key_file` | `~` | If not using SSL cert generation, this is the path to the Nginx SSL private key on the Ansible control node, for deployment |
 | `rocket_chat_ssl_cert_file` | `~` | If not using SSL cert generation, this is the path to the Nginx SSL cert on the Ansible control node, for deployment |
 | `rocket_chat_nginx_enable_pfs` | true | A boolean value that determines whether or not to enable [PFS](http://en.wikipedia.org/wiki/Perfect_forward_secrecy) when deploying Nginx |
