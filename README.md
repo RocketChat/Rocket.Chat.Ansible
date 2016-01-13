@@ -40,7 +40,7 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 |     Name     |     Default Value    |    Description     |
 |---------------------------|-----------------------|------------------------------------|
 | `rocket_chat_automatic_upgrades` | false | A boolean value that determines whether or not to upgrade Rocket.Chat upon source code changes |
-| `rocket_chat_upgrade_backup` | true | A boolean value that determines whether or not to back up the current Rocket.Chat version |
+| `rocket_chat_upgrade_backup` | true | A boolean value that determines whether or not to back up the current Rocket.Chat version when upgrading |
 | `rocket_chat_upgrade_backup_path` | `"{{ rocket_chat_application_path }}"`| The path to store the back up of Rocket.Chat when `rocket_chat_upgrade_backup` is `true` |
 | `rocket_chat_application_path` | `/var/lib/rocket.chat` | The destination on the filesystem to deploy Rocket.Chat to |
 | `rocket_chat_version` | `latest` | The version of Rocket.Chat to deploy; see the [Rocket.Chat releases page](https://rocket.chat/releases) for available options |
