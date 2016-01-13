@@ -1,5 +1,0 @@
-### THIS IS A DUMMY FILE - IT HAS NO INTENDED FUNCTIONALITY ###
-#
-# The support for automatic upgrades of Rocket.Chat via this role is a feature
-# written for use with Ansible 2.0 - until Ansible 2.0 is released, and the 
-# automatic upgrade feature is enabled, it is necessary that this file exists.
