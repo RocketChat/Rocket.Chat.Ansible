@@ -12,10 +12,10 @@ Features
     Automatically generate SSL certs for HTTPS connectivity via an [Nginx](https://www.nginx.com/) reverse proxy.  
     Or, deploy your own SSL certs!  
 
-- __Optional automatic upgrades:__  
-    If a new version of [Rocket.Chat](http://rocket.chat) is released, or if you want to follow development for testing purposes, simply update the `rocket_chat_build_version` to whichever release/branch you wish to deploy, set `rocket_chat_automatic_upgrades` to `true` and let this role do the rest!
-    If there's a change to the code deployed to your [Rocket.Chat](http://rocket.chat) server (either because of a remote change on the branch you're following, or because you set a new release to fetch), this role will handle the upgrade and redeployment of the [Rocket.Chat](http://rocket.chat) service, keeping your data in tact.  
-	_Note: Although this functionality has been written, there is [currently a bug in Ansible 1.8 onwards](https://github.com/ansible/ansible/issues/13182) (since fixed in 2.0) that will cause this to fail. As such, the current handler that takes care of this has been commented out, until the release of Ansible 2.0 (soon!)_
+- __Optional automatic upgrades [requires Ansible 2.0]:__  
+    If a new version of [Rocket.Chat](http://rocket.chat) is released, or if you want to follow development for testing purposes, simply update the `rocket_chat_version` to whichever release you wish to deploy (see [the Rocket.Chat releases page](https://rocket.chat/releaes), set `rocket_chat_automatic_upgrades` to `true` and let this role do the rest!
+    If there's a change to the code deployed to your [Rocket.Chat](http://rocket.chat) server (either because of a remote change to the `rocket_chat_version` you're following, 'latest' or 'develop' for instance, or because you set a new `rocket_chat_version` to fetch), this role will handle the upgrade and redeployment of the [Rocket.Chat](http://rocket.chat) service, keeping your data in tact.  
+	_Note: This functionality requires Ansible 2.0. See how to fetch the 2.0 version of this role in the [Install from Ansible Galaxy secion](#Install-the-Ansible-2.0-version-of-this-role)
 
 Supported Platforms
 -------------------
@@ -181,7 +181,7 @@ Install this role from Ansible Galaxy
 This role is available for download from [Ansible Galaxy](http://galaxy.ansible.com).
 To install this role, and track it in your Ansible code-base, use something similar to the following in your [`requirements.yml`](http://docs.ansible.com/ansible/galaxy.html#id8):
 
-```
+``` yaml
 - src: RocketChat.Server
   path: roles/external/
 
@@ -189,26 +189,40 @@ To install this role, and track it in your Ansible code-base, use something simi
 
 Or, install straight from the shell, with `$ ansible-galaxy install RocketChat.Server -p path/to/ansible_roles/`  
 
+### Install the Ansible 2.0 version of this role
+With the release of Ansible 2.0, this role is officially supported with some performance enhancements and extra features (automatic upgrades, for instance).  
+To use the Ansible 2.0 version of this role, you can install it using the `ansible-galaxy` command line tool using a `requirements.yml` (both mentioned above) to specify the version version you wish to use.  
+
+Here's an example `requirements.yml` file to install via `ansible-galaxy` will fetch the Ansible 2.0 code:
+``` yaml
+  - src: https://github.com/RocketChat/Rocket.Chat.Ansible
+    version: ansible_2.0
+    name: RocketChat.Server
+    path: roles/external
+```
+
 Example Playbook
 ----------------
 
 A simple playbook to run this role on all `chat_servers` systems:
+``` yaml
+  - hosts: chat_servers
+    roles:
+     - RocketChat.Server
+```
 
-    - hosts: chat_servers
-      roles:
-         - RocketChat.Server
+A playbook to deploy Rocket.Chat to `chat_servers` but exclude the deployment of MongoDB and use an external instance. Also permit automatic upgrades of Rocket.Chat (Ansible 2.0 required for `rocket_chat_automatic_upgrades`! See the [Install from Ansible Galaxy secion](#Install-the-Ansible-2.0-version-of-this-role)):
+``` yaml
+  - hosts: chat_servers
 
-A playbook to deploy Rocket.Chat to `chat_servers` but exclude the deployment of MongoDB and use an external instance. Also permit automatic upgrades of Rocket.Chat:
-
-    - hosts: chat_servers
-
-      vars:
-        rocket_chat_automatic_upgrades: true
-        rocket_chat_include_mongodb: false
-        rocket_chat_mongodb_server: 10.19.3.24
+    vars:
+      rocket_chat_automatic_upgrades: true
+      rocket_chat_include_mongodb: false
+      rocket_chat_mongodb_server: 10.19.3.24
   
-      roles:
-        - RocketChat.Server
+    roles:
+      - RocketChat.Server
+```
 
 Available tags
 --------------
@@ -241,10 +255,7 @@ TODO
 ----
 * [x] Add service user/group to run the Rocket.Chat process (for security...)
 * [x] Move from PM2 to native service management systems
-* [ ] Enable/modify Ansible "2.0 compatible" code upon Ansible 2.0 release (revert e117bd6)
-* [ ] Support for other OS/distros
 * [ ] Use Let's Encrypt for SSL
-* [ ] Offer Caddy as a webserver option
 
 License
 -------
