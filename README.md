@@ -15,7 +15,7 @@ Features
 - __Optional automatic upgrades [requires Ansible 2.0]:__  
     If a new version of [Rocket.Chat](http://rocket.chat) is released, or if you want to follow development for testing purposes, simply update the `rocket_chat_version` to whichever release you wish to deploy (see [the Rocket.Chat releases page](https://rocket.chat/releaes), set `rocket_chat_automatic_upgrades` to `true` and let this role do the rest!
     If there's a change to the code deployed to your [Rocket.Chat](http://rocket.chat) server (either because of a remote change to the `rocket_chat_version` you're following, 'latest' or 'develop' for instance, or because you set a new `rocket_chat_version` to fetch), this role will handle the upgrade and redeployment of the [Rocket.Chat](http://rocket.chat) service, keeping your data in tact.  
-	_Note: This functionality requires Ansible 2.0. See how to fetch the 2.0 version of this role in the [Install from Ansible Galaxy secion](#install-the-ansible-2.0-version-of-this-role)
+	_Note: This functionality requires Ansible 2.0. See how to fetch the 2.0 version of this role in the [Install from Ansible Galaxy secion](#install-the-ansible-20-version-of-this-role)_
 
 Supported Platforms
 -------------------
@@ -211,7 +211,7 @@ A simple playbook to run this role on all `chat_servers` systems:
      - RocketChat.Server
 ```
 
-A playbook to deploy Rocket.Chat to `chat_servers` but exclude the deployment of MongoDB and use an external instance. Also permit automatic upgrades of Rocket.Chat (Ansible 2.0 required for `rocket_chat_automatic_upgrades`! See the [Install from Ansible Galaxy secion](#install-the-ansible-2.0-version-of-this-role)):
+A playbook to deploy Rocket.Chat to `chat_servers` but exclude the deployment of MongoDB and use an external instance. Also permit automatic upgrades of Rocket.Chat (Ansible 2.0 required for `rocket_chat_automatic_upgrades`! See the [Install from Ansible Galaxy secion](#install-the-ansible-20-version-of-this-role)):
 ``` yaml
   - hosts: chat_servers
 
