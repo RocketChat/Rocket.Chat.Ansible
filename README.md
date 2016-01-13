@@ -191,7 +191,7 @@ Or, install straight from the shell, with `$ ansible-galaxy install RocketChat.S
 
 ### Install the Ansible 2.0 version of this role
 With the release of Ansible 2.0, this role is officially supported with some performance enhancements and extra features (automatic upgrades, for instance).  
-To use the Ansible 2.0 version of this role, you can install it using the `ansible-galaxy` command line tool using a `requirements.yml` (both mentioned above) to specify the version version you wish to use.  
+To use the Ansible 2.0 version of this role, you can install it using the `ansible-galaxy` command line tool using a `requirements.yml` (both mentioned above) to specify the version you wish to use.  
 
 Here's an example `requirements.yml` file to install via `ansible-galaxy` will fetch the Ansible 2.0 code:
 ``` yaml
