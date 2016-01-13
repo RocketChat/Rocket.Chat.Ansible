@@ -79,6 +79,10 @@
       path: "{{ rocket_chat_application_path }}/bundle"
     register: rocket_chat_deploy_state
 
+  - name: Set the initial Rocket.Chat upgrade status
+    set_fact:
+      rocket_chat_upgraded: false
+
   - name: Fetch the Rocket.Chat binary tarball
     get_url:
       url: "{{ rocket_chat_tarball_remote }}"
@@ -177,6 +181,10 @@
       chdir: /var/lib/mongodb
       creates: /var/lib/mongodb/.mongo_rs_initialised
     when: rocket_chat_include_mongodb|bool
+
+  - name: Restart the Rocket.Chat service [UPGRADE]
+    service: name=rocketchat state=restarted
+    when: rocket_chat_upgraded|bool
 
   - name: Ensure the Rocket.Chat service is running/enabled
     service: name=rocketchat state=started enabled=true

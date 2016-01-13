@@ -20,3 +20,7 @@
       path: "{{ rocket_chat_application_path }}/bundle"
       state: absent
     when: not rocket_chat_upgrade_backup|bool
+
+  - name: Set the Rocket.Chat upgrade status [UPGRADE]
+    set_fact:
+      rocket_chat_upgraded: true
