@@ -183,11 +183,11 @@ To install this role, and track it in your Ansible code-base, use something simi
 
 ``` yaml
 - src: RocketChat.Server
+  version: master
   path: roles/external/
 
 ```
-
-Or, install straight from the shell, with `$ ansible-galaxy install RocketChat.Server -p path/to/ansible_roles/`  
+_Note: you must specify `version` as `master` if you're still using Ansible 1.9.4_
 
 ### Install the Ansible 2.0 version of this role
 With the release of Ansible 2.0, this role is officially supported with some performance enhancements and extra features (automatic upgrades, for instance).  
