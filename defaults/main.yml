@@ -6,7 +6,7 @@ rocket_chat_upgrade_backup_path: "{{ rocket_chat_application_path }}"
 rocket_chat_application_path: /var/lib/rocket.chat
 rocket_chat_version: latest
 rocket_chat_tarball_remote: https://rocket.chat/releases/{{ rocket_chat_version }}/download
-rocket_chat_tarball_sha256sum: b8b03d9b3e98c7381c8fae67fd4a15b39f270a50096304edecad191b3202a06d
+rocket_chat_tarball_sha256sum: 8f9e633d08f90f636245fbe6180d23766f1b79d1b3f042fcb6e8d0cf4206a4ca
 rocket_chat_tarball_fetch_timeout: 100
 rocket_chat_tarball_validate_remote_cert: true
 rocket_chat_service_user: rocketchat
