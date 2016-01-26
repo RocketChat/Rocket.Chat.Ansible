@@ -195,9 +195,8 @@ To use the Ansible 2.0 version of this role, you can install it using the `ansib
 
 Here's an example `requirements.yml` file to install via `ansible-galaxy` will fetch the Ansible 2.0 code:
 ``` yaml
-  - src: https://github.com/RocketChat/Rocket.Chat.Ansible
+  - src: RocketChat.Server
     version: v2.0
-    name: RocketChat.Server
     path: roles/external
 ```
 
