@@ -3,6 +3,11 @@
 
   - include_vars: "{{ ansible_distribution }}.yml"
     tags: vars
+    when: ansible_distribution != "RedHat"
+
+  - include_vars: CentOS.yml
+    tags: vars
+    when: ansible_distribution == "RedHat"
 
   - include: repo_RedHat.yml
     when: ansible_os_family == "RedHat"
@@ -165,6 +170,14 @@
       - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
       - "{{ ansible_distribution }}.yml"
     tags: service
+    when: ansible_distribution != "RedHat"
+
+  - include_vars: "{{ item }}"
+    with_first_found:
+      - "CentOS_{{ ansible_distribution_major_version }}.yml"
+      - CentOS.yml
+    tags: service
+    when: ansible_distribution == "RedHat"
 
   - name: Deploy the Rocket.Chat service file
     template:
