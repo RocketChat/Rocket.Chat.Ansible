@@ -3,15 +3,9 @@
   - include_vars: "{{ item }}"
     with_first_found:
       - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+      - "{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yml"
       - "{{ ansible_distribution }}.yml"
-    when: ansible_distribution != "RedHat"
-
-  - include_vars: "{{ item }}"
-    with_first_found:
-      - "CentOS_{{ ansible_distribution_major_version }}.yml"
-      - CentOS.yml
-    tags: service
-    when: ansible_distribution == "RedHat"
+      - "{{ ansible_os_family }}.yml"
 
   - name: Ensure the MongoDB repository key has been imported
     apt_key:

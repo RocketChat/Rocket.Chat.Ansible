@@ -78,8 +78,8 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 Some variables differ between operating systems/distributions.
 These are set in the `vars/` directory, typically in a file named after the distribution.
 
-### CentOS variables (also used for RHEL systems)
-Set in [`vars/CentOS.yml`](vars/CentOS.yml)
+### RHEL/CentOS variables
+Set in [`vars/RedHat.yml`](vars/RedHat.yml)
 
 |     Name     |     Default Value    |    Description     |
 |---------------------------|-----------------------|------------------------------------|
@@ -98,8 +98,8 @@ Set in [`vars/CentOS.yml`](vars/CentOS.yml)
 | `rocket_chat_mongodb_dbpath` | `/var/lib/mongodb` | The path for MongoDB to store its databases |
 | `rocket_chat_nginx_process_user` | `nginx` | The user for that will be used to spawn the Nginx server process |
 
-### CentOS 7 variables (also used for RHEL 7 systems)
-Set in [`vars/CentOS_7.yml`](vars/CentOS_7.yml)
+### RHEL/CentOS 7 variables
+Set in [`vars/RedHat_7.yml`](vars/RedHat_7.yml)
 
 |     Name     |     Default Value    |    Description     |
 |---------------------------|-----------------------|------------------------------------|
