@@ -32,6 +32,10 @@ Supported Platforms
 Support for other distributions/operating systems is planned for the near future.
 If you'd like to see your distribution/operating system supported, please [raise an issue](https://github.com/RocketChat/Rocket.Chat.Ansible/issues)!
 
+Running into problems?
+----------------------
+Please be sure you've read the [FAQ](#faq) and all documentation before raising an issue.  
+
 Role Variables
 --------------
 All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
@@ -187,7 +191,7 @@ To install this role, and track it in your Ansible code-base, use something simi
   path: roles/external/
 
 ```
-_Note:you must specify `version` as `master` if you're still using Ansible 1.9.4_
+_Note: you must specify `version` as `master` if you're still using Ansible 1.9.4_
 
 ### Install the Ansible 2.0 version of this role
 With the release of Ansible 2.0, this role is officially supported with some performance enhancements and extra features (automatic upgrades, for instance).  
@@ -222,6 +226,16 @@ A playbook to deploy Rocket.Chat to `chat_servers` but exclude the deployment of
     roles:
       - RocketChat.Server
 ```
+
+FAQ
+---
+- **When I try to deploy using this role, it fails on the `Fetch the Rocket.Chat binary tarball` task**  
+If deployment fails with a message similar to the following, this is because the role hasn't been updated to reflect the SHA256 hash sum of the latest Rocket.Chat release tarball
+```
+TASK [RocketChat.Server : Fetch the Rocket.Chat binary tarball] ****************
+fatal: [chat1]: FAILED! => {"changed": false, "failed": true, "msg": "The checksum for /var/lib/rocket.chat/rocket.chat-latest.tgz did not match e6caca890c86f79595da14398dd3ab0c0d3222932d6a8a1b38c6e5082531acd2; it was 21ef5ee220671e5f514f240d1423514c5780d81d6ffba8720d19660079099925."}
+```
+Right now, maintenance of this variable is a manual process. In the meantime you can simply set this variable's value yourself; via `host_vars`, `group_vars`, `vars` in your playbook, or with `-e` when running `ansible-playbook`, etc.  
 
 Available tags
 --------------
