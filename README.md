@@ -102,7 +102,7 @@ Set in [`vars/RedHat.yml`](vars/RedHat.yml)
 | `rocket_chat_mongodb_dbpath` | `/var/lib/mongodb` | The path for MongoDB to store its databases |
 | `rocket_chat_nginx_process_user` | `nginx` | The user for that will be used to spawn the Nginx server process |
 
-### RHEL/CentOS 7 variables (also used for RHEL 7 systems)
+### RHEL/CentOS 7 variables
 Set in [`vars/RedHat_7.yml`](vars/RedHat_7.yml)
 
 |     Name     |     Default Value    |    Description     |
