@@ -9,6 +9,12 @@
         To permit automatic upgrades set 'rocket_chat_automatic_upgrades' to true
     when: not rocket_chat_automatic_upgrades|bool
 
+  - name: Ensure the back up directory exists [UPGRADE]
+    file:
+      path: "{{ rocket_chat_upgrade_backup_path }}"
+      state: directory
+    when: rocket_chat_upgrade_backup|bool
+
   - name: Back up the current Rocket.Chat instance [UPGRADE]
     shell: >-
       mv {{ rocket_chat_application_path }}/bundle
