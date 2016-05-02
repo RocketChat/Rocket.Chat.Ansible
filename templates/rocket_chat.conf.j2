@@ -1,5 +1,5 @@
 upstream rocket_chat {
-        server 127.0.0.1:3000;
+        server 127.0.0.1:{{ rocket_chat_service_port }};
 }
 server {
         listen  80;
