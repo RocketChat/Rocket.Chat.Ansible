@@ -108,7 +108,7 @@
     become: true
     become_user: "{{ rocket_chat_service_user }}"
     tags: build
-      
+
   - name: Install Rocket.Chat via NPM
     npm:
       state: present
@@ -194,7 +194,7 @@
   - name: Ensure the Rocket.Chat service is running/enabled
     service: name=rocketchat state=started enabled=true
     tags: service
-  
+
   - include: nginx.yml
     when: rocket_chat_include_nginx|bool
     tags: nginx
