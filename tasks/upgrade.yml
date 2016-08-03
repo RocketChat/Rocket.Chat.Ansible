@@ -15,17 +15,20 @@
       state: directory
     when: rocket_chat_upgrade_backup|bool
 
+  - name: Check if a backup was already made today [UPGRADE]
+    stat:
+      path: "{{ rocket_chat_upgrade_backup_path }}/backup_{{ ansible_date_time.date }}"
+    register: rocket_chat_upgrade_backup_dir_stat
+
   - name: Back up the current Rocket.Chat instance [UPGRADE]
     shell: >-
-      mv {{ rocket_chat_application_path }}/bundle
-      {{ rocket_chat_upgrade_backup_path }}/backup_{{ ansible_date_time.date }}
+      mv -f
+      "{{ rocket_chat_application_path }}/bundle"
+      "{{ rocket_chat_upgrade_backup_path }}/backup_{{ ansible_date_time.date }}"
+    args:
+      removes: "{{ rocket_chat_application_path }}/bundle"
     when: rocket_chat_upgrade_backup|bool
-
-  - name: Delete the current Rocket.Chat instance [UPGRADE]
-    file:
-      path: "{{ rocket_chat_application_path }}/bundle"
-      state: absent
-    when: not rocket_chat_upgrade_backup|bool
+          and not rocket_chat_upgrade_backup_dir_stat.stat.exists
 
   - name: Set the Rocket.Chat upgrade status [UPGRADE]
     set_fact:

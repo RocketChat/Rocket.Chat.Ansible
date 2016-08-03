@@ -7,8 +7,12 @@ rocket_chat_application_path: /var/lib/rocket.chat
 rocket_chat_version: latest
 rocket_chat_tarball_remote: https://rocket.chat/releases/{{ rocket_chat_version }}/download
 rocket_chat_tarball_sha256sum: 2bee49931331ebe1c5985f08db74dd93150ace3ead4404244176e2fffb657780
+rocket_chat_tarball_sha256sum_short: "{{ rocket_chat_tarball_sha256sum | truncate(7, True, '') }}"
 rocket_chat_tarball_fetch_timeout: 100
 rocket_chat_tarball_validate_remote_cert: true
+rocket_chat_tarball_new: "{{ rocket_chat_temp_bundle_dir }}/rocket.chat-{{ rocket_chat_tarball_sha256sum_short }}.tgz"
+rocket_chat_tarball_current: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
+rocket_chat_temp_bundle_dir: "{{ rocket_chat_application_path }}/{{ rocket_chat_tarball_sha256sum_short }}"
 rocket_chat_service_user: rocketchat
 rocket_chat_service_group: rocketchat
 rocket_chat_service_host: "{{ ansible_fqdn }}"

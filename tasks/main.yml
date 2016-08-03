@@ -19,12 +19,6 @@
     when: rocket_chat_include_mongodb|bool
     tags: mongodb
 
-  - name: Ensure the Rocket.Chat service group is present
-    group:
-      name: "{{ rocket_chat_service_group }}"
-      state: present
-      system: true
-
   - name: Ensure the Rocket.Chat service user is present
     user:
       comment: Rocket.Chat Service User
@@ -33,6 +27,12 @@
       home: "{{ rocket_chat_application_path }}"
       createhome: true
       shell: /bin/false
+      state: present
+      system: true
+
+  - name: Ensure the Rocket.Chat service group is present
+    group:
+      name: "{{ rocket_chat_service_group }}"
       state: present
       system: true
 
@@ -86,29 +86,54 @@
     set_fact:
       rocket_chat_upgraded: false
 
-  - name: Fetch the Rocket.Chat binary tarball
+  - name: Create temporary tarball/bundle directory
+    file:
+      path: "{{ rocket_chat_temp_bundle_dir }}"
+      state: directory
+    become: true
+    become_user: "{{ rocket_chat_service_user }}"
+
+  - name: Fetch the Rocket.Chat binary tarball into a temp location
     get_url:
       url: "{{ rocket_chat_tarball_remote }}"
       checksum: "sha256:{{ rocket_chat_tarball_sha256sum }}"
-      dest: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
-      force: yes
+      dest: "{{ rocket_chat_tarball_new }}"
       timeout: "{{ rocket_chat_tarball_fetch_timeout }}"
       validate_certs: "{{ rocket_chat_tarball_validate_remote_cert }}"
-    notify: Upgrade Rocket.Chat
     become: true
     become_user: "{{ rocket_chat_service_user }}"
+
+  - name: Unpack the Rocket.Chat binary into a temp location
+    unarchive:
+      copy: false
+      src: "{{ rocket_chat_tarball_new }}"
+      dest: "{{ rocket_chat_temp_bundle_dir }}"
+    become: true
+    become_user: "{{ rocket_chat_service_user }}"
+
+  - name: Recursively diff both unpacked bundles to determine if a Rocket.Chat upgrade is necessary
+      # These should be identical if nothing changed, sans node_modules, hence -x
+    shell: >-
+      diff -rq -x'node_modules'
+      "{{ rocket_chat_temp_bundle_dir | quote }}/bundle"
+      "{{ rocket_chat_application_path | quote }}/bundle"
+      >/dev/null
+    register: diff_result
+    changed_when: "diff_result.rc != 0" # 1 is different, 2 is error
+    failed_when: false
+    notify:
+      - Upgrade Rocket.Chat
+      - Install Rocket.Chat
+    tags:
+      - install
+      - upgrade
 
   - meta: flush_handlers
 
-  - name: Unpack the Rocket.Chat binary tarball
-    unarchive:
-      copy: false
-      src: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
-      dest: "{{ rocket_chat_application_path }}"
-      creates: "{{ rocket_chat_application_path }}/bundle"
-    become: true
-    become_user: "{{ rocket_chat_service_user }}"
-    tags: build
+  - name: Remove temporary archive dir if present
+    file:
+      path: "{{ rocket_chat_temp_bundle_dir }}"
+      state: absent
 
   - name: Install Rocket.Chat via NPM
     npm:

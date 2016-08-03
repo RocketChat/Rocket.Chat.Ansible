@@ -1,0 +1,24 @@
+
+  - name: Delete the current Rocket.Chat instance [INSTALL]
+    file:
+      path: "{{ rocket_chat_application_path }}/bundle"
+      state: absent
+
+  - name: Move the unpacked Rocket.Chat binary tarball into place [INSTALL]
+    shell: >-
+      mv
+      "{{ rocket_chat_temp_bundle_dir }}/bundle"
+      "{{ rocket_chat_application_path }}/bundle"
+    args:
+      removes: "{{ rocket_chat_temp_bundle_dir }}/bundle"
+    become: true
+    become_user: "{{ rocket_chat_service_user }}"
+
+  - name: Hardlink the new Rocket.Chat tarball to be the current tarball [INSTALL]
+    file:
+      force: yes
+      state: hard
+      src: "{{ rocket_chat_tarball_new }}"
+      path: "{{ rocket_chat_tarball_current }}"
+      owner: "{{ rocket_chat_service_user }}"
+      group: "{{ rocket_chat_service_group }}"
