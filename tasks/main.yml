@@ -54,7 +54,7 @@
       global: true
       executable: "{{ rocket_chat_original_npm }}"
 
-  - name: Ensure Forever (NodeJS) is installed
+  - name: Ensure Forever (NodeJS) is installed [Ubuntu 14]
     npm:
       name: forever
       global: yes
@@ -86,7 +86,7 @@
     set_fact:
       rocket_chat_upgraded: false
 
-  - name: Ensure acl-tools are present
+  - name: Ensure acl-tools are present [Ubuntu 16]
     package:
       name: acl
       state: present
@@ -115,7 +115,7 @@
     become: true
     become_user: "{{ rocket_chat_service_user }}"
     tags: build
-      
+
   - name: Install Rocket.Chat via NPM
     npm:
       state: present
@@ -125,13 +125,13 @@
     become_user: "{{ rocket_chat_service_user }}"
     tags: build
 
-  - name: Check to see if the Rocket.Chat log file is present
+  - name: Check to see if the Rocket.Chat log file is present [Ubuntu 14]
     stat: path=/var/log/rocketchat.log
     register: rocket_chat_log_file_state
     when: (ansible_distribution == "Ubuntu")
           and (ansible_distribution_major_version == "14")
 
-  - name: Ensure the Rocket.Chat log file is present
+  - name: Ensure the Rocket.Chat log file is present [Ubuntu 14]
     file:
       path: /var/log/rocketchat.log
       state: touch
@@ -141,13 +141,13 @@
           and (ansible_distribution_major_version == "14")
           and not rocket_chat_log_file_state.stat.exists
 
-  - name: Check to see if the Rocket.Chat pid file is present
+  - name: Check to see if the Rocket.Chat pid file is present [Ubuntu 14]
     stat: path=/var/run/rocketchat.pid
     register: rocket_chat_pid_file_state
     when: (ansible_distribution == "Ubuntu")
           and (ansible_distribution_major_version == "14")
 
-  - name: Ensure the Rocket.Chat pid file is present
+  - name: Ensure the Rocket.Chat pid file is present [Ubuntu 14]
     file:
       path: /var/run/rocketchat.pid
       state: touch
@@ -201,7 +201,7 @@
   - name: Ensure the Rocket.Chat service is running/enabled
     service: name=rocketchat state=started enabled=true
     tags: service
-  
+
   - include: nginx.yml
     when: rocket_chat_include_nginx|bool
     tags: nginx
