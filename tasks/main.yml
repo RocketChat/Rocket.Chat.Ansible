@@ -86,6 +86,13 @@
     set_fact:
       rocket_chat_upgraded: false
 
+  - name: Ensure acl-tools are present
+    package:
+      name: acl
+      state: present
+    when: (ansible_distribution == "Ubuntu")
+          and (ansible_distribution_major_version == "16")
+
   - name: Fetch the Rocket.Chat binary tarball
     get_url:
       url: "{{ rocket_chat_tarball_remote }}"
