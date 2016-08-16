@@ -4,17 +4,17 @@ Deploy [Rocket.Chat](http://rocket.chat), the ultimate open source web chat plat
 
 Features
 --------
-- __Optional full stack deployment:__  
-    Fully deploy [Rocket.Chat](http://rocket.chat), including [MongoDB](http://mongodb.com) & an [Nginx](https://www.nginx.com/) reverse SSL proxy.  
-    Or, deploy [Rocket.Chat](http://rocket.chat) and integrate with your existing [MongoDB](http://mongodb.com) and/or [Nginx](https://www.nginx.com/) instances/deployment methods.  
+- __Optional full stack deployment:__
+    Fully deploy [Rocket.Chat](http://rocket.chat), including [MongoDB](http://mongodb.com) & an [Nginx](https://www.nginx.com/) reverse SSL proxy.
+    Or, deploy [Rocket.Chat](http://rocket.chat) and integrate with your existing [MongoDB](http://mongodb.com) and/or [Nginx](https://www.nginx.com/) instances/deployment methods.
 
-- __Optional automatic SSL cert generation:__  
-    Automatically generate SSL certs for HTTPS connectivity via an [Nginx](https://www.nginx.com/) reverse proxy.  
-    Or, deploy your own SSL certs!  
+- __Optional automatic SSL cert generation:__
+    Automatically generate SSL certs for HTTPS connectivity via an [Nginx](https://www.nginx.com/) reverse proxy.
+    Or, deploy your own SSL certs!
 
-- __Optional automatic upgrades [requires Ansible 2.0]:__  
+- __Optional automatic upgrades [requires Ansible 2.0]:__
     If a new version of [Rocket.Chat](http://rocket.chat) is released, or if you want to follow development for testing purposes, simply update the `rocket_chat_version` to whichever release you wish to deploy (see [the Rocket.Chat releases page](https://rocket.chat/releaes), set `rocket_chat_automatic_upgrades` to `true` and let this role do the rest!
-    If there's a change to the code deployed to your [Rocket.Chat](http://rocket.chat) server (either because of a remote change to the `rocket_chat_version` you're following, 'latest' or 'develop' for instance, or because you set a new `rocket_chat_version` to fetch), this role will handle the upgrade and redeployment of the [Rocket.Chat](http://rocket.chat) service, keeping your data in tact.  
+    If there's a change to the code deployed to your [Rocket.Chat](http://rocket.chat) server (either because of a remote change to the `rocket_chat_version` you're following, 'latest' or 'develop' for instance, or because you set a new `rocket_chat_version` to fetch), this role will handle the upgrade and redeployment of the [Rocket.Chat](http://rocket.chat) service, keeping your data in tact.
 	_Note: This functionality requires Ansible 2.0. See how to fetch the 2.0 version of this role in the [Install from Ansible Galaxy secion](#install-the-ansible-20-version-of-this-role)_
 
 Supported Platforms
@@ -23,18 +23,17 @@ Supported Platforms
 - Jessie (8)
 
 ### Ubuntu
-- Trusty: 14.04
-- Vivid: 15.04
+- Xenial: 16.04 LTS
+- Trusty: 14.04 LTS
 
 ### EL (RHEL/CentOS)
 - 7
 
-Support for other distributions/operating systems is planned for the near future.
 If you'd like to see your distribution/operating system supported, please [raise an issue](https://github.com/RocketChat/Rocket.Chat.Ansible/issues)!
 
 Running into problems?
 ----------------------
-Please be sure you've read the [FAQ](#faq) and all documentation before raising an issue.  
+Please be sure you've read the [FAQ](#faq) and all documentation before raising an issue.
 
 Role Variables
 --------------
@@ -114,7 +113,7 @@ Set in [`vars/RedHat_7.yml`](vars/RedHat_7.yml)
 | `rocket_chat_tarball_validate_remote_cert` | false | A boolean value that determines wether or not to validate the SSL certs for the Rocket.Chat tarball remote |
 
 ### Debian variables
-Set in [`vars/Debian.yml`](vars/Debian.yml)  
+Set in [`vars/Debian.yml`](vars/Debian.yml)
 
 |     Name     |     Default Value    |    Description     |
 |---------------------------|-----------------------|------------------------------------|
@@ -130,7 +129,7 @@ Set in [`vars/Debian.yml`](vars/Debian.yml)
 | `rocket_chat_nginx_process_user` | `www-data` | The user for that will be used to spawn the Nginx server process |
 
 ### Debian 8 variables
-Set in [`vars/Debian_8.yml`](vars/Debian_8.yml)  
+Set in [`vars/Debian_8.yml`](vars/Debian_8.yml)
 
 |     Name     |     Default Value    |    Description     |
 |---------------------------|-----------------------|------------------------------------|
@@ -141,7 +140,7 @@ Set in [`vars/Debian_8.yml`](vars/Debian_8.yml)
 | `rocket_chat_mongodb_apt_repo` | `deb http://repo.mongodb.org/apt/debian wheezy/mongodb-org/3.0 main` | The APT repository for MongoDB |
 
 ### Ubuntu variables
-Set in [`vars/Ubuntu.yml`](vars/Ubuntu.yml)  
+Set in [`vars/Ubuntu.yml`](vars/Ubuntu.yml)
 
 |     Name     |     Default Value    |    Description     |
 |---------------------------|-----------------------|------------------------------------|
@@ -156,8 +155,8 @@ Set in [`vars/Ubuntu.yml`](vars/Ubuntu.yml)
 |                                  | `    replSetName:  "001-rs"`  |                                       |
 | `rocket_chat_nginx_process_user` | `www-data` | The user for that will be used to spawn the Nginx server process |
 
-### Ubuntu 15 variables
-Set in [`vars/Ubuntu_15.yml`](vars/Ubuntu_15.yml)  
+### Ubuntu 16 variables
+Set in [`vars/Ubuntu_15.yml`](vars/Ubuntu_15.yml)
 
 |     Name     |     Default Value    |    Description     |
 |---------------------------|-----------------------|------------------------------------|
@@ -168,7 +167,7 @@ Set in [`vars/Ubuntu_15.yml`](vars/Ubuntu_15.yml)
 | `rocket_chat_mongodb_apt_repo` | `deb http://repo.mongodb.org/apt/debian wheezy/mongodb-org/3.0 main` | The APT repository for MongoDB |
 
 ### Ubuntu 14 variables
-Set in [`vars/Ubuntu_14.yml`](vars/Ubuntu_14.yml)  
+Set in [`vars/Ubuntu_14.yml`](vars/Ubuntu_14.yml)
 
 |     Name     |     Default Value    |    Description     |
 |---------------------------|-----------------------|------------------------------------|
@@ -187,20 +186,20 @@ To install this role, and track it in your Ansible code-base, use something simi
 
 ``` yaml
 - src: RocketChat.Server
-  version: master
+  version: v1.9.0
   path: roles/external/
 
 ```
-_Note: you must specify `version` as `master` if you're still using Ansible 1.9.4_
+_Note: you must specify `version` as `v1.9.0` if you're still using Ansible 1.9.4_
 
 ### Install the Ansible 2.0 version of this role
-With the release of Ansible 2.0, this role is officially supported with some performance enhancements and extra features (automatic upgrades, for instance).  
-To use the Ansible 2.0 version of this role, you can install it using the `ansible-galaxy` command line tool using a `requirements.yml` (both mentioned above) to specify the version you wish to use.  
+With the release of Ansible 2.0, this role is officially supported with some performance enhancements and extra features (automatic upgrades, for instance).
+To use the Ansible 2.0 version of this role, you can install it using the `ansible-galaxy` command line tool using a `requirements.yml` (both mentioned above) to specify the version you wish to use.
 
 Here's an example `requirements.yml` file to install via `ansible-galaxy` will fetch the Ansible 2.0 code:
 ``` yaml
   - src: RocketChat.Server
-    version: v2.0
+    version: v2.1.0
     path: roles/external
 ```
 
@@ -222,20 +221,20 @@ A playbook to deploy Rocket.Chat to `chat_servers` but exclude the deployment of
       rocket_chat_automatic_upgrades: true
       rocket_chat_include_mongodb: false
       rocket_chat_mongodb_server: 10.19.3.24
-  
+
     roles:
       - RocketChat.Server
 ```
 
 FAQ
 ---
-- **When I try to deploy using this role, it fails on the `Fetch the Rocket.Chat binary tarball` task**  
+- **When I try to deploy using this role, it fails on the `Fetch the Rocket.Chat binary tarball` task**
 If deployment fails with a message similar to the following, this is because the role hasn't been updated to reflect the SHA256 hash sum of the latest Rocket.Chat release tarball
 ```
 TASK [RocketChat.Server : Fetch the Rocket.Chat binary tarball] ****************
 fatal: [chat1]: FAILED! => {"changed": false, "failed": true, "msg": "The checksum for /var/lib/rocket.chat/rocket.chat-latest.tgz did not match e6caca890c86f79595da14398dd3ab0c0d3222932d6a8a1b38c6e5082531acd2; it was 21ef5ee220671e5f514f240d1423514c5780d81d6ffba8720d19660079099925."}
 ```
-Right now, maintenance of this variable is a manual process. In the meantime you can simply set this variable's value yourself; via `host_vars`, `group_vars`, `vars` in your playbook, or with `-e` when running `ansible-playbook`, etc.  
+Right now, maintenance of this variable is a manual process. In the meantime you can simply set this variable's value yourself; via `host_vars`, `group_vars`, `vars` in your playbook, or with `-e` when running `ansible-playbook`, etc.
 
 Available tags
 --------------
@@ -261,13 +260,11 @@ This is, as you might have guessed, for running test deployments via [Vagrant](h
 If you'd like to test some changes, or simply see how the role works/provision a little play Rocket.Chat server locally,
 you can `cd` into `tests/` and run `vagrant up` (provided you have Vagrant & VirtualBox installed).
 
-If you take a look at the `Vagrantfile`, you'll see there's a deployment for each currently supported platform - simply comment out any you don't want to deploy (don't forget their Ansible config at the bottom, either!).  
+If you take a look at the `Vagrantfile`, you'll see there's a deployment for each currently supported platform - simply comment out any you don't want to deploy (don't forget their Ansible config at the bottom, either!).
 Once deployment is finished, if you want to try Rocket.Chat out, you can visit `http://localhost:4000` in your browser (the port `4000` varies here, based on which platform you're deploying, see the `forwarded_port` value for your platform).
 
 TODO
 ----
-* [x] Add service user/group to run the Rocket.Chat process (for security...)
-* [x] Move from PM2 to native service management systems
 * [ ] Use Let's Encrypt for SSL
 
 License
@@ -276,6 +273,6 @@ MIT
 
 Issues/Contributions
 --------------------
-Feel free to:  
-[Raise an issue](https://github.com/RocketChat/Rocket.Chat.Ansible/issues)  
-[Contribute](https://github.com/RocketChat/Rocket.Chat.Ansible/pulls)  
+Feel free to:
+[Raise an issue](https://github.com/RocketChat/Rocket.Chat.Ansible/issues)
+[Contribute](https://github.com/RocketChat/Rocket.Chat.Ansible/pulls)
