@@ -1,54 +1,52 @@
 ---
-language: python
-python: "2.7"
 sudo: required
 
-# Install ansible
-addons:
-  apt:
-    packages:
-      - python-pip
+env:
+  - >
+    container_id=$(mktemp)
+    distribution=centos
+    version=7
+    init=/usr/lib/systemd/systemd
+    run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+  - >
+    container_id=$(mktemp)
+    distribution=ubuntu
+    version=14.04
+    init=/sbin/init
+    run_opts=""
+
+services:
+  - docker
+
+before_install:
+  - sudo apt-get update
+  - sudo docker pull ${distribution}:${version}
+  - >
+    sudo docker build --rm=true
+    --file=tests/Dockerfile.${distribution}
+    --tag=${distribution}:ansible tests
 
 before_script:
-    - printf '{"role_name":"Rocket.Chat.Ansible","host_name":"localhost"}' > /tmp/extra_vars
-
-
-install:
-  # Install ansible
-  - pip install ansible
-
-  # Check ansible version
-  - ansible --version
-
-  # Create ansible.cfg with correct roles_path
-  - printf '[defaults]\nroles_path=../' >ansible.cfg
+  - printf '{"role_name":"Rocket.Chat.Ansible","host_name":"localhost"}' > /tmp/extra_vars
 
 script:
-  # Basic role syntax check
-  - >
-    ansible-playbook tests/provision.yml
-    -i localhost, --syntax-check
-    --extra-vars "@/tmp/extra_vars"
 
-  # First run
-  - >
-    ansible-playbook tests/provision.yml
-    -i localhost, --connection=local --become
-    --extra-vars "@/tmp/extra_vars"
+    # Run container in detached state
+  - sudo docker run --detach --volume="${PWD}":/etc/ansible/roles/Rocket.Chat.Ansible:ro ${run_opts} ${distribution}:ansible "${init}" > "${container_id}"
 
-  # Check for idempotency
+    # Syntax check
+  - sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/Rocket.Chat.Ansible/tests/provision.yml --syntax-check --extra-vars="$(cat /tmp/extra_vars)"
+    # Test role
+  - sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/Rocket.Chat.Ansible/tests/provision.yml --extra-vars="$(cat /tmp/extra_vars)"
+    # Idempotence test
   - >
-    ansible-playbook tests/provision.yml
-    -i localhost, --connection=local --become
-    --extra-vars "@/tmp/extra_vars"
-    | awk -F'[ =]' '$0 ~ "^PLAY RECAP ***" { ln=NR+1 } ln==NR {
-     for(i=1;i<=NF;i++){ if($i~"changed"){ cngnum=$(i+1) }}}
-     END{ if(cngnum>0){ exit 1 }}'
+    sudo docker exec "$(cat ${container_id})" ansible-playbook /etc/ansible/roles/Rocket.Chat.Ansible/tests/provision.yml --extra-vars="$(cat /tmp/extra_vars)"
+    | grep -q 'changed=0.*failed=0'
+    && (echo 'Idempotence test: pass' && exit 0)
+    || (echo 'Idempotence test: fail' && exit 1)
 
-  # Check for running instance with HTTP and HTTPS ports
-  - sleep 10
-  - curl http://localhost:80
-  - curl https://localhost:443
+    # Clean up
+  - sudo docker stop "$(cat ${container_id})"
 
 
 notifications:
