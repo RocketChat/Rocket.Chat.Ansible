@@ -1,8 +1,7 @@
 ---
 
 - name: Apply the Rocket.Chat role to all chat_servers
-  hosts: chat_servers
+  hosts: "{{ host_name }}"
 
   roles:
-    # Clone as RochetChat.Server from git or test from ansible-galaxy install
-    - ../../RocketChat.Server
+    - "{{ role_name }}"

@@ -1,15 +1,17 @@
 ---
 language: python
 python: "2.7"
-
-# Use the new container infrastructure
-sudo: false
+sudo: required
 
 # Install ansible
 addons:
   apt:
     packages:
-    - python-pip
+      - python-pip
+
+before_script:
+    - printf '{"role_name":"Rocket.Chat.Ansible","host_name":"localhost"}' > /tmp/extra_vars
+
 
 install:
   # Install ansible
@@ -23,7 +25,31 @@ install:
 
 script:
   # Basic role syntax check
-  - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+  - >
+    ansible-playbook tests/provision.yml
+    -i localhost, --syntax-check
+    --extra-vars "@/tmp/extra_vars"
+
+  # First run
+  - >
+    ansible-playbook tests/provision.yml
+    -i localhost, --connection=local --become
+    --extra-vars "@/tmp/extra_vars"
+
+  # Check for idempotency
+  - >
+    ansible-playbook tests/provision.yml
+    -i localhost, --connection=local --become
+    --extra-vars "@/tmp/extra_vars"
+    | awk -F'[ =]' '$0 ~ "^PLAY RECAP ***" { ln=NR+1 } ln==NR {
+     for(i=1;i<=NF;i++){ if($i~"changed"){ cngnum=$(i+1) }}}
+     END{ if(cngnum>0){ exit 1 }}'
+
+  # Check for running instance with HTTP and HTTPS ports
+  - sleep 10
+  - curl http://localhost:80
+  - curl https://localhost:443
+
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
