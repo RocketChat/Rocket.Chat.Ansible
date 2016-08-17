@@ -101,9 +101,20 @@
       dest: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
       timeout: "{{ rocket_chat_tarball_fetch_timeout }}"
       validate_certs: "{{ rocket_chat_tarball_validate_remote_cert }}"
-    notify: Upgrade Rocket.Chat
+    # Temp fix for ansible/ansible#15915 ( Broken include in handlers )
+    # https://github.com/ansible/ansible/issues/15915
+    #notify: Upgrade Rocket.Chat
     become: true
     become_user: "{{ rocket_chat_service_user }}"
+    register: result
+    retries: 3
+
+  - name: Upgrade Rocket.Chat
+    include: upgrade.yml
+    when: ( result|changed )
+          and ( rocket_chat_deploy_state.stat.exists )
+    tags:
+      - upgrade
 
   - meta: flush_handlers
 
