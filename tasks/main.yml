@@ -40,6 +40,7 @@
     package:
       name: "{{ rocket_chat_dep_packages }}"
       state: present
+    retries: 2
 
   - name: Ensure link /bin/node -> /bin/nodejs exists
     file:
