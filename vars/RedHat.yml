@@ -5,6 +5,7 @@ rocket_chat_dep_packages:
   - nodejs
   - npm
   - make
+  - wget
 
 rocket_chat_mongodb_packages:
   - mongodb
