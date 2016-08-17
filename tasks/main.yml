@@ -77,6 +77,7 @@
       dest: /etc/hosts
       line:  "127.0.0.1    {{ ansible_fqdn }}    {{ ansible_hostname }}"
       regexp: '^127.0.0.1'
+    when: ansible_virtualization_type != "docker"
 
   - name: Check to see if this is the initial Rocket.Chat deployment
     stat:
