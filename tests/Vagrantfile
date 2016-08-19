@@ -55,12 +55,7 @@ Vagrant.configure("2") do |config|
       "chat_servers" => ["debian8", "ubuntu14", "ubuntu16", "centos7"],
     }
 
-    ansible.extra_vars = {
-      rocket_chat_service_host: "localhost",
-      rocket_chat_automatic_upgrades: 'true',
-	  role_name: "../../RocketChat.Server",
-	  host_name: "chat_servers",
-    }
+    #ansible.extra_vars = { }
 
     ansible.sudo = true
     ansible.playbook = "provision.yml"

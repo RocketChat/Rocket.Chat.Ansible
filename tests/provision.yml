@@ -1,7 +1,10 @@
 ---
 
 - name: Apply the Rocket.Chat role to all chat_servers
-  hosts: "{{ host_name }}"
+  hosts: "{{ host_name | default('chat_servers') }}"
 
   roles:
-    - "{{ role_name }}"
+    - role: "{{ role_name | default('../../RocketChat.Server') }}"
+      rocket_chat_tarball_check_checksum: false
+      rocket_chat_service_host: localhost
+      rocket_chat_automatic_upgrades: true
