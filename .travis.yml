@@ -48,7 +48,7 @@ before_install:
 before_script:
   - sudo docker run --detach
     --volume="${PWD}:/etc/ansible/roles/Rocket.Chat.Ansible:ro"
-    "${run_opts}" "${dist}:ansible" "${init}" > "${container_id}"
+    ${run_opts} "${dist}:ansible" "${init}" > "${container_id}"
 
 script:
   - sudo docker exec --tty "$(cat ${container_id})"
