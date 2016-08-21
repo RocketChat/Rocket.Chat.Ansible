@@ -39,7 +39,7 @@ RUN sed -i 's/^\($ModLoad imklog\)/#\1/' /etc/rsyslog.conf
 
 # Install Ansible
 RUN apt-get update -y
-RUN apt-get install -y python-pip python-dev git
+RUN apt-get install -y python-pip python-dev libssl-dev git libffi-dev
 RUN pip install --upgrade pip
 RUN pip install --upgrade ansible
 # Install Ansible inventory file
