@@ -1,7 +1,7 @@
 # Dockerfile.ubuntu
-FROM ubuntu:14.04
+FROM ubuntu-upstart:14.04
 # Install Ansible
-RUN mv /sbin/initctl.distrib /sbin/initctl
+#RUN mv /sbin/initctl.distrib /sbin/initctl
 RUN apt-get update -y
 RUN apt-get install -y python-software-properties software-properties-common
 RUN add-apt-repository -y ppa:ansible/ansible
