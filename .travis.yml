@@ -42,7 +42,7 @@ services:
 
 before_install:
   - sudo docker build --rm=true
-    --file="tests/Dockerfile.${dist}_${ver}"
+    --file="tests/Dockerfile.${dist}-${ver}"
     --tag="${dist}:ansible" tests
 
 before_script:
