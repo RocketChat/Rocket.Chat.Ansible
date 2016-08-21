@@ -1,8 +1,10 @@
 ---
 
 - name: Apply the Rocket.Chat role to all chat_servers
-  hosts: chat_servers
+  hosts: "{{ host_name | default('chat_servers') }}"
 
   roles:
-    # Clone as RochetChat.Server from git or test from ansible-galaxy install
-    - ../../RocketChat.Server
+    - role: "{{ role_name | default('../../RocketChat.Server') }}"
+      rocket_chat_tarball_check_checksum: false
+      rocket_chat_service_host: localhost
+      rocket_chat_automatic_upgrades: true

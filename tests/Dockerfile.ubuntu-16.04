@@ -1,0 +1,52 @@
+# Dockerfile.ubuntu
+FROM ubuntu:16.04
+
+RUN systemctl mask -- \
+    -.mount \
+    dev-mqueue.mount \
+    dev-hugepages.mount \
+    etc-hosts.mount \
+    etc-hostname.mount \
+    etc-resolv.conf.mount \
+    proc-bus.mount \
+    proc-irq.mount \
+    proc-kcore.mount \
+    proc-sys-fs-binfmt_misc.mount \
+    proc-sysrq\\\\x2dtrigger.mount \
+    sys-fs-fuse-connections.mount \
+    sys-kernel-config.mount \
+    sys-kernel-debug.mount \
+    tmp.mount \
+ \
+ && systemctl mask -- \
+    console-getty.service \
+    display-manager.service \
+    getty-static.service \
+    getty\@tty1.service \
+    hwclock-save.service \
+    ondemand.service \
+    systemd-logind.service \
+    systemd-remount-fs.service \
+ \
+ && ln -sf /lib/systemd/system/multi-user.target /etc/systemd/system/default.target \
+ \
+&& ln -sf /lib/systemd/system/halt.target /etc/systemd/system/sigpwr.target
+
+RUN apt-get update -qq -y
+RUN apt-get install -qq -y python-software-properties software-properties-common \
+	rsyslog systemd systemd-cron sudo
+RUN sed -i 's/^\($ModLoad imklog\)/#\1/' /etc/rsyslog.conf
+#ADD etc/rsyslog.d/50-default.conf /etc/rsyslog.d/50-default.conf
+
+# Install Ansible
+RUN add-apt-repository -y ppa:ansible/ansible
+RUN apt-get update -y
+RUN apt-get install -y ansible git-core
+# Install Ansible inventory file
+RUN echo "[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
+
+VOLUME ["/sys/fs/cgroup"]
+VOLUME ["/run"]
+CMD ["/sbin/init"]
+
+

@@ -12,8 +12,10 @@
     tags: repo
 
   - name: Ensure APT cache has been updated recently
-    apt: update_cache=yes cache_valid_time=3600
-    when: ansible_os_family == "Debian"
+    apt:
+      update_cache: yes
+      #cache_valid_time: 3600
+    when: ansible_pkg_mgr == "apt"
 
   - include: mongodb.yml
     when: rocket_chat_include_mongodb|bool
@@ -77,6 +79,7 @@
       dest: /etc/hosts
       line:  "127.0.0.1    {{ ansible_fqdn }}    {{ ansible_hostname }}"
       regexp: '^127.0.0.1'
+    when: ansible_virtualization_type != "docker"
 
   - name: Check to see if this is the initial Rocket.Chat deployment
     stat:
@@ -97,7 +100,7 @@
   - name: Fetch the Rocket.Chat binary tarball
     get_url:
       url: "{{ rocket_chat_tarball_remote }}"
-      sha256sum: "{{ rocket_chat_tarball_sha256sum }}"
+      checksum: "{{ (rocket_chat_tarball_check_checksum == false) | ternary(omit, 'sha256: ' + rocket_chat_tarball_sha256sum) }}"
       dest: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
       timeout: "{{ rocket_chat_tarball_fetch_timeout }}"
       validate_certs: "{{ rocket_chat_tarball_validate_remote_cert }}"

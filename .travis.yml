@@ -1,0 +1,65 @@
+---
+sudo: required
+dist: trusty
+language: generic
+
+env:
+  - >
+    dist=debian
+    ver=8
+    container_id=$(mktemp)
+    init=/sbin/init
+    run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    EXTRA_VARS='{"role_name":"Rocket.Chat.Ansible","host_name":"localhost"}'
+    VERBOSE='-vv'
+  - >
+    dist=centos
+    ver=7
+    container_id=$(mktemp)
+    init=/usr/lib/systemd/systemd
+    run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    EXTRA_VARS='{"role_name":"Rocket.Chat.Ansible","host_name":"localhost"}'
+    VERBOSE='-vv'
+  - >
+    dist=ubuntu
+    ver=14.04
+    container_id=$(mktemp)
+    init=/sbin/init
+    run_opts=""
+    EXTRA_VARS='{"role_name":"Rocket.Chat.Ansible","host_name":"localhost"}'
+    VERBOSE='-vv'
+  - >
+    dist=ubuntu
+    ver=16.04
+    container_id=$(mktemp)
+    init=/sbin/init
+    run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    EXTRA_VARS='{"role_name":"Rocket.Chat.Ansible","host_name":"localhost"}'
+    VERBOSE='-vv'
+
+services:
+  - docker
+
+before_install:
+  - sudo docker build --rm=true
+    --file="tests/Dockerfile.${dist}-${ver}"
+    --tag="${dist}:ansible" tests
+
+before_script:
+  - sudo docker run --detach
+    --volume="${PWD}:/etc/ansible/roles/Rocket.Chat.Ansible:ro"
+    ${run_opts} "${dist}:ansible" "${init}" > "${container_id}"
+
+script:
+  - sudo docker exec --tty "$(cat ${container_id})"
+    env TERM=xterm ansible-playbook
+    /etc/ansible/roles/Rocket.Chat.Ansible/tests/provision.yml
+    --extra-vars="$EXTRA_VARS" $VERBOSE --syntax-check
+
+  - sudo docker exec --tty "$(cat ${container_id})"
+    env TERM=xterm ansible-playbook
+    /etc/ansible/roles/Rocket.Chat.Ansible/tests/provision.yml
+    --extra-vars="$EXTRA_VARS" $VERBOSE
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
