@@ -2,6 +2,11 @@ Rocket.Chat [![Ansible Galaxy](https://img.shields.io/badge/galaxy-RocketChat.Se
 ===========
 Deploy [Rocket.Chat](http://rocket.chat), the ultimate open source web chat platform, with [Ansible](http://ansible.com)!
 
+Notes
+--------
+ - `master` has been rebased on `v2.0` and is now the most current code of the role (Instead of it being the 1.9-compatible version.) If you want the latest code, just don't include any version at all and `ansible-galaxy` will pull in the latest tag, or you can include `version: master` to always be current with development.
+ - `v1.9` users can continue to use tags `v1.9` and `v1.9.0`, and an `ansible_1.9` branch remains, though little if any backports will be made there.
+
 Features
 --------
 - __Optional full stack deployment:__
@@ -199,9 +204,9 @@ To use the Ansible 2.0 version of this role, you can install it using the `ansib
 Here's an example `requirements.yml` file to install via `ansible-galaxy` will fetch the Ansible 2.0 code:
 ``` yaml
   - src: RocketChat.Server
-    version: v2.1.0
     path: roles/external
 ```
+##### Note: `master` has been rebased on v2.0 and is now the most current code of the role. If you want the latest just don't include any version at all and `ansible-galaxy` will pull in the latest tag, or you can include `version: master` to always be current.
 
 Example Playbook
 ----------------
