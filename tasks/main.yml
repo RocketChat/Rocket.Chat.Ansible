@@ -57,14 +57,6 @@
       global: true
       executable: "{{ rocket_chat_original_npm }}"
 
-  - name: Ensure Forever (NodeJS) is installed [Ubuntu 14]
-    npm:
-      name: forever
-      global: yes
-      executable: "{{ rocket_chat_original_npm }}"
-    when: (ansible_distribution == "Ubuntu")
-          and (ansible_distribution_major_version == "14")
-
   - name: Check to see if n has installed the required 'node' binary
     stat:
       path: "{{ rocket_chat_node_10_40_path }}/node"
@@ -140,37 +132,15 @@
     become_user: "{{ rocket_chat_service_user }}"
     tags: build
 
-  - name: Check to see if the Rocket.Chat log file is present [Ubuntu 14]
-    stat: path=/var/log/rocketchat.log
-    register: rocket_chat_log_file_state
-    when: (ansible_distribution == "Ubuntu")
-          and (ansible_distribution_major_version == "14")
-
-  - name: Ensure the Rocket.Chat log file is present [Ubuntu 14]
+  - name: Ensure the Rocket.Chat log file symlink is present [Ubuntu 14]
     file:
       path: /var/log/rocketchat.log
-      state: touch
-      owner: "{{ rocket_chat_service_user }}"
-      group: "{{ rocket_chat_service_group }}"
-    when: (ansible_distribution == "Ubuntu")
-          and (ansible_distribution_major_version == "14")
-          and not rocket_chat_log_file_state.stat.exists
+      src: /var/log/upstart/rocketchat.log
+      state: link
+      force: yes
 
-  - name: Check to see if the Rocket.Chat pid file is present [Ubuntu 14]
-    stat: path=/var/run/rocketchat.pid
-    register: rocket_chat_pid_file_state
     when: (ansible_distribution == "Ubuntu")
           and (ansible_distribution_major_version == "14")
-
-  - name: Ensure the Rocket.Chat pid file is present [Ubuntu 14]
-    file:
-      path: /var/run/rocketchat.pid
-      state: touch
-      owner: "{{ rocket_chat_service_user }}"
-      group: "{{ rocket_chat_service_group }}"
-    when: (ansible_distribution == "Ubuntu")
-          and (ansible_distribution_major_version == "14")
-          and not rocket_chat_pid_file_state.stat.exists
 
   - name: Ensure the Rocket.Chat application data permissions are correct
     file:

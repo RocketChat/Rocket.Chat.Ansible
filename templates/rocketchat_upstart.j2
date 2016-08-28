@@ -1,23 +1,19 @@
 #!upstart
 #
 # Rocket.Chat upstart script
-# This upstart script makes use of Forever : https://github.com/nodejitsu/forever
-
 
 description "Rocket.Chat Server"
- 
+
 start on startup
 stop on shutdown
- 
-expect fork
- 
+
+console log
+respawn
+respawn limit 10 5
+
 env NODE_BIN_DIR="{{ rocket_chat_node_10_40_path }}"
 env NODE_PATH="/usr/local/lib/node_modules"
 env APPLICATION_PATH="{{ rocket_chat_application_path }}/bundle/main.js"
-env PIDFILE="/var/run/rocketchat.pid"
-env LOG="/var/log/rocketchat.log"
-env MIN_UPTIME="5000"
-env SPIN_SLEEP_TIME="2000"
 
 chdir {{ rocket_chat_application_path }}
 setuid {{ rocket_chat_service_user }}
@@ -28,20 +24,7 @@ env MONGO_OPLOG_URL="mongodb://{{ rocket_chat_mongodb_server }}:{{ rocket_chat_m
 env ROOT_URL="https://{{ rocket_chat_service_host }}"
 env PORT="{{ rocket_chat_service_port }}"
 
-
 script
     PATH=$NODE_BIN_DIR:$PATH
-
-    exec forever \
-      --pidFile $PIDFILE \
-      -a \
-      -l $LOG \
-      --minUptime $MIN_UPTIME \
-      --spinSleepTime $SPIN_SLEEP_TIME \
-      start $APPLICATION_PATH
-end script
-
-pre-stop script
-    PATH=$NODE_BIN_DIR:$PATH
-    exec forever stop $APPLICATION_PATH
+    node $APPLICATION_PATH
 end script
