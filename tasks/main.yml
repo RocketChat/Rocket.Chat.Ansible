@@ -94,6 +94,7 @@
     get_url:
       url: "{{ rocket_chat_tarball_remote }}"
       checksum: "{{ (rocket_chat_tarball_check_checksum == false) | ternary(omit, 'sha256: ' + rocket_chat_tarball_sha256sum) }}"
+      force: "{{ (rocket_chat_tarball_check_checksum == false) | ternary('yes', omit) }}"
       dest: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
       timeout: "{{ rocket_chat_tarball_fetch_timeout }}"
       validate_certs: "{{ rocket_chat_tarball_validate_remote_cert }}"
@@ -104,6 +105,8 @@
     become_user: "{{ rocket_chat_service_user }}"
     register: result
     retries: 3
+    changed_when: (result|changed)
+                  or (not rocket_chat_tarball_check_checksum)
 
   - name: Upgrade Rocket.Chat
     include: upgrade.yml
