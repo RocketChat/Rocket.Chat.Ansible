@@ -8,7 +8,9 @@
           (ansible_selinux.status != "disabled")
 
   - name: Ensure Nginx is present
-    package: name=nginx state=present
+    package:
+      name: nginx
+      state: present
 
   - name: Deploy Nginx configuration
     template:
@@ -62,4 +64,7 @@
     notify: Reload the Nginx service
 
   - name: Ensure the Nginx service is running/enabled
-    service: name=nginx state=started enabled=true
+    service:
+      name: nginx
+      state: started
+      enabled: true

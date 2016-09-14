@@ -86,8 +86,9 @@
     package:
       name: acl
       state: present
-    when: (ansible_distribution == "Ubuntu")
-          and (ansible_distribution_major_version == "16")
+    when:
+      - ansible_distribution == "Ubuntu"
+      - ansible_distribution_major_version == "16"
 
   - name: Fetch the Rocket.Chat binary tarball
     get_url:
@@ -109,8 +110,9 @@
 
   - name: Upgrade Rocket.Chat
     include: upgrade.yml
-    when: ( result|changed )
-          and ( rocket_chat_deploy_state.stat.exists )
+    when:
+      - result|changed
+      - rocket_chat_deploy_state.stat.exists
     tags:
       - upgrade
 
@@ -142,8 +144,9 @@
       state: link
       force: yes
 
-    when: (ansible_distribution == "Ubuntu")
-          and (ansible_distribution_major_version == "14")
+    when:
+      - ansible_distribution == "Ubuntu"
+      - ansible_distribution_major_version == "14"
 
   - name: Ensure the Rocket.Chat application data permissions are correct
     file:
@@ -185,11 +188,16 @@
     when: rocket_chat_include_mongodb|bool
 
   - name: Restart the Rocket.Chat service [UPGRADE]
-    service: name=rocketchat state=restarted
+    service:
+      name: rocketchat
+      state: restarted
     when: rocket_chat_upgraded|bool
 
   - name: Ensure the Rocket.Chat service is running/enabled
-    service: name=rocketchat state=started enabled=true
+    service:
+      name: rocketchat
+      state: started
+      enabled: true
     tags: service
 
   - include: nginx.yml
