@@ -55,16 +55,16 @@
     npm:
       name: n
       global: true
-      executable: "{{ rocket_chat_original_npm }}"
+      executable: "{{ rocket_chat_node_orig_npm }}"
 
   - name: Check to see if n has installed the required 'node' binary
     stat:
-      path: "{{ rocket_chat_node_10_40_path }}/node"
-    register: n_10_40_node_bin
+      path: "{{ rocket_chat_node_path }}/node"
+    register: n_node_bin
 
-  - name: Install the 0.10.40 NodeJS environment via n
-    shell: n 0.10.40
-    when: not n_10_40_node_bin.stat.exists|bool
+  - name: Install the supported NodeJS environment via n
+    shell: n {{ rocket_chat_node_version }}
+    when: not n_node_bin.stat.exists|bool
 
   - name: "Configure /etc/hosts"
     lineinfile:
@@ -132,7 +132,7 @@
     npm:
       state: present
       path: "{{ rocket_chat_application_path }}/bundle/programs/server"
-      executable: "{{ rocket_chat_original_npm }}"
+      executable: "{{ rocket_chat_node_orig_npm }}"
     become: true
     become_user: "{{ rocket_chat_service_user }}"
     tags: build

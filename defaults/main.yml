@@ -14,8 +14,9 @@ rocket_chat_service_user: rocketchat
 rocket_chat_service_group: rocketchat
 rocket_chat_service_host: "{{ ansible_fqdn }}"
 rocket_chat_service_port: 3000
-rocket_chat_node_10_40_path: /usr/local/n/versions/node/0.10.40/bin
-rocket_chat_original_npm: /usr/bin/npm
+rocket_chat_node_version: 4.5.0
+rocket_chat_node_path: /usr/local/n/versions/node/{{ rocket_chat_node_version }}/bin
+rocket_chat_node_orig_npm: /usr/bin/npm
 
 # MongoDB settings
 rocket_chat_mongodb_packages: mongodb
