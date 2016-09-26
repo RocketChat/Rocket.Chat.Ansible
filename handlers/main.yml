@@ -1,20 +1,25 @@
 ---
 # handlers/main.yml: Handlers for RocketChat.Ansible
   - name: Reload the Nginx service
-    service: name=nginx state=reloaded
+    service:
+      name: nginx
+      state: reloaded
 
   - name: Restart the MongoDB service
-    service: name=mongod state=restarted
+    service:
+      name: mongod
+      state: restarted
 
   - name: Upgrade Rocket.Chat
     include: upgrade.yml
     when: rocket_chat_deploy_state.stat.exists
-    tags:
-      - upgrade
+    tags: upgrade
 
   - name: Update the Rocket.Chat service configuration
     shell: "{{ rocket_chat_service_update_command }}"
     when: rocket_chat_service_update_command is defined
 
   - name: Restart the Rocket.Chat service
-    service: name=rocketchat state=restarted
+    service:
+      name: rocketchat
+      state: restarted

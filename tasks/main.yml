@@ -42,6 +42,8 @@
     package:
       name: "{{ rocket_chat_dep_packages }}"
       state: present
+    register: result
+    until: result | succeeded
     retries: 2
 
   - name: Ensure link /bin/node -> /bin/nodejs exists
@@ -104,7 +106,8 @@
     become: true
     become_user: "{{ rocket_chat_service_user }}"
     register: result
-    retries: 3
+    retries: 2
+    until: result | succeeded
     changed_when: (result|changed)
                   or (not rocket_chat_tarball_check_checksum)
 
