@@ -40,7 +40,14 @@
 
   - name: Ensure Rocket.Chat dependencies are installed
     package:
-      name: "{{ rocket_chat_dep_packages }}"
+      name:
+        "{{
+            (ansible_virtualization_type != 'docker') |
+            ternary(
+              rocket_chat_dep_packages,
+              rocket_chat_dep_packages | difference('[\"cron\"]')
+              )
+          }}"
       state: present
     register: result
     until: result | succeeded
