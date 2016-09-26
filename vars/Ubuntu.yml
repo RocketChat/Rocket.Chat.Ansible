@@ -6,6 +6,7 @@ rocket_chat_dep_packages:
   - npm
   - make
   - wget
+  - cron
 
 rocket_chat_mongodb_packages:
   - mongodb-org-server
