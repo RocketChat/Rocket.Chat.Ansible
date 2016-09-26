@@ -207,3 +207,7 @@
   - include: nginx.yml
     when: rocket_chat_include_nginx|bool
     tags: nginx
+
+  - include: letsencrypt.yml
+    when: rocket_chat_include_letsencrypt|bool
+    tags: letsencrypt
