@@ -4,10 +4,14 @@ upstream rocket_chat {
 server {
         listen  80;
         server_name  {{ rocket_chat_service_host }};
-
-        # tell users to go to SSL version this time
-        if ($ssl_protocol = "") {
-        rewrite     ^   https://$server_name$request_uri? permanent;
+{% if rocket_chat_include_letsencrypt|bool %}
+        location /.well-known/acme-challenge/ {
+                alias /var/www/letsencrypt/;
+                try_files $uri =404;
+        }
+{% endif %}
+        location / {
+                return 301 https://$host$request_uri;
         }
 }
 

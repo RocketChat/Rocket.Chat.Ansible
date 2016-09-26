@@ -40,3 +40,13 @@ rocket_chat_nginx_generate_pfs_key: true
 rocket_chat_nginx_pfs_key_numbits: 2048
 rocket_chat_nginx_pfs_key_path: /etc/nginx/rocket_chat.pem
 rocket_chat_nginx_pfs_file: ~
+
+# letsencrypt settings
+rocket_chat_include_letsencrypt: false
+rocket_chat_letsencrypt_email: ~
+rocket_chat_letsencrypt_account_key: /etc/nginx/acme-tiny_account.key
+rocket_chat_letsencrypt_csr: /etc/nginx/acme-tiny_{{ rocket_chat_service_host }}.csr
+rocket_chat_letsencrypt_domain: "{{ rocket_chat_service_host }}"
+rocket_chat_letsencrypt_acmetiny_path: /opt/acme-tiny
+rocket_chat_letsencrypt_wellknown_path: /var/www/letsencrypt
+rocket_chat_letsencrypt_ca_cert: https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem

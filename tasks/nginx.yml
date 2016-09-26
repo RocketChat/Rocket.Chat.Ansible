@@ -36,16 +36,19 @@
 
   - name: Ensure SSL certs have been generated
     shell: >-
-      openssl req -x509 -newkey rsa:2048 -nodes
+      openssl req -x509 -newkey rsa:4096 -nodes
       -subj "/CN={{ rocket_chat_service_host }}/
       /C=NA/ST=NA/L=NA/O=NA/OU=NA"
       -keyout {{ rocket_chat_ssl_key_path }}
       -out {{ rocket_chat_ssl_cert_path }}
       -days 3650
-    when: rocket_chat_ssl_generate_certs|bool
+    when:
+      - rocket_chat_include_letsencrypt|bool
+        or rocket_chat_ssl_generate_certs|bool
     args:
       creates: "{{ rocket_chat_ssl_key_path }}"
     notify: Reload the Nginx service
+    register: key_gen_result
 
   - name: Ensure provided PFS key has been deployed
     copy:
