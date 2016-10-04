@@ -1,64 +1,92 @@
-ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
+# ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
+TYPE_NAME = 'RocketChat'
+MEM_SIZE = 2048
+ANSIBLE_GROUP_NAME = 'chat_servers'
+SHARED_FOLDER_DISABLED = true
 
-Vagrant.configure("2") do |config|
+Vagrant.configure('2') do |config|
   config.ssh.insert_key = false
   config.ssh.username = 'vagrant'
+  # Since we're provisioning with ansible through the network stack
+  # don't bother sharing folders.
+  config.vm.synced_folder '.', '/vagrant', disabled: SHARED_FOLDER_DISABLED
 
-  if Vagrant.has_plugin?("vagrant-hostmanager")
-	config.hostmanager.manage_host = true
+  def do_ansible(name, boxes)
+    name.vm.provision 'ansible' do |ansible|
+      ansible.groups = { ANSIBLE_GROUP_NAME => boxes.keys }
+      # ansible.extra_vars = { }
+      ansible.sudo = true
+      ansible.playbook = 'provision.yml'
+      ansible.raw_arguments = '-vv'
+    end
   end
 
-  config.vm.provider :virtualbox do |vb|
-    vb.customize ["modifyvm", :id, "--memory", "2048"]
-  end
+  # Define here the different box properties
+  # Ports are computed by id + 4000/4430
+  boxes = {
+    'debian8' => {
+      'id'            => 0,
+      'atlas_name'    => 'debian/jessie64'
+    },
+    'ubuntu16' => {
+      'id'            => 1,
+      'atlas_name'    => 'bento/ubuntu-16.04',
+      'lv_atlas_name' => 'wholebits/ubuntu-16.04-64'
+    },
+    'ubuntu14' => {
+      'id'            => 2,
+      'atlas_name'    => 'bento/ubuntu-14.04',
+      'lv_atlas_name' => 'wholebits/ubuntu-14.04-64'
+    },
+    'centos7' => {
+      'id'            => 3,
+      'atlas_name'    => 'centos/7'
+    }
+  }
 
-  # Debian 8
-  config.vm.define "debian8" do |rocket|
-    rocket.vm.hostname = "debian8.dev"
-    rocket.vm.box = "debian/jessie64"
-    rocket.vm.network :private_network, ip: "192.168.60.3"
-    rocket.vm.network "forwarded_port", guest: 3000, host: 4000
-    rocket.vm.network "forwarded_port", guest: 443, host: 4430
-  end
-
-  # Ubuntu 16.04 LTS
-  config.vm.define "ubuntu16" do |rocket|
-    rocket.vm.hostname = "ubuntu16.dev"
-    rocket.vm.box = "bento/ubuntu-16.04"
-    rocket.vm.network :private_network, ip: "192.168.60.4"
-    rocket.vm.network "forwarded_port", guest: 3000, host: 4001
-    rocket.vm.network "forwarded_port", guest: 443, host: 4431
-  end
-
-  # Ubuntu 14.04 LTS
-  config.vm.define "ubuntu14" do |rocket|
-    rocket.vm.hostname = "ubuntu14.dev"
-    rocket.vm.box = "ubuntu/trusty64"
-    rocket.vm.network :private_network, ip: "192.168.60.5"
-    rocket.vm.network "forwarded_port", guest: 3000, host: 4002
-    rocket.vm.network "forwarded_port", guest: 443, host: 4432
-  end
-
-  # CentOS 7
-  config.vm.define "centos7" do |rocket|
-    rocket.vm.hostname = "centos7.dev"
-    rocket.vm.box = "centos/7"
-    rocket.vm.network :private_network, ip: "192.168.60.6"
-    rocket.vm.network "forwarded_port", guest: 3000, host: 4003
-    rocket.vm.network "forwarded_port", guest: 443, host: 4433
-  end
-
-  # Ansible
-  config.vm.provision "ansible" do |ansible|
-
-    ansible.groups = {
-      "chat_servers" => ["debian8", "ubuntu14", "ubuntu16", "centos7"],
+  boxes.each do |name, box_props|
+    network_args = {
+      :priv_net => {
+        :ip    => "192.168.60.#{100 + box_props['id']}"
+      },
+      # Don't iterate the port because we want it to remain the same
+      :fwd_pt_http => {
+        :guest => 3000,
+        :host  => 4000 + box_props['id']
+      },
+      :fwd_pt_https => {
+        :guest => 443,
+        :host  => 4430 + box_props['id']
+      }
     }
 
-    #ansible.extra_vars = { }
+    # Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1381537
+    name == 'ubuntu16' && network_args[:priv_net][:auto_config] = false
 
-    ansible.sudo = true
-    ansible.playbook = "provision.yml"
-	ansible.raw_arguments = "-vv"
+    config.vm.define name do |machine|
+      machine.vm.provider :virtualbox do |vb, override|
+        vb.customize ['modifyvm', :id, '--memory', MEM_SIZE.to_s]
+        vb.name = name + '-' + TYPE_NAME
+        do_ansible(override, boxes)
+      end
+
+      machine.vm.provider :libvirt do |lv, override|
+        lv.default_prefix = TYPE_NAME
+        lv.memory = MEM_SIZE
+        override.vm.box = box_props['lv_atlas_name'] || box_props['atlas_name']
+        if box_props['lv_atlas_name'] =~ /wholebits/
+          override.vm.provision 'shell',
+                                inline: 'apt-get -yqq update &&' \
+                                'apt-get -yqq install python-minimal'
+        end
+        do_ansible(override, boxes)
+      end
+
+      machine.vm.box = box_props['atlas_name']
+      machine.vm.hostname = name + '.dev'
+      machine.vm.network :private_network, network_args[:priv_net]
+      machine.vm.network :forwarded_port, network_args[:fwd_pt_http]
+      machine.vm.network :forwarded_port, network_args[:fwd_pt_https]
+    end
   end
 end
