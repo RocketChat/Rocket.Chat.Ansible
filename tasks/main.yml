@@ -136,7 +136,7 @@
     npm:
       state: present
       path: "{{ rocket_chat_application_path }}/bundle/programs/server"
-      executable: "{{ rocket_chat_node_orig_npm }}"
+      executable: "{{ rocket_chat_node_path }}/npm"
     become: true
     become_user: "{{ rocket_chat_service_user }}"
     tags: build
