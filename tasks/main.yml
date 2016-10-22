@@ -153,12 +153,11 @@
       - ansible_distribution_major_version == "14"
 
   - name: Ensure the Rocket.Chat application data permissions are correct
-    file:
-      path: "{{ rocket_chat_application_path }}"
-      state: directory
-      owner: "{{ rocket_chat_service_user }}"
-      group: "{{ rocket_chat_service_user }}"
-      recurse: true
+    command: >-
+      chown {{ rocket_chat_service_user }}.{{ rocket_chat_service_group }}
+      -R {{ rocket_chat_application_path | quote }}
+    args:
+      warn: no
     tags: build
 
   - include_vars: "{{ item }}"
