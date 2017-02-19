@@ -13,6 +13,8 @@
     path: "{{ rocket_chat_letsencrypt_wellknown_path }}"
     state: directory
     owner: "{{ rocket_chat_nginx_process_user }}"
+    setype: httpd_sys_content_t
+    recurse: yes
 
 - name: Restore SELinux contexts for well-know dir [Let's Encrypt!:SELinux]
   command: restorecon -R "{{ rocket_chat_letsencrypt_wellknown_path }}"
