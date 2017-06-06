@@ -22,7 +22,7 @@ rocket_chat_node_orig_npm: /usr/bin/npm
 rocket_chat_mongodb_packages: mongodb
 rocket_chat_include_mongodb: true
 rocket_chat_mongodb_keyserver: hkp://keyserver.ubuntu.com:80
-rocket_chat_mongodb_gpg_key: 7F0CEB10
+rocket_chat_mongodb_gpg_key: EA312927
 rocket_chat_mongodb_server: 127.0.0.1
 rocket_chat_mongodb_port: 27017
 rocket_chat_mongodb_config_template: mongod.conf.j2
