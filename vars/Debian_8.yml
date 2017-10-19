@@ -4,4 +4,4 @@ rocket_chat_service_template:
   src: rocketchat.service.j2
   dest: /etc/systemd/system/rocketchat.service
 
-rocket_chat_mongodb_apt_repo: "deb http://repo.mongodb.org/apt/debian wheezy/mongodb-org/3.0 main"
+rocket_chat_mongodb_apt_repo: "deb http://repo.mongodb.org/apt/debian jessie/mongodb-org/3.2 main"
