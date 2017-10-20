@@ -183,6 +183,7 @@
     become: yes
     become_user: mongodb
     args:
+      executable: /bin/bash
       chdir: /var/lib/mongodb
       creates: /var/lib/mongodb/.mongo_rs_initialised
     when: rocket_chat_include_mongodb|bool
