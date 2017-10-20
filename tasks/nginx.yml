@@ -4,9 +4,7 @@
   - name: Grant Nginx permissions to proxy requests to an upstream [SELinux]
     shell: setsebool httpd_can_network_connect on -P
     changed_when: false
-    when: (ansible_selinux is defined) and
-          (ansible_selinux != false) and
-          (ansible_selinux.status == "enabled")
+    when: ansible_selinux.status | default(None) == "enabled"
 
   - name: Ensure Nginx is present
     package:
@@ -26,8 +24,9 @@
     copy:
       src: "{{ item.src }}"
       dest: "{{ item.dest }}"
-    when: not rocket_chat_ssl_generate_certs|bool and
-          rocket_chat_ssl_deploy_data|bool
+    when:
+      - not rocket_chat_ssl_generate_certs|bool
+      - rocket_chat_ssl_deploy_data|bool
     with_items:
       - src: "{{ rocket_chat_ssl_key_file }}"
         dest: "{{ rocket_chat_ssl_key_path }}"
