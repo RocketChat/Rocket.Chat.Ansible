@@ -6,7 +6,7 @@ rocket_chat_upgrade_backup_path: "{{ rocket_chat_application_path }}"
 rocket_chat_application_path: /var/lib/rocket.chat
 rocket_chat_version: stable
 rocket_chat_tarball_remote: https://download.rocket.chat/{{ rocket_chat_version }}
-rocket_chat_tarball_sha256sum: e001895f4319f34b0bc6d68af03ced3ac32a6715d98ffcab88f7d89b44ae4f98
+rocket_chat_tarball_sha256sum: 35bdf90350ad3a0789edcbebe51e421b1f82b06c22278b504f2215fa0e962b56
 rocket_chat_tarball_check_checksum: true
 rocket_chat_tarball_fetch_timeout: 100
 rocket_chat_tarball_validate_remote_cert: true
@@ -14,7 +14,7 @@ rocket_chat_service_user: rocketchat
 rocket_chat_service_group: rocketchat
 rocket_chat_service_host: "{{ ansible_fqdn }}"
 rocket_chat_service_port: 3000
-rocket_chat_node_version: 4.5.0
+rocket_chat_node_version: 4.8.4
 rocket_chat_node_path: /usr/local/n/versions/node/{{ rocket_chat_node_version }}/bin
 rocket_chat_node_orig_npm: /usr/bin/npm
 
