@@ -16,8 +16,11 @@ rocket_chat_service_group: rocketchat
 rocket_chat_service_host: "{{ ansible_fqdn }}"
 rocket_chat_service_port: 3000
 rocket_chat_node_version: 8.9.4
-rocket_chat_node_path: /usr/local/n/versions/node/{{ rocket_chat_node_version }}/bin
-rocket_chat_node_orig_npm: /usr/bin/npm
+rocket_chat_node_prefix: /usr/local/n/versions/node/{{ rocket_chat_node_version }}
+rocket_chat_node_path: "{{ rocket_chat_node_prefix }}/bin/node"
+rocket_chat_npm_version: 3.10.9
+rocket_chat_npm_path: "{{ rocket_chat_node_prefix }}/bin/npm"
+rocket_chat_npm_dist: /usr/bin/npm
 
 # MongoDB settings
 rocket_chat_mongodb_packages: mongodb
@@ -51,3 +54,4 @@ rocket_chat_letsencrypt_domain: "{{ rocket_chat_service_host }}"
 rocket_chat_letsencrypt_acmetiny_path: /opt/acme-tiny
 rocket_chat_letsencrypt_wellknown_path: /var/www/letsencrypt
 rocket_chat_letsencrypt_ca_cert: https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem
+rocket_chat_letsencrypt_force_renew: false

@@ -1,26 +1,6 @@
 ---
 # tasks/main.yml: Main tasks for RocketChat.Ansible
 
-  - include_vars: "{{ item }}"
-    with_first_found:
-      - "{{ ansible_distribution }}.yml"
-      - "{{ ansible_os_family }}.yml"
-    tags: vars
-
-  - include: repo_RedHat.yml
-    when: ansible_os_family == "RedHat"
-    tags: repo
-
-  - name: Ensure APT cache has been updated recently
-    apt:
-      update_cache: yes
-      #cache_valid_time: 3600
-    when: ansible_pkg_mgr == "apt"
-
-  - include: mongodb.yml
-    when: rocket_chat_include_mongodb|bool
-    tags: mongodb
-
   - name: Ensure the Rocket.Chat service group is present
     group:
       name: "{{ rocket_chat_service_group }}"
@@ -37,6 +17,48 @@
       shell: /bin/false
       state: present
       system: true
+
+  - name: Check for adequate privilege escalation rights
+    ping:
+    become: yes
+    become_user: "{{ rocket_chat_service_user }}"
+    register: result
+    ignore_errors: true
+  - assert:
+      that: result|succeeded
+      msg: >
+        Check your sudo configuration to ensure that your connecting user
+        can assume the identities of other users without prompting.
+
+  - include_vars: "{{ item }}"
+    with_first_found:
+      - "{{ ansible_distribution }}.yml"
+      - "{{ ansible_os_family }}.yml"
+    tags: vars
+
+  - include_vars: "{{ item }}"
+    with_first_found:
+      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+      # Below is for example: Fedora_2x.yml = 20-29
+      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version[:1] ~ 'x' }}.yml"
+      - "{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yml"
+    tags: vars
+
+  - include: repo_RedHat.yml
+    when:
+      - ansible_os_family|lower == "redhat"
+      - not ansible_distribution|lower == "fedora"
+    tags: repo
+
+  - name: Ensure APT cache has been updated recently
+    apt:
+      update_cache: yes
+      #cache_valid_time: 3600
+    when: ansible_pkg_mgr == "apt"
+
+  - include: mongodb.yml
+    when: rocket_chat_include_mongodb|bool
+    tags: mongodb
 
   - name: Ensure Rocket.Chat dependencies are installed
     package:
@@ -60,20 +82,35 @@
       state: link
     when: ansible_os_family == "RedHat"
 
-  - name: Ensure n (NodeJS) is installed
+  - name: Ensure n (NodeJS) is installed (bootstrap correct version of NodeJS)
     npm:
       name: n
       global: true
-      executable: "{{ rocket_chat_node_orig_npm }}"
+      executable: "{{ rocket_chat_npm_dist }}"
 
-  - name: Check to see if n has installed the required 'node' binary
+  - name: Check to see if n has installed the required binaries in {{ rocket_chat_node_prefix }}
     stat:
-      path: "{{ rocket_chat_node_path }}/node"
+      path: "{{ rocket_chat_node_path }}"
     register: n_node_bin
 
-  - name: Install the supported NodeJS environment via n
+  - name: "Install the supported NodeJS environment via n [Version: {{ rocket_chat_node_version }}]"
     shell: n {{ rocket_chat_node_version }}
     when: not n_node_bin.stat.exists|bool
+
+  - name: Check to see if the proper npm version has already been installed
+    command: "{{ rocket_chat_npm_path }} --version"
+    changed_when: false
+    register: current_npm_version
+
+  - name: "Install the supported NPM version via npm [Version: {{ rocket_chat_npm_version }}]"
+    npm:
+      name: npm
+      version: "{{ rocket_chat_npm_version }}"
+      path: "{{ rocket_chat_node_prefix }}/lib"
+      executable: "{{ rocket_chat_npm_path }}"
+    environment:
+      PATH: "{{ rocket_chat_node_prefix }}/bin:{{ ansible_env.PATH }}"
+    when: current_npm_version != rocket_chat_npm_version
 
   - name: "Configure /etc/hosts"
     lineinfile:
@@ -108,11 +145,11 @@
       dest: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
       timeout: "{{ rocket_chat_tarball_fetch_timeout }}"
       validate_certs: "{{ rocket_chat_tarball_validate_remote_cert }}"
+      owner: "{{ rocket_chat_service_user }}"
+      group: "{{ rocket_chat_service_group }}"
     # Temp fix for ansible/ansible#15915 ( Broken include in handlers )
     # https://github.com/ansible/ansible/issues/15915
     #notify: Upgrade Rocket.Chat
-    become: true
-    become_user: "{{ rocket_chat_service_user }}"
     register: result
     retries: 2
     until: result | succeeded
@@ -135,17 +172,20 @@
       src: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
       dest: "{{ rocket_chat_application_path }}"
       creates: "{{ rocket_chat_application_path }}/bundle"
-    become: true
-    become_user: "{{ rocket_chat_service_user }}"
+      owner: "{{ rocket_chat_service_user }}"
+      group: "{{ rocket_chat_service_group }}"
     tags: build
 
   - name: Install Rocket.Chat via NPM
     npm:
       state: present
       path: "{{ rocket_chat_application_path }}/bundle/programs/server"
-      executable: "{{ rocket_chat_node_path }}/npm"
+      executable: "{{ rocket_chat_npm_path }}"
+      production: true
     become: true
     become_user: "{{ rocket_chat_service_user }}"
+    environment:
+      PATH: "{{ rocket_chat_node_prefix }}/bin:{{ ansible_env.PATH }}"
     tags: build
 
   - name: Ensure the Rocket.Chat log file symlink is present [Ubuntu 14]

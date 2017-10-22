@@ -10,9 +10,13 @@
 
 - name: Ensure letsencrypt well-known dir exists [Let's Encrypt!]
   file:
-    path: "{{ rocket_chat_letsencrypt_wellknown_path  }}"
+    path: "{{ rocket_chat_letsencrypt_wellknown_path }}"
     state: directory
     owner: "{{ rocket_chat_nginx_process_user }}"
+
+- name: Restore SELinux contexts for well-know dir [Let's Encrypt!:SELinux]
+  command: restorecon -R "{{ rocket_chat_letsencrypt_wellknown_path }}"
+  when: ansible_selinux.status | default(None) | lower == "enabled"
 
 - name: Generate acme-tiny Let's Encrypt account key [Let's Encrypt!]
   shell: >-
@@ -53,4 +57,4 @@
 - name: Run acme-tiny_renew.sh (first run cert creation) [Let's Encrypt!]
   shell: /etc/cron.monthly/acme-tiny_renew.sh
   notify: Reload the Nginx service
-  when: csr_gen_result | changed
+  when: (csr_gen_result | changed) or rocket_chat_letsencrypt_force_renew
