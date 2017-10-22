@@ -11,13 +11,29 @@
       name: nginx
       state: present
 
+  - name: Check if Nginx was compiled with the HTTP/2 module
+    shell: nginx -V 2>&1 | grep -q 'with-http_v2_module'
+    register: nginx_http2_module
+    changed_when: false
+    failed_when: false
+
+  - name: Gather the current Nginx version string
+    shell: nginx -v 2>&1 | awk 'BEGIN{ FS="/" } { print $2 }'
+    register: nginx_version_string
+    changed_when: false
+    failed_when: false
+
   - name: Deploy Nginx configuration
     template:
       src: "{{ item.src }}"
       dest: "{{ item.dest }}"
     with_items:
-      - { src: nginx.conf.j2, dest: /etc/nginx/nginx.conf }
-      - { src: rocket_chat.conf.j2, dest: /etc/nginx/conf.d/rocket_chat.conf }
+      - src: nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+      - src: ssl.inc.j2
+        dest: /etc/nginx/conf.d/ssl.inc
+      - src: rocket_chat.conf.j2
+        dest: /etc/nginx/conf.d/rocket_chat.conf
     notify: Reload the Nginx service
 
   - name: Ensure provided SSL certs have been deployed
