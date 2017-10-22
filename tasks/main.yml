@@ -71,8 +71,9 @@
   - name: "Configure /etc/hosts"
     lineinfile:
       dest: /etc/hosts
-      line:  "127.0.0.1    {{ ansible_fqdn }}    {{ ansible_hostname }}"
-      regexp: '^127.0.0.1'
+      line:  "127.0.0.1    localhost {{ ansible_fqdn }} {{ ansible_nodename }} {{ ansible_hostname }}"
+      regexp: '^127\.0\.0\.1'
+      insertbefore: BOF
     when: ansible_virtualization_type != "docker"
 
   - name: Check to see if this is the initial Rocket.Chat deployment
