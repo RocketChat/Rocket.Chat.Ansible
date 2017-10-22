@@ -2,6 +2,18 @@
 
 - name: Apply the Rocket.Chat role to all chat_servers
   hosts: "{{ host_name | default('chat_servers') }}"
+  become: yes
+
+  pre_tasks:
+
+    - name: "Drop in permissive sudoers file for user: {{ ansible_user }}"
+      lineinfile:
+        dest: /etc/sudoers.d/{{ ansible_user }}
+        state: present
+        create: yes
+        regexp: '^{{ ansible_user }}.*'
+        line: '%{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
+        validate: visudo -cf %s
 
   roles:
     - role: "{{ role_name | default('../../RocketChat.Server') }}"
