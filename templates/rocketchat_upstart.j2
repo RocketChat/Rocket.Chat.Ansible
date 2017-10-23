@@ -1,3 +1,13 @@
+{% if rocket_chat_mongodb_user is defined and rocket_chat_mongodb_password is defined %}
+{% set rocket_chat_mongodb_credentials = rocket_chat_mongodb_user+":"+rocket_chat_mongodb_password+"@" -%}
+{% else %}
+{% set rocket_chat_mongodb_credentials = "" -%}
+{% endif %}
+{% if rocket_chat_mongodb_database is defined %}
+{% set rocket_chat_mongodb_database = rocket_chat_mongodb_database -%}
+{% else %}
+{% set rocket_chat_mongodb_database = "rocketchat" -%}
+{% endif %}
 #!upstart
 #
 # Rocket.Chat upstart script
@@ -19,7 +29,7 @@ chdir {{ rocket_chat_application_path }}
 setuid {{ rocket_chat_service_user }}
 setgid {{ rocket_chat_service_group }}
 
-env MONGO_URL="mongodb://{{ rocket_chat_mongodb_server }}:{{ rocket_chat_mongodb_port }}/rocketchat"
+env MONGO_URL="mongodb://{{ rocket_chat_mongodb_credentials }}{{ rocket_chat_mongodb_server }}:{{ rocket_chat_mongodb_port }}/{{ rocket_chat_mongodb_database }}"
 env MONGO_OPLOG_URL="mongodb://{{ rocket_chat_mongodb_server }}:{{ rocket_chat_mongodb_port }}/local"
 env ROOT_URL="https://{{ rocket_chat_service_host }}"
 env PORT="{{ rocket_chat_service_port }}"
