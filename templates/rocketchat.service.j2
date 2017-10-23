@@ -8,6 +8,11 @@
 {% else %}
 {% set rocket_chat_mongodb_database = "rocketchat" -%}
 {% endif %}
+{% if rocket_chat_mongodb_use_tls == true %}
+{% set rocket_chat_mongodb_use_tls = "?ssl=true" -%}
+{% else %}
+{% set rocket_chat_mongodb_use_tls = "?ssl=false" -%}
+{% endif %}
 [Unit]
 Description=Rocket.Chat Server
 After=syslog.target
@@ -20,7 +25,7 @@ StandardOutput=syslog
 SyslogIdentifier=RocketChat
 User={{ rocket_chat_service_user }}
 Group={{ rocket_chat_service_group }}
-Environment=MONGO_URL=mongodb://{{ rocket_chat_mongodb_credentials }}{{ rocket_chat_mongodb_server }}:{{ rocket_chat_mongodb_port }}/{{ rocket_chat_mongodb_database }}
+Environment=MONGO_URL=mongodb://{{ rocket_chat_mongodb_credentials }}{{ rocket_chat_mongodb_server }}:{{ rocket_chat_mongodb_port }}/{{ rocket_chat_mongodb_database }}{{ rocket_chat_mongodb_use_tls }}
 Environment=MONGO_OPLOG_URL=mongodb://{{ rocket_chat_mongodb_server }}:{{ rocket_chat_mongodb_port }}/local
 Environment=ROOT_URL=https://{{ rocket_chat_service_host }}
 Environment=PORT={{ rocket_chat_service_port }}
