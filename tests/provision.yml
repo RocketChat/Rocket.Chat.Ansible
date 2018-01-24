@@ -4,7 +4,7 @@
   hosts: "{{ host_name | default('chat_servers') }}"
 
   roles:
-    - role: "{{ role_name | default('../../RocketChat.Server') }}"
+    - role: "{{ role_name | default('../../Rocket.Chat.Ansible') }}"
       rocket_chat_tarball_check_checksum: false
       rocket_chat_service_host: localhost
       rocket_chat_automatic_upgrades: true
