@@ -1,11 +1,5 @@
 ---
 # tasks/mongodb.yml: MongoDB configuration for RocketChat.Ansible
-  - include_vars: "{{ item }}"
-    with_first_found:
-      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
-      - "{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yml"
-      - "{{ ansible_distribution }}.yml"
-      - "{{ ansible_os_family }}.yml"
 
   - name: Ensure the MongoDB repository key has been imported
     apt_key:
