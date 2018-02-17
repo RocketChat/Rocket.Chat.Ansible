@@ -1,6 +1,8 @@
 ---
 galaxy_info:
-  author: Calum MacRae
+  author:
+    - Calum MacRae
+    - Michael Goodwin
   description: Deploy Rocket.Chat
   #company: your company (optional)
   # If the issue tracker for your role is not on github, uncomment the

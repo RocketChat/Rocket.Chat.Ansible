@@ -1,6 +1,7 @@
-# ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
+ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 TYPE_NAME = 'RocketChat'
-MEM_SIZE = 2048
+MEM_SIZE = 1024
+LV_CPU_MODE = 'host-passthrough'
 ANSIBLE_GROUP_NAME = 'chat_servers'
 SHARED_FOLDER_DISABLED = true
 
@@ -31,16 +32,24 @@ Vagrant.configure('2') do |config|
     'ubuntu16' => {
       'id'            => 1,
       'atlas_name'    => 'bento/ubuntu-16.04',
-      'lv_atlas_name' => 'wholebits/ubuntu-16.04-64'
+      'lv_atlas_name' => 'wholebits/ubuntu16.04-64'
     },
     'ubuntu14' => {
       'id'            => 2,
       'atlas_name'    => 'bento/ubuntu-14.04',
-      'lv_atlas_name' => 'wholebits/ubuntu-14.04-64'
+      'lv_atlas_name' => 'wholebits/ubuntu14.04-64'
     },
     'centos7' => {
       'id'            => 3,
       'atlas_name'    => 'centos/7'
+    },
+    'Fedora24' => {
+      'id'            => 4,
+      'atlas_name'    => 'fedora/24-cloud-base'
+    },
+    'Fedora25' => {
+      'id'            => 5,
+      'atlas_name'    => 'fedora/25-cloud-base'
     }
   }
 
@@ -67,19 +76,23 @@ Vagrant.configure('2') do |config|
       machine.vm.provider :virtualbox do |vb, override|
         vb.customize ['modifyvm', :id, '--memory', MEM_SIZE.to_s]
         vb.name = name + '-' + TYPE_NAME
-        do_ansible(override, boxes)
       end
 
       machine.vm.provider :libvirt do |lv, override|
         lv.default_prefix = TYPE_NAME
         lv.memory = MEM_SIZE
+        lv.cpu_mode = LV_CPU_MODE
         override.vm.box = box_props['lv_atlas_name'] || box_props['atlas_name']
         if box_props['lv_atlas_name'] =~ /wholebits/
           override.vm.provision 'shell',
-                                inline: 'apt-get -yqq update &&' \
-                                'apt-get -yqq install python-minimal'
+            inline: 'apt-get -yqq update && apt-get -yqq install python-minimal'
+          do_ansible(override, boxes)
         end
-        do_ansible(override, boxes)
+        if box_props['atlas_name'] =~ /^fedora/
+          override.vm.provision 'shell',
+            inline: 'dnf -d0 -e0 -y install python2-dnf libselinux-python'
+          do_ansible(override, boxes)
+        end
       end
 
       machine.vm.box = box_props['atlas_name']
