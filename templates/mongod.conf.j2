@@ -6,7 +6,7 @@
 {% if rocket_chat_mongodb_fork is defined %}
 # whether to fork the process or not
 fork = {{ rocket_chat_mongodb_fork }}
-{% endif %}  
+{% endif %}
 {% if rocket_chat_mongodb_pidfile_path is defined %}
 
 pidfilepath = {{ rocket_chat_mongodb_pidfile_path }}
@@ -35,7 +35,7 @@ storage:
 systemLog:
   destination: file
   logAppend: true
-  path: /var/log/mongodb/mongod.log
+  path: /var/log/mongodb/{{ rocket_chat_mongodb_service_name }}.log
 # network interfaces
 net:
   port: {{ rocket_chat_mongodb_port }}
