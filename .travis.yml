@@ -1,12 +1,13 @@
 ---
 sudo: required
-dist: trusty
-language: generic
+
+services:
+  - docker
 
 env:
   - >
     dist=debian
-    ver=8
+    ver=9
     container_id=$(mktemp)
     init=/sbin/init
     run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
@@ -15,6 +16,14 @@ env:
   - >
     dist=centos
     ver=7
+    container_id=$(mktemp)
+    init=/usr/lib/systemd/systemd
+    run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    EXTRA_VARS='{"role_name":"Rocket.Chat.Ansible","host_name":"localhost"}'
+    VERBOSE='-vv'
+  - >
+    dist=fedora
+    ver=2x
     container_id=$(mktemp)
     init=/usr/lib/systemd/systemd
     run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
@@ -36,9 +45,14 @@ env:
     run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
     EXTRA_VARS='{"role_name":"Rocket.Chat.Ansible","host_name":"localhost"}'
     VERBOSE='-vv'
-
-services:
-  - docker
+  - >
+    dist=ubuntu
+    ver=18.04
+    container_id=$(mktemp)
+    init=/sbin/init
+    run_opts=""
+    EXTRA_VARS='{"role_name":"Rocket.Chat.Ansible","host_name":"localhost"}'
+    VERBOSE='-vv'
 
 before_install:
   - sudo docker build --rm=true
