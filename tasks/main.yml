@@ -1,6 +1,20 @@
 ---
 # tasks/main.yml: Main tasks for RocketChat.Ansible
 
+  - include_vars: "{{ item }}"
+    with_first_found:
+      - "{{ ansible_distribution }}.yml"
+      - "{{ ansible_os_family }}.yml"
+    tags: vars
+
+  - include_vars: "{{ item }}"
+    with_first_found:
+      # Below is for example: Fedora_2x.yml = 20-29
+      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version[:1] ~ 'x' }}.yml"
+      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+      - "{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yml"
+    tags: vars
+
   - name: Ensure the Rocket.Chat service group is present
     group:
       name: "{{ rocket_chat_service_group }}"
@@ -29,20 +43,6 @@
       msg: >
         Check your sudo configuration to ensure that your connecting user
         can assume the identities of other users without prompting.
-
-  - include_vars: "{{ item }}"
-    with_first_found:
-      - "{{ ansible_distribution }}.yml"
-      - "{{ ansible_os_family }}.yml"
-    tags: vars
-
-  - include_vars: "{{ item }}"
-    with_first_found:
-      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
-      # Below is for example: Fedora_2x.yml = 20-29
-      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version[:1] ~ 'x' }}.yml"
-      - "{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yml"
-    tags: vars
 
   - include: repo_RedHat.yml
     when:
@@ -75,42 +75,8 @@
     until: result | succeeded
     retries: 2
 
-  - name: Ensure link /bin/node -> /bin/nodejs exists
-    file:
-      src: /bin/node
-      dest: /bin/nodejs
-      state: link
-    when: ansible_os_family == "RedHat"
-
-  - name: Ensure n (NodeJS) is installed (bootstrap correct version of NodeJS)
-    npm:
-      name: n
-      global: true
-      executable: "{{ rocket_chat_npm_dist }}"
-
-  - name: Check to see if n has installed the required binaries in {{ rocket_chat_node_prefix }}
-    stat:
-      path: "{{ rocket_chat_node_path }}"
-    register: n_node_bin
-
-  - name: "Install the supported NodeJS environment via n [Version: {{ rocket_chat_node_version }}]"
-    shell: n {{ rocket_chat_node_version }}
-    when: not n_node_bin.stat.exists|bool
-
-  - name: Check to see if the proper npm version has already been installed
-    command: "{{ rocket_chat_npm_path }} --version"
-    changed_when: false
-    register: current_npm_version
-
-  - name: "Install the supported NPM version via npm [Version: {{ rocket_chat_npm_version }}]"
-    npm:
-      name: npm
-      version: "{{ rocket_chat_npm_version }}"
-      path: "{{ rocket_chat_node_prefix }}/lib"
-      executable: "{{ rocket_chat_npm_path }}"
-    environment:
-      PATH: "{{ rocket_chat_node_prefix }}/bin:{{ ansible_env.PATH }}"
-    when: current_npm_version != rocket_chat_npm_version
+  - include: nodejs.yml
+    tags: nodejs
 
   - name: "Configure /etc/hosts"
     lineinfile:
@@ -242,14 +208,6 @@
     args:
       warn: no
     tags: build
-
-  - include_vars: "{{ item }}"
-    with_first_found:
-      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
-      - "{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yml"
-      - "{{ ansible_distribution }}.yml"
-      - "{{ ansible_os_family }}.yml"
-    tags: service
 
   - name: Deploy the Rocket.Chat service file
     template:
