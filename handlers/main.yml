@@ -7,11 +7,11 @@
 
   - name: Restart the MongoDB service
     service:
-      name: mongod
+      name: "{{ rocket_chat_mongodb_service }}"
       state: restarted
 
   - name: Upgrade Rocket.Chat
-    include: upgrade.yml
+    include_tasks: upgrade.yml
     when: rocket_chat_deploy_state.stat.exists
     tags: upgrade
 

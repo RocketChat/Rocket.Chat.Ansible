@@ -1,0 +1,19 @@
+---
+- name: Ensure apt-transport-https is installed
+  apt:
+    name: apt-transport-https
+    state: present
+  tags: repo
+
+- name: Ensure the node.js repository key has been imported
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: 1655A0AB68576280
+  tags: repo
+
+- name: Ensure the node.js repository is present
+  apt_repository:
+    repo:  deb https://deb.nodesource.com/node_8.x stretch main
+    filename: nodesource
+    state: present
+  tags: repo

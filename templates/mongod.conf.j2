@@ -35,7 +35,7 @@ storage:
 systemLog:
   destination: file
   logAppend: true
-  path: /var/log/mongodb/mongod.log
+  path: /var/log/mongodb/{{ rocket_chat_mongodb_service }}.log
 # network interfaces
 net:
   port: {{ rocket_chat_mongodb_port }}
