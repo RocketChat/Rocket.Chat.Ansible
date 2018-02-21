@@ -11,7 +11,7 @@
         dest: /etc/sudoers.d/{{ ansible_user }}
         state: present
         create: yes
-        regexp: '^{{ ansible_user }}.*'
+        regexp: '^%{{ ansible_user }}.*'
         line: '%{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
         validate: visudo -cf %s
 
@@ -20,5 +20,36 @@
       rocket_chat_tarball_check_checksum: false
       rocket_chat_service_host: localhost
       rocket_chat_automatic_upgrades: true
-      # The below PEM file is provided so we don't have to wait for it to generate.
+      # Below PEM file is provided so we don't have to wait for it to generate.
       rocket_chat_nginx_pfs_file: dhparam_INSECURE.pem
+      # Below is an example of deploying an old version of Rocket.Chat:
+      # rocket_chat_version: 0.59.4
+      # rocket_chat_npm_version: 3.10.9
+      # rocket_chat_node_version: 4.8.4
+
+  post_tasks:
+
+    - block:
+      - name: Wait for the Rocket.Chat nodejs service to come online
+        wait_for:
+          port: "{{ rocket_chat_service_port }}"
+          host: localhost
+          state: started
+        retries: 1
+
+      - name: Do a basic status check of the API
+        uri:
+          url: "{{ item }}"
+          validate_certs: no
+        with_items:
+          - https://localhost/api/v1/info
+          - http://localhost/api/v1/info
+        register: api_check
+        failed_when:
+         - (api_check.status|int != 200)
+           or (api_check.msg|string is not search('^OK '))
+           or (api_check.json.success|bool != True)
+      rescue:
+        - name: Output debug information when the check fails
+          debug: var=api_check
+      tags: check
