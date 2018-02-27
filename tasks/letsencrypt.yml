@@ -1,0 +1,62 @@
+---
+
+# possibly just copy the script into files and include it w/ the role?
+- name: Clone acme-tiny to /opt [Let's Encrypt!]
+  git:
+    dest: "{{ rocket_chat_letsencrypt_acmetiny_path }}"
+    repo: https://github.com/diafygi/acme-tiny.git
+    force: yes
+    update: yes
+
+- name: Ensure letsencrypt well-known dir exists [Let's Encrypt!]
+  file:
+    path: "{{ rocket_chat_letsencrypt_wellknown_path }}"
+    state: directory
+    owner: "{{ rocket_chat_nginx_process_user }}"
+    setype: httpd_sys_content_t
+    recurse: yes
+
+- name: Restore SELinux contexts for well-know dir [Let's Encrypt!:SELinux]
+  command: restorecon -R "{{ rocket_chat_letsencrypt_wellknown_path }}"
+  when: ansible_selinux.status | default(None) | lower == "enabled"
+
+- name: Generate acme-tiny Let's Encrypt account key [Let's Encrypt!]
+  shell: >-
+    openssl genrsa -out {{ rocket_chat_letsencrypt_account_key }} 4096
+  args:
+    creates: "{{ rocket_chat_letsencrypt_account_key }}"
+
+- name: Check if acme-tiny Let's Encrypt CSR exists [Let's Encrypt!]
+  stat:
+    path: "{{ rocket_chat_letsencrypt_csr }}"
+  register: csr_path
+
+- name: Generate acme-tiny Let's Encrypt CSR [Let's Encrypt!]
+  shell: >-
+    openssl req -new -sha256 -key {{ rocket_chat_ssl_key_path }}
+    -subj "/CN={{ rocket_chat_letsencrypt_domain | default(rocket_chat_service_host) }}"
+    -out {{ rocket_chat_letsencrypt_csr }}
+  when:
+    - (key_gen_result | changed) or
+      not csr_path.stat.exists
+  register: csr_gen_result
+
+- name: Setup script in cron.daily [Let's Encrypt!]
+  copy:
+    dest: /etc/cron.monthly/acme-tiny_renew.sh
+    mode: 0755
+    content: |
+      #!/bin/bash
+      python {{ rocket_chat_letsencrypt_acmetiny_path }}/acme_tiny.py \
+      --account-key {{ rocket_chat_letsencrypt_account_key }}  \
+      --csr {{ rocket_chat_letsencrypt_csr }}  \
+      --acme-dir {{ rocket_chat_letsencrypt_wellknown_path  }} \
+      > {{ rocket_chat_ssl_cert_path }} || exit
+      curl -s {{ rocket_chat_letsencrypt_ca_cert }} \
+      >> {{ rocket_chat_ssl_cert_path }} &&
+      nginx -t && nginx -s reload
+
+- name: Run acme-tiny_renew.sh (first run cert creation) [Let's Encrypt!]
+  shell: /etc/cron.monthly/acme-tiny_renew.sh
+  notify: Reload the Nginx service
+  when: (csr_gen_result | changed) or rocket_chat_letsencrypt_force_renew

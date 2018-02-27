@@ -1,0 +1,21 @@
+
+ssl_ciphers 'EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH';
+{% if nginx_version_string.stdout | version_compare('1.1.0','>=') %}
+ssl_ecdh_curve secp384r1;
+{% endif %}
+ssl_prefer_server_ciphers on;
+ssl_protocols TLSv1.2 TLSv1.1;
+ssl_session_cache shared:SSL:10M;
+{% if nginx_version_string.stdout | version_compare('1.5.9','>=') %}
+ssl_session_tickets off;
+{% endif %}
+{% if rocket_chat_nginx_enable_pfs %}
+ssl_dhparam {{ rocket_chat_nginx_pfs_key_path }};
+{% endif %}
+ssl_stapling on;
+ssl_stapling_verify on;
+resolver_timeout 5s;
+add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload";
+add_header X-Frame-Options DENY;
+add_header X-Content-Type-Options nosniff;
+gzip off;
