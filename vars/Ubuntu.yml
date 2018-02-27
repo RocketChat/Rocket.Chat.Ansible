@@ -7,6 +7,7 @@ rocket_chat_dep_packages:
   - make
   - wget
   - cron
+  - gpg
 
 rocket_chat_mongodb_packages:
   - mongodb-org-server
