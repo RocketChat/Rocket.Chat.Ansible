@@ -9,7 +9,7 @@ rocket_chat_dep_packages:
   - wget
   - crontabs
   - policycoreutils-python
-  - gpg
+  - gnupg2
 
 rocket_chat_mongodb_packages:
   - mongodb
