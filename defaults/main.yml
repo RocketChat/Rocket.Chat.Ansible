@@ -7,9 +7,13 @@ rocket_chat_application_path: /var/lib/rocket.chat
 # "latest" implies latest stable here, can be "0.61.2", for example
 rocket_chat_version: latest
 rocket_chat_tarball_remote: https://releases.rocket.chat/{{ rocket_chat_version }}/download
-# SHA256 is version 0.61.2
-rocket_chat_tarball_sha256sum: 5131806173af17af73b736366c2163d453ecb7de892a2bcc817667d10b9d8fb9
-rocket_chat_tarball_check_checksum: true
+rocket_chat_tarball_asc_remote:  https://releases.rocket.chat/{{ rocket_chat_version }}/asc
+# Using the sha256sum is deprecated in favor of GPG verifying
+rocket_chat_tarball_sha256sum: 0
+rocket_chat_tarball_gpg_key: 0E163286C20D07B9787EBE9FD7F9D0414FD08104
+rocket_chat_tarball_gpg_keyserver: ha.pool.sks-keyservers.net
+rocket_chat_tarball_check_checksum: false
+rocket_Chat_tarball_check_pgp: true
 rocket_chat_tarball_fetch_timeout: 100
 rocket_chat_tarball_validate_remote_cert: true
 rocket_chat_service_user: rocketchat
