@@ -36,6 +36,24 @@
       state: present
       system: true
 
+  - name: Ensure APT cache has been updated recently
+    apt:
+      update_cache: yes
+      cache_valid_time: 3600
+    when: ansible_pkg_mgr == "apt"
+
+  - include: repo_RedHat.yml
+    when:
+      - ansible_os_family|lower == "redhat"
+      - not ansible_distribution|lower == "fedora"
+    tags: repo
+
+  # https://docs.ansible.com/ansible/latest/become.html#becoming-an-unprivileged-user
+  - name: Install acl controls
+    package:
+      name: acl
+      state: present
+
   - name: Check for adequate privilege escalation rights
     ping:
     become: yes
@@ -47,18 +65,6 @@
       msg: >
         Check your sudo configuration to ensure that your connecting user
         can assume the identities of other users without prompting.
-
-  - include: repo_RedHat.yml
-    when:
-      - ansible_os_family|lower == "redhat"
-      - not ansible_distribution|lower == "fedora"
-    tags: repo
-
-  - name: Ensure APT cache has been updated recently
-    apt:
-      update_cache: yes
-      #cache_valid_time: 3600
-    when: ansible_pkg_mgr == "apt"
 
   - include: mongodb.yml
     when: rocket_chat_include_mongodb|bool
@@ -104,14 +110,6 @@
   - name: Set the initial Rocket.Chat upgrade status
     set_fact:
       rocket_chat_upgraded: false
-
-  - name: Ensure acl-tools are present [Ubuntu 16]
-    package:
-      name: acl
-      state: present
-    when:
-      - ansible_distribution == "Ubuntu"
-      - ansible_distribution_major_version == "16"
 
   - name: Setup PGP for verifying the Rocket.Chat tarball
     block:
