@@ -5,7 +5,7 @@
     src: /bin/node
     dest: /bin/nodejs
     state: link
-  when: ansible_os_family == "RedHat"
+  when: (ansible_os_family | lower == "redhat")
 
 - name: Check for npm
   stat:
@@ -17,7 +17,8 @@
     name: n
     global: true
     executable: "{{ rocket_chat_npm_dist }}"
-  when: dist_npm_bin.stat.exists|bool
+  when: ('stat' in dist_npm_bin)
+         and (dist_npm_bin.stat.exists | bool)
 
 - name: Bootstrap node-version-manager from GitHub
   get_url:
@@ -28,7 +29,8 @@
     owner: root
     validate_certs: true
   become: yes
-  when: not dist_npm_bin.stat.exists|bool
+  when: ('stat' in dist_npm_bin)
+         and (not (dist_npm_bin.stat.exists | bool))
 
 - name: Check to see if n has installed the required binaries in {{ rocket_chat_node_prefix }}
   stat:
@@ -37,7 +39,8 @@
 
 - name: "Install the supported NodeJS environment via n [Version: {{ rocket_chat_node_version }}]"
   shell: n {{ rocket_chat_node_version }}
-  when: not n_node_bin.stat.exists|bool
+  when: ('stat' in n_node_bin)
+         and (not (n_node_bin.stat.exists | bool))
 
 - name: Check to see if the proper npm version has already been installed
   command: "{{ rocket_chat_npm_path }} --version"
@@ -52,4 +55,4 @@
     executable: "{{ rocket_chat_npm_path }}"
   environment:
     PATH: "{{ rocket_chat_node_prefix }}/bin:{{ ansible_env.PATH }}"
-  when: current_npm_version != rocket_chat_npm_version
+  when: (current_npm_version != rocket_chat_npm_version)

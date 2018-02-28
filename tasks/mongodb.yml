@@ -27,8 +27,9 @@
         register: rocket_chat_mongodb_repo_state
 
       when:
-        - rocket_chat_mongodb_apt_repo is defined
-        - (ansible_os_family | lower) == "debian"
+        - (rocket_chat_mongodb_apt_repo is defined)
+        - (rocket_chat_mongodb_apt_repo)
+        - ((ansible_os_family | lower) == "debian")
 
     - name: RHEL-based MongoDB.org official pkgs tasks
       block:
@@ -51,11 +52,13 @@
           register: rocket_chat_mongodb_repo_state
 
       when:
-        - rocket_chat_mongodb_rpm_repo is defined
-        - (ansible_os_family | lower) = "redhat"
+      - (rocket_chat_mongodb_rpm_repo is defined)
+      - (rocket_chat_mongodb_rpm_repo)
+      - ((ansible_os_family | lower) == "redhat")
 
     when:
-      - rocket_chat_mongodb_org_pkgs
+      - (rocket_chat_mongodb_org_pkgs is defined)
+      - (rocket_chat_mongodb_org_pkgs | bool)
 
   - name: Ensure MongoDB Server is installed
     package:

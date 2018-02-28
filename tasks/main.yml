@@ -40,12 +40,11 @@
     apt:
       update_cache: yes
       cache_valid_time: 3600
-    when: ansible_pkg_mgr == "apt"
+    when: ((ansible_pkg_mgr | lower) == "apt")
 
   - include: repo_RedHat.yml
-    when:
-      - ansible_os_family|lower == "redhat"
-      - not ansible_distribution|lower == "fedora"
+    when: ((ansible_distribution | lower) == "centos")
+            or ((ansible_distribution | lower) == "redhat")
     tags: repo
 
   # https://docs.ansible.com/ansible/latest/become.html#becoming-an-unprivileged-user
@@ -58,23 +57,25 @@
     ping:
     become: yes
     become_user: "{{ rocket_chat_service_user }}"
-    register: result
     ignore_errors: true
+    register: priv_check_result
   - assert:
-      that: result|succeeded
+      that: (priv_check_result | succeeded)
       msg: >
         Check your sudo configuration to ensure that your connecting user
         can assume the identities of other users without prompting.
 
   - include: mongodb.yml
-    when: rocket_chat_include_mongodb|bool
+    when: (rocket_chat_include_mongodb | bool)
     tags: mongodb
 
   - name: Redefine rocket_chat_dep_packages to add dist specific packages if needed
     set_fact:
       rocket_chat_dep_packages:
         "{{ rocket_chat_dep_packages | union(rocket_chat_dist_specific_packages) | unique }}"
-    when: rocket_chat_dist_specific_packages is defined
+    when:
+      - (rocket_chat_dist_specific_packages is defined)
+      - (rocket_chat_dist_specific_packages)
 
   - name: Ensure Rocket.Chat dependencies are installed
     package:
@@ -87,8 +88,8 @@
               )
           }}"
       state: present
-    register: result
-    until: result | succeeded
+    register: dep_install_result
+    until: (dep_install_result | succeeded)
     retries: 2
 
   - include: nodejs.yml
@@ -100,7 +101,7 @@
       line:  "127.0.1.1    {{ ansible_fqdn }} {{ ansible_nodename }}"
       regexp: '^127\.0\.1\.1'
       insertbefore: BOF
-    when: ansible_virtualization_type != "docker"
+    when: ((ansible_virtualization_type | lower) != "docker")
 
   - name: Check to see if this is the initial Rocket.Chat deployment
     stat:
@@ -134,7 +135,7 @@
         group: "{{ rocket_chat_service_group }}"
       retries: 2
 
-    when: rocket_Chat_tarball_check_pgp
+    when: (rocket_Chat_tarball_check_pgp | bool)
     tags: pgp
 
   - name: Fetch the Rocket.Chat binary tarball
@@ -150,11 +151,11 @@
     # Temp fix for ansible/ansible#15915 ( Broken include in handlers )
     # https://github.com/ansible/ansible/issues/15915
     #notify: Upgrade Rocket.Chat
-    register: result
+    register: download_result
     retries: 2
-    until: result | succeeded
-    changed_when: (result|changed)
-                  or (not rocket_chat_tarball_check_checksum)
+    until: (download_result | succeeded)
+    changed_when: (download_result | changed)
+                   or (not (rocket_chat_tarball_check_checksum | bool))
 
   - name: Verify Rocket.Chat binary tarball with GPG
     shell: |
@@ -163,15 +164,16 @@
                  rocket.chat-{{ rocket_chat_version }}.tgz
     args:
       chdir: "{{ rocket_chat_application_path }}"
-    when: rocket_Chat_tarball_check_pgp
+    when: (rocket_Chat_tarball_check_pgp | bool)
     changed_when: false
     tags: pgp
 
   - name: Upgrade Rocket.Chat
     include: upgrade.yml
     when:
-      - result|changed
-      - rocket_chat_deploy_state.stat.exists
+      - (download_result | changed)
+      - ('stat' in rocket_chat_deploy_state)
+      - (rocket_chat_deploy_state.stat.exists | bool)
     tags:
       - upgrade
 
@@ -206,8 +208,8 @@
       state: link
       force: yes
     when:
-      - ansible_distribution == "Ubuntu"
-      - ansible_distribution_major_version == "14"
+      - ((ansible_distribution | lower) == "ubuntu")
+      - ((ansible_distribution_major_version | int) == "14")
 
   - name: Ensure the Rocket.Chat application data permissions are correct
     command: >-
@@ -232,7 +234,7 @@
     service:
       name: rocketchat
       state: restarted
-    when: rocket_chat_upgraded|bool
+    when: (rocket_chat_upgraded | bool)
 
   - name: Ensure the Rocket.Chat service is running/enabled
     service:
@@ -242,9 +244,9 @@
     tags: service
 
   - include: nginx.yml
-    when: rocket_chat_include_nginx|bool
+    when: (rocket_chat_include_nginx | bool)
     tags: nginx
 
   - include: letsencrypt.yml
-    when: rocket_chat_include_letsencrypt|bool
+    when: (rocket_chat_include_letsencrypt | bool)
     tags: letsencrypt

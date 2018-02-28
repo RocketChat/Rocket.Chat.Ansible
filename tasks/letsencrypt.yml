@@ -18,7 +18,8 @@
 
 - name: Restore SELinux contexts for well-know dir [Let's Encrypt!:SELinux]
   command: restorecon -R "{{ rocket_chat_letsencrypt_wellknown_path }}"
-  when: ansible_selinux.status | default(None) | lower == "enabled"
+  when: ('status' in ansible_selinux)
+         and ((ansible_selinux.status | lower) == "enabled")
 
 - name: Generate acme-tiny Let's Encrypt account key [Let's Encrypt!]
   shell: >-
@@ -36,10 +37,11 @@
     openssl req -new -sha256 -key {{ rocket_chat_ssl_key_path }}
     -subj "/CN={{ rocket_chat_letsencrypt_domain | default(rocket_chat_service_host) }}"
     -out {{ rocket_chat_letsencrypt_csr }}
-  when:
-    - (key_gen_result | changed) or
-      not csr_path.stat.exists
   register: csr_gen_result
+  when:
+    - (key_gen_result | changed)
+       or (('stat' in csr_path)
+            and (not (csr_path.stat.exists | bool)))
 
 - name: Setup script in cron.daily [Let's Encrypt!]
   copy:
@@ -59,4 +61,5 @@
 - name: Run acme-tiny_renew.sh (first run cert creation) [Let's Encrypt!]
   shell: /etc/cron.monthly/acme-tiny_renew.sh
   notify: Reload the Nginx service
-  when: (csr_gen_result | changed) or rocket_chat_letsencrypt_force_renew
+  when: (csr_gen_result | changed)
+         or (rocket_chat_letsencrypt_force_renew | bool)

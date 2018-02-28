@@ -7,25 +7,25 @@
         It doesn't look like you've permitted automatic upgrades.
         A new version of Rocket.Chat was released.
         To permit automatic upgrades set 'rocket_chat_automatic_upgrades' to true
-    when: not rocket_chat_automatic_upgrades|bool
+    when: not (rocket_chat_automatic_upgrades | bool)
 
   - name: Ensure the back up directory exists [UPGRADE]
     file:
       path: "{{ rocket_chat_upgrade_backup_path }}"
       state: directory
-    when: rocket_chat_upgrade_backup|bool
+    when: (rocket_chat_upgrade_backup | bool)
 
   - name: Back up the current Rocket.Chat instance [UPGRADE]
     shell: >-
       mv {{ rocket_chat_application_path }}/bundle
       {{ rocket_chat_upgrade_backup_path }}/backup_{{ ansible_date_time.date }}_{{ (1000|random|string|hash)[:8] }}
-    when: rocket_chat_upgrade_backup|bool
+    when: (rocket_chat_upgrade_backup | bool)
 
   - name: Delete the current Rocket.Chat instance [UPGRADE]
     file:
       path: "{{ rocket_chat_application_path }}/bundle"
       state: absent
-    when: not rocket_chat_upgrade_backup|bool
+    when: not (rocket_chat_upgrade_backup | bool)
 
   - name: Set the Rocket.Chat upgrade status [UPGRADE]
     set_fact:
