@@ -11,7 +11,7 @@
       state: restarted
 
   - name: Upgrade Rocket.Chat
-    include: upgrade.yml
+    import_tasks: upgrade.yml
     when: ('stat' in rocket_chat_deploy_state)
            and (rocket_chat_deploy_state.stat.exists | bool)
     tags: upgrade

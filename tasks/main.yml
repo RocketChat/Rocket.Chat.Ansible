@@ -77,7 +77,7 @@
         Check your sudo configuration to ensure that your connecting user
         can assume the identities of other users without prompting.
 
-  - include: mongodb.yml
+  - import_tasks: mongodb.yml
     when: (rocket_chat_include_mongodb | bool)
     tags: mongodb
 
@@ -105,7 +105,7 @@
     retries: 2
     tags: packages
 
-  - include: nodejs.yml
+  - import_tasks: nodejs.yml
     tags: nodejs
 
   - name: "Configure /etc/hosts"
@@ -185,7 +185,7 @@
     tags: pgp
 
   - name: Upgrade Rocket.Chat
-    include: upgrade.yml
+    include_tasks: upgrade.yml
     when:
       - (download_result | changed)
       - ('stat' in rocket_chat_deploy_state)
@@ -261,10 +261,10 @@
       enabled: true
     tags: service
 
-  - include: nginx.yml
+  - import_tasks: nginx.yml
     when: (rocket_chat_include_nginx | bool)
     tags: nginx
 
-  - include: letsencrypt.yml
+  - import_tasks: letsencrypt.yml
     when: (rocket_chat_include_letsencrypt | bool)
     tags: letsencrypt
