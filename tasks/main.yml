@@ -42,7 +42,19 @@
       cache_valid_time: 3600
     when: ((ansible_pkg_mgr | lower) == "apt")
 
-  - include: repo_RedHat.yml
+  - name: Install EPEL for RHEL based distros (CentOS/RHEL)
+    block:
+
+      - name: Ensure the EPEL repository is present
+        package:
+          name: epel-release
+          state: present
+
+      - name: Ensure the EPEL repository GPG key is imported
+        rpm_key:
+          key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+          state: present
+
     when: ((ansible_distribution | lower) == "centos")
             or ((ansible_distribution | lower) == "redhat")
     tags: repo
