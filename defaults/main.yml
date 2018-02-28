@@ -16,6 +16,7 @@ rocket_chat_tarball_check_checksum: false
 rocket_Chat_tarball_check_pgp: true
 rocket_chat_tarball_fetch_timeout: 100
 rocket_chat_tarball_validate_remote_cert: true
+rocket_chat_pgp_command: gpg2
 rocket_chat_service_user: rocketchat
 rocket_chat_service_group: rocketchat
 rocket_chat_service_host: "{{ ansible_fqdn }}"

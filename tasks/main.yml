@@ -140,9 +140,10 @@
   - name: Setup PGP for verifying the Rocket.Chat tarball
     block:
 
-    - name: Import RochetChat PGP Key from default keyservers
+    - name: "Import RochetChat PGP Key from keyserver: {{ rocket_chat_tarball_gpg_keyserver }}"
       shell: |
-        gpg --keyserver "{{ rocket_chat_tarball_gpg_keyserver }}" \
+        {{ rocket_chat_pgp_command }} \
+            --keyserver "{{ rocket_chat_tarball_gpg_keyserver }}" \
             --recv-keys "{{ rocket_chat_tarball_gpg_key }}"
       register: add_key
       changed_when: "'not changed' not in add_key.stderr"
@@ -183,8 +184,9 @@
 
   - name: Verify Rocket.Chat binary tarball with GPG
     shell: |
-      gpg --verify rocket.chat-{{ rocket_chat_version }}.asc \
-                   rocket.chat-{{ rocket_chat_version }}.tgz
+      {{ rocket_chat_pgp_command }} \
+        --verify rocket.chat-{{ rocket_chat_version }}.asc \
+                 rocket.chat-{{ rocket_chat_version }}.tgz
     args:
       chdir: "{{ rocket_chat_application_path }}"
     when: rocket_Chat_tarball_check_pgp
