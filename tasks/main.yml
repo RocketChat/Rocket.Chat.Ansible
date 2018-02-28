@@ -64,6 +64,12 @@
     when: rocket_chat_include_mongodb|bool
     tags: mongodb
 
+  - name: Redefine rocket_chat_dep_packages to add dist specific packages if needed
+    set_fact:
+      rocket_chat_dep_packages:
+        "{{ rocket_chat_dep_packages | union(rocket_chat_dist_specific_packages) | unique }}"
+    when: rocket_chat_dist_specific_packages is defined
+
   - name: Ensure Rocket.Chat dependencies are installed
     package:
       name:

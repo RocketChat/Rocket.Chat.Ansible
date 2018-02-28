@@ -1,1 +1,5 @@
 ---
+
+rocket_chat_dist_specific_packages:
+  - nodejs
+  - npm
