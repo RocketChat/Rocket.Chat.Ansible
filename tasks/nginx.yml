@@ -70,7 +70,8 @@
     copy:
       src: "{{ rocket_chat_nginx_pfs_file }}"
       dest: "{{ rocket_chat_nginx_pfs_key_path }}"
-    when: not rocket_chat_nginx_generate_pfs_key
+    when: (not rocket_chat_nginx_generate_pfs_key|bool) or
+          (rocket_chat_nginx_pfs_file is defined)
     notify: Reload the Nginx service
 
   - name: Ensure the PFS key has been generated (this can take a while!)

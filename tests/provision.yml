@@ -20,3 +20,5 @@
       rocket_chat_tarball_check_checksum: false
       rocket_chat_service_host: localhost
       rocket_chat_automatic_upgrades: true
+      # The below PEM file is provided so we don't have to wait for it to generate.
+      rocket_chat_nginx_pfs_file: dhparam_INSECURE.pem
