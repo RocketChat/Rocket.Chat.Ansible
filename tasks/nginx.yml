@@ -81,6 +81,7 @@
       - (rocket_chat_nginx_pfs_file)
       - (rocket_chat_nginx_pfs_file | exists)
     notify: Reload the Nginx service
+    tags: pfs
 
   - name: Ensure the PFS key has been generated (this can take a while!)
     shell: >-
@@ -90,6 +91,7 @@
     args:
       creates: "{{ rocket_chat_nginx_pfs_key_path }}"
     notify: Reload the Nginx service
+    tags: pfs
 
   - name: Ensure the Nginx service is running/enabled
     service:

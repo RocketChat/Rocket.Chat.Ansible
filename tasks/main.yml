@@ -103,6 +103,7 @@
     register: dep_install_result
     until: (dep_install_result | succeeded)
     retries: 2
+    tags: packages
 
   - include: nodejs.yml
     tags: nodejs
@@ -168,6 +169,9 @@
     until: (download_result | succeeded)
     changed_when: (download_result | changed)
                    or (not (rocket_chat_tarball_check_checksum | bool))
+    tags:
+      - download
+      - pgp
 
   - name: Verify Rocket.Chat binary tarball with GPG
     shell: |
@@ -222,6 +226,7 @@
     when:
       - ((ansible_distribution | lower) == "ubuntu")
       - ((ansible_distribution_major_version | int) == "14")
+    tags: build
 
   - name: Ensure the Rocket.Chat application data permissions are correct
     command: >-
@@ -247,6 +252,7 @@
       name: rocketchat
       state: restarted
     when: (rocket_chat_upgraded | bool)
+    tags: service
 
   - name: Ensure the Rocket.Chat service is running/enabled
     service:
