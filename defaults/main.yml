@@ -37,6 +37,7 @@ rocket_chat_mongodb_gpg_key: EA312927
 rocket_chat_mongodb_server: 127.0.0.1
 rocket_chat_mongodb_port: 27017
 rocket_chat_mongodb_config_template: mongod.conf.j2
+rocket_chat_mongodb_service: mongod
 
 # nginx settings
 rocket_chat_include_nginx: true
