@@ -133,8 +133,9 @@
         {{ rocket_chat_pgp_command }} \
             --keyserver "{{ rocket_chat_tarball_gpg_keyserver }}" \
             --recv-keys "{{ rocket_chat_tarball_gpg_key }}"
-      register: add_key
-      changed_when: "'not changed' not in add_key.stderr"
+      changed_when: "'not changed' not in key_recv_result.stderr"
+      register: key_recv_result
+      until:  (key_recv_result | succeeded)
       retries: 4
 
     - name: Fetch the Rocket.Chat binary tarball PGP signature
@@ -146,6 +147,8 @@
         validate_certs: "{{ rocket_chat_tarball_validate_remote_cert }}"
         owner: "{{ rocket_chat_service_user }}"
         group: "{{ rocket_chat_service_group }}"
+      register: get_pgp_asc_result
+      until: (get_pgp_asc_result | succeeded)
       retries: 2
 
     when: (rocket_Chat_tarball_check_pgp | bool)
@@ -165,8 +168,8 @@
     # https://github.com/ansible/ansible/issues/15915
     #notify: Upgrade Rocket.Chat
     register: download_result
-    retries: 2
     until: (download_result | succeeded)
+    retries: 2
     changed_when: (download_result | changed)
                    or (not (rocket_chat_tarball_check_checksum | bool))
     tags:

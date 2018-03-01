@@ -35,7 +35,9 @@
           port: "{{ rocket_chat_service_port }}"
           host: localhost
           state: started
-        retries: 1
+        register: api_pre_check
+        until: (api_pre_check | succeeded)
+        retries: 2
 
       - name: Do a basic status check of the API
         uri:
@@ -51,5 +53,8 @@
            or (api_check.json.success|bool != True)
       rescue:
         - name: Output debug information when the check fails
-          debug: var=api_check
+          debug: var="{{ item }}"
+          with_items:
+            - api_pre_check | default(None)
+            - api_check | default(None)
       tags: check
