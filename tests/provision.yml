@@ -50,6 +50,7 @@
           with_items:
             - https://localhost/api/v1/info
             - http://localhost/api/v1/info
+          register: api_check
           failed_when:
             - (api_check.status|int != 200)
                or (api_check.msg|string is not search('^OK '))
@@ -66,7 +67,7 @@
             - (api_pre_check | succeeded) and (api_check | succeeded)
             - ((ansible_virtualization | default(None) | lower) != "docker")
             - (lookup('pipe','command -v vagrant') | search('vagrant$'))
-            
+
         # We use YAML anchoring to duplicate this below
         # because Ansible does not supported nested rescue.
         rescue: &rescue
