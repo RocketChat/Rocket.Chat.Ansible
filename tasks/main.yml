@@ -150,7 +150,6 @@
       register: get_pgp_asc_result
       until: (get_pgp_asc_result | succeeded)
       retries: 2
-
     when: (rocket_Chat_tarball_check_pgp | bool)
     tags: pgp
 
@@ -158,7 +157,7 @@
     get_url:
       url: "{{ rocket_chat_tarball_remote }}"
       checksum: "{{ (rocket_chat_tarball_check_checksum == false) | ternary(omit, 'sha256: ' + (rocket_chat_tarball_sha256sum|string)) }}"
-      force: "{{ (rocket_chat_tarball_check_checksum == false) | ternary('yes', omit) }}"
+      force: yes
       dest: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
       timeout: "{{ rocket_chat_tarball_fetch_timeout }}"
       validate_certs: "{{ rocket_chat_tarball_validate_remote_cert }}"
