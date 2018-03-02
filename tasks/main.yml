@@ -271,3 +271,5 @@
   - import_tasks: letsencrypt.yml
     when: (rocket_chat_include_letsencrypt | bool)
     tags: letsencrypt
+
+  - meta: flush_handlers
