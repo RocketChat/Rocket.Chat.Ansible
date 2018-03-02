@@ -142,11 +142,11 @@
   - name: Setup PGP for verifying the Rocket.Chat tarball
     block:
 
-    - name: "Import RochetChat PGP Key from keyserver: {{ rocket_chat_tarball_gpg_keyserver }}"
+    - name: "Import RochetChat PGP Key from keyserver: {{ rocket_chat_pgp_keyserver }}"
       shell: |
         {{ rocket_chat_pgp_command }} \
-            --keyserver "{{ rocket_chat_tarball_gpg_keyserver }}" \
-            --recv-keys "{{ rocket_chat_tarball_gpg_key }}"
+            --keyserver "{{ rocket_chat_pgp_keyserver }}" \
+            --recv-keys "{{ rocket_chat_tarball_pgp_key }}"
       changed_when: "'not changed' not in key_recv_result.stderr"
       register: key_recv_result
       until:  (key_recv_result | succeeded)
