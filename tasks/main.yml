@@ -139,18 +139,23 @@
     set_fact:
       rocket_chat_upgraded: false
 
+  # PGP BLOCK BEGIN
   - name: Setup PGP for verifying the Rocket.Chat tarball
     block:
 
-    - name: "Import RochetChat PGP Key from keyserver: {{ rocket_chat_pgp_keyserver }}"
+    - name: "Import RochetChat PGP Key from keyserver: {{ rocket_chat_pgp_keyservers }}"
       shell: |
-        {{ rocket_chat_pgp_command }} \
-            --keyserver "{{ rocket_chat_pgp_keyserver }}" \
-            --recv-keys "{{ rocket_chat_tarball_pgp_key }}"
-      changed_when: "'not changed' not in key_recv_result.stderr"
+          {{ rocket_chat_pgp_command }} \
+              --keyserver "{{ item }}" \
+              --recv-keys "{{ rocket_chat_tarball_pgp_key }}"
       register: key_recv_result
-      until:  (key_recv_result | succeeded)
-      retries: 4
+      changed_when: (not ('not changed' in key_recv_result.stderr))
+      when:
+        - (key_recv_result is undefined)
+           or ((key_recv_result is defined)
+               and (key_recv_result.rc != 0))
+      with_items: "{{ rocket_chat_pgp_keyservers }}"
+      ignore_errors: true
 
     - name: Fetch the Rocket.Chat binary tarball PGP signature
       get_url:
@@ -164,41 +169,39 @@
       register: get_pgp_asc_result
       until: (get_pgp_asc_result | succeeded)
       retries: 2
-    when: (rocket_Chat_tarball_check_pgp | bool)
-    tags: pgp
+      when: (rocket_Chat_tarball_check_pgp | bool)
 
-  - name: Fetch the Rocket.Chat binary tarball
-    get_url:
-      url: "{{ rocket_chat_tarball_remote }}"
-      checksum: "{{ (rocket_chat_tarball_check_checksum == false) | ternary(omit, 'sha256: ' + (rocket_chat_tarball_sha256sum|string)) }}"
-      force: yes
-      dest: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
-      timeout: "{{ rocket_chat_tarball_fetch_timeout }}"
-      validate_certs: "{{ rocket_chat_tarball_validate_remote_cert }}"
-      owner: "{{ rocket_chat_service_user }}"
-      group: "{{ rocket_chat_service_group }}"
-    # Temp fix for ansible/ansible#15915 ( Broken include in handlers )
-    # https://github.com/ansible/ansible/issues/15915
-    #notify: Upgrade Rocket.Chat
-    register: download_result
-    until: (download_result | succeeded)
-    retries: 2
-    changed_when: (download_result | changed)
-                   or (not (rocket_chat_tarball_check_checksum | bool))
-    tags:
-      - download
-      - pgp
+    - name: Fetch the Rocket.Chat binary tarball
+      get_url:
+        url: "{{ rocket_chat_tarball_remote }}"
+        checksum: "{{ (rocket_chat_tarball_check_checksum == false) | ternary(omit, 'sha256: ' + (rocket_chat_tarball_sha256sum|string)) }}"
+        force: yes
+        dest: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
+        timeout: "{{ rocket_chat_tarball_fetch_timeout }}"
+        validate_certs: "{{ rocket_chat_tarball_validate_remote_cert }}"
+        owner: "{{ rocket_chat_service_user }}"
+        group: "{{ rocket_chat_service_group }}"
+      # Temp fix for ansible/ansible#15915 ( Broken include in handlers )
+      # https://github.com/ansible/ansible/issues/15915
+      #notify: Upgrade Rocket.Chat
+      register: download_result
+      until: (download_result | succeeded)
+      retries: 2
+      tags: download
+      changed_when: (download_result | changed)
+                     or (not (rocket_chat_tarball_check_checksum | bool))
 
-  - name: Verify Rocket.Chat binary tarball with GPG
-    shell: |
-      {{ rocket_chat_pgp_command }} \
-        --verify rocket.chat-{{ rocket_chat_version }}.asc \
-                 rocket.chat-{{ rocket_chat_version }}.tgz
-    args:
-      chdir: "{{ rocket_chat_application_path }}"
-    when: (rocket_Chat_tarball_check_pgp | bool)
-    changed_when: false
+    - name: Verify Rocket.Chat binary tarball with GPG
+      shell: |
+        {{ rocket_chat_pgp_command }} \
+          --verify rocket.chat-{{ rocket_chat_version }}.asc \
+                   rocket.chat-{{ rocket_chat_version }}.tgz
+      args:
+        chdir: "{{ rocket_chat_application_path }}"
+      when: (rocket_Chat_tarball_check_pgp | bool)
+      changed_when: false
     tags: pgp
+    # PGP BLOCK END
 
   - name: Upgrade Rocket.Chat
     include_tasks: upgrade.yml

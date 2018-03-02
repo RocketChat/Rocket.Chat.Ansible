@@ -15,8 +15,15 @@
 
       - name: Ensure the MongoDB repository key has been imported [Debian]
         apt_key:
-          keyserver: "{{ rocket_chat_pgp_keyserver }}"
+          keyserver: "{{ item }}"
           id: "{{ rocket_chat_mongodb_pgp_key }}"
+        with_items: "{{ rocket_chat_pgp_keyservers }}"
+        when:
+          - (apt_key_result is undefined)
+             or ((apt_key_result is defined)
+                 and (apt_key_result.rc != 0))
+        ignore_errors: true
+        register: apt_key_result
         tags: repo
 
       - name: Ensure the MongoDB repository is present [Debian]

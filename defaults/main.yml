@@ -11,7 +11,10 @@ rocket_chat_tarball_asc_remote:  https://releases.rocket.chat/{{ rocket_chat_ver
 # Using the sha256sum is deprecated in favor of GPG verifying
 rocket_chat_tarball_sha256sum: 0
 rocket_chat_tarball_pgp_key: 0E163286C20D07B9787EBE9FD7F9D0414FD08104
-rocket_chat_pgp_keyserver: hkp://p80.pool.sks-keyservers.net:80
+rocket_chat_pgp_keyservers:
+  - hkp://p80.pool.sks-keyservers.net:80
+  - keyserver.ubuntu.com
+  - pgp.mit.edu
 rocket_chat_tarball_check_checksum: false
 rocket_Chat_tarball_check_pgp: true
 rocket_chat_tarball_fetch_timeout: 100
