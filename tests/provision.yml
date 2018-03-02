@@ -1,5 +1,18 @@
 ---
 
+# The intent of this playbook is to be run from Vagrant or from a CI like Travis
+# or Gitlab, but mostly vagrant. The purpose of the structure of this playbooks is
+# so that vagrant can loop through all of the supported boxes in the Vagrantfile
+# and pass/fail them based on whether or not the VM still exists and is paused.
+# Whereas, since there is a viable status check - successful plays need not keep
+# a VM behind. The suspended VMs can thus be started and inspected for problems.
+# They are paused to conserve resources on computers that can only handle a few
+# VMs at a time. Here we are utilizing the ability of ansible to run both local
+# tasks (to manage vagrant) on the provisining system, and capture errors in the
+# "rescue:" block. (to keep vagrant from exiting on an ansible error.)
+#
+#                                                             - Michael Goodwin
+
 - name: Apply the Rocket.Chat role to all chat_servers
   hosts: "{{ host_name | default('chat_servers') }}"
   become: yes
