@@ -2,7 +2,7 @@ upstream rocket_chat {
         server 127.0.0.1:{{ rocket_chat_service_port }};
 }
 server {
-{% if ansible_default_ipv6.gateway is defined %}
+{% if ('gateway' in ansible_default_ipv6) %}
         listen [::]:80 ipv6only=on;
 {% endif %}
         listen  80;
@@ -19,7 +19,7 @@ server {
 }
 
 server {
-{% if ansible_default_ipv6.gateway is defined %}
+{% if ('gateway' in ansible_default_ipv6) %}
         listen [::]:443 ssl ipv6only=on{% if nginx_http2_module.rc == 0 %} http2{% endif %};
 {% endif %}
         listen 443 ssl{% if nginx_http2_module.rc == 0 %} http2{% endif %};
