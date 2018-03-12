@@ -93,7 +93,7 @@
       members: [{"_id":1, "host":
       "{{ rocket_chat_mongodb_server }}:{{ rocket_chat_mongodb_port }}"}]})'
     become: yes
-    become_user: mongodb
+    become_user: "{{ rocket_chat_mongodb_service_user }}"
     args:
       executable: /bin/bash
     register: replSet_result
@@ -101,3 +101,19 @@
       - not (replSet_result.stdout | search(' Object'))
       - ('ok' in (replSet_result.stdout | from_json))
       - (((replSet_result.stdout | from_json).ok | int) == 1)
+
+  - name: Reset replSet config when /etc/hosts changes
+    shell: >-
+       mongo --quiet --eval
+       'cfg = rs.conf();
+       cfg.members[0].host = "{{ ansible_nodename }}";
+       rs.reconfig(cfg, {force: true})'
+    become: yes
+    become_user: "{{ rocket_chat_mongodb_service_user }}"
+    when:
+      - (hosts_change_result | changed)
+      - ((replSet_result is undefined) or (not (replSet_result | changed)))
+    args:
+      executable: /bin/bash
+    notify:
+      - Restart the MongoDB service
