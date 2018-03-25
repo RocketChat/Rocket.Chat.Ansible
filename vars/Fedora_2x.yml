@@ -1,5 +1,4 @@
 ---
-rocket_chat_service_update_command: systemctl daemon-reload
 rocket_chat_service_template:
   src: rocketchat.service.j2
   dest: /usr/lib/systemd/system/rocketchat.service
