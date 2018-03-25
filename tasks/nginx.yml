@@ -81,7 +81,9 @@
     when: rocket_chat_nginx_generate_pfs_key|bool
     args:
       creates: "{{ rocket_chat_nginx_pfs_key_path }}"
-    notify: Reload the Nginx service
+    notify: 
+      - Reload the Nginx service
+      - Reload nginx systemd
 
   - name: Ensure the Nginx service is running/enabled
     service:
