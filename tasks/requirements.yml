@@ -1,0 +1,84 @@
+---
+  
+  - include_vars: "{{ item }}"
+    with_first_found:
+      - "{{ ansible_distribution }}.yml"
+      - "{{ ansible_os_family }}.yml"
+    tags: vars
+
+  - include_vars: "{{ item }}"
+    with_first_found:
+      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+      # Below is for example: Fedora_2x.yml = 20-29
+      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version[:1] ~ 'x' }}.yml"
+      - "{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yml"
+    tags: vars
+    notify: Ensure APT cache has been updated recently
+
+  - include_tasks: repo_RedHat.yml
+    when:
+      - ansible_os_family|lower == "redhat"
+      - not ansible_distribution|lower == "fedora"
+    tags: repo
+
+  - name: Ensure Rocket.Chat dependencies are installed
+    package:
+      name:
+        "{{
+            (ansible_virtualization_type != 'docker') |
+            ternary(
+              rocket_chat_dep_packages,
+              rocket_chat_dep_packages | difference('[\"cron\"]')
+              )
+          }}"
+      state: present
+    register: result
+    until: result | succeeded
+    retries: 2
+  
+  
+  - name: Ensure the Rocket.Chat service group is present
+    group:
+      name: "{{ rocket_chat_service_group }}"
+      state: present
+      system: true
+
+  - name: Ensure the Rocket.Chat service user is present
+    user:
+      comment: Rocket.Chat Service User
+      name: "{{ rocket_chat_service_user }}"
+      group: "{{ rocket_chat_service_group }}"
+      home: "{{ rocket_chat_application_path }}"
+      createhome: true
+      shell: /bin/false
+      state: present
+      system: true
+
+  - name: Check for adequate privilege escalation rights
+    ping:
+    become: yes
+    become_user: "{{ rocket_chat_service_user }}"
+    register: result
+    ignore_errors: true
+  - assert:
+      that: result|succeeded
+      msg: >
+        Check your sudo configuration to ensure that your connecting user
+        can assume the identities of other users without prompting.
+
+  - name: Ensure link /bin/node -> /bin/nodejs exists
+    file:
+      src: /bin/node
+      dest: /bin/nodejs
+      state: link
+    when: ansible_os_family == "RedHat"
+
+  - name: "Configure /etc/hosts"
+    lineinfile:
+      dest: /etc/hosts
+      line:  "127.0.0.1    localhost {{ ansible_fqdn }} {{ ansible_nodename }} {{ ansible_hostname }}"
+      regexp: '^127\.0\.0\.1'
+      insertbefore: BOF
+    when: ansible_virtualization_type != "docker"
+
+

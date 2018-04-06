@@ -1,0 +1,185 @@
+---
+  
+  - name: Ensure n (NodeJS) is installed (bootstrap correct version of NodeJS)
+    npm:
+      name: n
+      global: true
+      executable: "{{ rocket_chat_npm_dist }}"
+
+  - name: Check to see if n has installed the required binaries in {{ rocket_chat_node_prefix }}
+    stat:
+      path: "{{ rocket_chat_node_path }}"
+    register: n_node_bin
+
+  - name: "Install the supported NodeJS environment via n [Version: {{ rocket_chat_node_version }}]"
+    shell: n {{ rocket_chat_node_version }}
+    when: not n_node_bin.stat.exists|bool
+
+  - name: Check to see if the proper npm version has already been installed
+    command: "{{ rocket_chat_npm_path }} --version"
+    changed_when: false
+    register: current_npm_version
+
+  - name: "Install the supported NPM version via npm [Version: {{ rocket_chat_npm_version }}]"
+    npm:
+      name: npm
+      version: "{{ rocket_chat_npm_version }}"
+      path: "{{ rocket_chat_node_prefix }}/lib"
+      executable: "{{ rocket_chat_npm_path }}"
+    environment:
+      PATH: "{{ rocket_chat_node_prefix }}/bin:{{ ansible_env.PATH }}"
+    when: current_npm_version != rocket_chat_npm_version
+
+  - name: Check to see if this is the initial Rocket.Chat deployment
+    stat:
+      path: "{{ rocket_chat_application_path }}/bundle"
+    register: rocket_chat_deploy_state
+
+  - name: Set the initial Rocket.Chat upgrade status
+    set_fact:
+      rocket_chat_upgraded: false
+
+  - name: Setup PGP for verifying the Rocket.Chat tarball
+    block:
+
+    - name: "Import RochetChat PGP Key from keyserver: {{ rocket_chat_tarball_gpg_keyserver }}"
+      shell: |
+        {{ rocket_chat_pgp_command }} \
+            --keyserver "{{ rocket_chat_tarball_gpg_keyserver }}" \
+            --recv-keys "{{ rocket_chat_tarball_gpg_key }}"
+      register: add_key
+      changed_when: "'not changed' not in add_key.stderr"
+      retries: 4
+
+    - name: Fetch the Rocket.Chat binary tarball PGP signature
+      get_url:
+        url: "{{ rocket_chat_tarball_asc_remote }}"
+        force: yes
+        dest: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.asc"
+        timeout: "{{ rocket_chat_tarball_fetch_timeout }}"
+        validate_certs: "{{ rocket_chat_tarball_validate_remote_cert }}"
+        owner: "{{ rocket_chat_service_user }}"
+        group: "{{ rocket_chat_service_group }}"
+      retries: 2
+
+    when: rocket_Chat_tarball_check_pgp
+    tags: pgp
+
+  - name: Fetch the Rocket.Chat binary tarball
+    get_url:
+      url: "{{ rocket_chat_tarball_remote }}"
+      checksum: "{{ (rocket_chat_tarball_check_checksum == false) | ternary(omit, 'sha256: ' + (rocket_chat_tarball_sha256sum|string)) }}"
+      force: "{{ (rocket_chat_tarball_check_checksum == false) | ternary('yes', omit) }}"
+      dest: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
+      timeout: "{{ rocket_chat_tarball_fetch_timeout }}"
+      validate_certs: "{{ rocket_chat_tarball_validate_remote_cert }}"
+      owner: "{{ rocket_chat_service_user }}"
+      group: "{{ rocket_chat_service_group }}"
+    # Temp fix for ansible/ansible#15915 ( Broken include in handlers )
+    # https://github.com/ansible/ansible/issues/15915
+    #notify: Upgrade Rocket.Chat
+    register: result
+    retries: 2
+    until: result | succeeded
+    changed_when: (result|changed)
+                  or (not rocket_chat_tarball_check_checksum)
+
+  - name: Verify Rocket.Chat binary tarball with GPG
+    shell: |
+      {{ rocket_chat_pgp_command }} \
+        --verify rocket.chat-{{ rocket_chat_version }}.asc \
+                 rocket.chat-{{ rocket_chat_version }}.tgz
+    args:
+      chdir: "{{ rocket_chat_application_path }}"
+    when: rocket_Chat_tarball_check_pgp
+    changed_when: false
+    tags: pgp
+
+  - meta: flush_handlers
+
+  - name: Unpack the Rocket.Chat binary tarball
+    unarchive:
+      copy: false
+      src: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
+      dest: "{{ rocket_chat_application_path }}"
+      creates: "{{ rocket_chat_application_path }}/bundle"
+      owner: "{{ rocket_chat_service_user }}"
+      group: "{{ rocket_chat_service_group }}"
+    tags: build
+
+  - name: Install Rocket.Chat via NPM
+    npm:
+      state: present
+      path: "{{ rocket_chat_application_path }}/bundle/programs/server"
+      executable: "{{ rocket_chat_npm_path }}"
+      production: true
+    become: true
+    become_user: "{{ rocket_chat_service_user }}"
+    environment:
+      PATH: "{{ rocket_chat_node_prefix }}/bin:{{ ansible_env.PATH }}"
+    tags: build
+
+  - name: Ensure the Rocket.Chat log file symlink is present [Ubuntu 14]
+    file:
+      path: /var/log/rocketchat.log
+      src: /var/log/upstart/rocketchat.log
+      state: link
+      force: yes
+
+    when:
+      - ansible_distribution == "Ubuntu"
+      - ansible_distribution_major_version == "14"
+
+  - name: Ensure the Rocket.Chat application data permissions are correct
+    command: >-
+      chown {{ rocket_chat_service_user }}.{{ rocket_chat_service_group }}
+      -R {{ rocket_chat_application_path | quote }}
+    args:
+      warn: no
+    tags: build
+
+  - include_vars: "{{ item }}"
+    with_first_found:
+      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+      - "{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yml"
+      - "{{ ansible_distribution }}.yml"
+      - "{{ ansible_os_family }}.yml"
+    tags: service
+
+  - name: Deploy the Rocket.Chat service file
+    template:
+      src: "{{ rocket_chat_service_template.src }}"
+      dest: "{{ rocket_chat_service_template.dest }}"
+    notify:
+      - Update the Rocket.Chat service configuration
+      - Restart the Rocket.Chat service
+    tags: service
+
+  - meta: flush_handlers
+
+  - name: Ensure the MongoDB replSets have been initiated
+    shell: >-
+      mongo --eval 'rs.initiate()' &&
+      touch .mongo_rs_initialised
+    become: yes
+    become_user: mongodb
+    args:
+      executable: /bin/bash
+      chdir: /var/lib/mongodb
+      creates: /var/lib/mongodb/.mongo_rs_initialised
+    when: rocket_chat_include_mongodb|bool
+
+  - name: Restart the Rocket.Chat service [UPGRADE]
+    service:
+      name: rocketchat
+      state: restarted
+    when: rocket_chat_upgraded|bool
+
+  - name: Ensure the Rocket.Chat service is running/enabled
+    service:
+      name: rocketchat
+      state: started
+      enabled: true
+    tags: service
+
+
