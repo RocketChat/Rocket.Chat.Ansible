@@ -70,6 +70,11 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 | `rocket_chat_mongodb_port` | 27017 | The TCP port to contact the MongoDB host host via |
 | `rocket_chat_mongodb_packages` | `mongodb` | The name of the MongoDB package(s) to install (differs for different distros - see `vars/`) |
 | `rocket_chat_mongodb_config_template` | [`mongod.conf.j2`](templates/mongod.conf.j2) | The `/etc/mongod.conf` template to deploy |
+| `rocket_chat_mongodb_database` | `rocketchat`| MongoDB Database to use. (Advanced use only). |
+| `rocket_chat_mongodb_options` | `` | MongoDB (Connection) options. (Advanced use only). This is the place to set connection details like use TLS. |
+| `rocket_chat_mongodb_user` |  UNSET | MongoDB user (Advanced use only). Only set this is you use this! |
+| `rocket_chat_mongodb_password` | UNSET | MongoDB password (Advanced use only). Only set this is you use this! |
+| `rocket_chat_mongodb_credentials` | UNSET | MongoDB credentials (Advanced use only). Only set this is you use this! (is automagically created from `rocket_chat_mongodb_user` and `rocket_chat_mongodb_password` is not set.)|
 | `rocket_chat_include_nginx`| true | A boolean value that determines whether or not to deploy Nginx |
 | `rocket_chat_ssl_generate_certs` | true | A boolean value that determines whether or not to generate the Nginx SSL certs |
 | `rocket_chat_ssl_key_path` | `/etc/nginx/rocket_chat.key` | The destination path for the Nginx SSL private key |
