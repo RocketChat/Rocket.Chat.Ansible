@@ -25,3 +25,9 @@
     service:
       name: rocketchat
       state: restarted
+
+  - name: Restart the Rocket.Chat@ services
+    service:
+      name: "rocketchat@{{ item }}"
+      state: restarted
+    with_list: "{{ rocket_chat_service_extra_instances }}"

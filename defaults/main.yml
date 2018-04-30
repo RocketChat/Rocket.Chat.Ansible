@@ -22,6 +22,7 @@ rocket_chat_service_group: rocketchat
 rocket_chat_service_host: "{{ ansible_fqdn }}"
 rocket_chat_service_port: 3000
 rocket_chat_service_environment: {}
+rocket_chat_service_extra_instances: []
 rocket_chat_node_version: 8.9.4
 rocket_chat_node_prefix: /usr/local/n/versions/node/{{ rocket_chat_node_version }}
 rocket_chat_node_path: "{{ rocket_chat_node_prefix }}/bin/node"
