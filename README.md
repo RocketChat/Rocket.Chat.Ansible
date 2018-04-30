@@ -60,6 +60,7 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 | `rocket_chat_service_group` | `rocketchat` | The name of the primary group for the `rocket_chat_service_user` user |
 | `rocket_chat_service_host` | `"{{ ansible_fqdn }}"` | The FQDN of the Rocket.Chat system |
 | `rocket_chat_service_port` | 3000 | The TCP port Rocket.Chat listens on |
+| `rocket_chat_service_extra_instances` | `[]` | List of TCP port numbers for additional rocketchat service instances to handle more users on one machine |
 | `rocket_chat_node_version` | `4.5.0` | The version of NodeJS to install that `n` understands |
 | `rocket_chat_node_prefix` | `/usr/local/n/versions/node/{{ rocket_chat_node_version }}` | The path to the `node` binary directory that n installs |
 | `rocket_chat_npm_dist` | `/usr/bin/npm` | The path to the original `npm` binary, before n installs any Node versions |
