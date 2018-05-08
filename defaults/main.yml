@@ -37,6 +37,14 @@ rocket_chat_mongodb_gpg_key: EA312927
 rocket_chat_mongodb_server: 127.0.0.1
 rocket_chat_mongodb_port: 27017
 rocket_chat_mongodb_config_template: mongod.conf.j2
+rocket_chat_mongodb_database: "rocketchat"
+#Any options for the MongoDB (like TLS) should go in here.
+rocket_chat_mongodb_options: ""
+# Only set user / password when you have a mongodb that uses it.
+#rocket_chat_mongodb_user: ""
+#rocket_chat_mongodb_password: ""
+#rocket_chat_mongodb_credentials will be Automatically set unless defined.
+#rocket_chat_mongodb_credentials: ""
 
 # nginx settings
 rocket_chat_include_nginx: true
