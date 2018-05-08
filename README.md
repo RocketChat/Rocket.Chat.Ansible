@@ -71,9 +71,10 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 | `rocket_chat_mongodb_server` | 127.0.0.1 | The IP/FQDN of the MongoDB host |
 | `rocket_chat_mongodb_port` | 27017 | The TCP port to contact the MongoDB host host via |
 | `rocket_chat_mongodb_database` | rocketchat |  The MongoDB database to be used for Rocket.Chat |
-| `rocket_chat_mongodb_use_tls`   | false  | Whether or not to use TLS to connect to the MongoDB DB  |
 | `rocket_chat_mongodb_packages` | `mongodb` | The name of the MongoDB package(s) to install (differs for different distros - see `vars/`) |
 | `rocket_chat_mongodb_config_template` | [`mongod.conf.j2`](templates/mongod.conf.j2) | The `/etc/mongod.conf` template to deploy |
+| `rocket_chat_mongodb_options` | `` | MongoDB (Connection) options. (Advanced use only). This is the place to set connection details like use TLS. |
+| `rocket_chat_mongodb_credentials` | UNSET | MongoDB credentials (Advanced use only). Only set this if you use this! (is automagically created from `rocket_chat_mongodb_user` and `rocket_chat_mongodb_password` is not set.)|
 | `rocket_chat_mongodb_org_pkgs` | false &#124; true (Debian/Ubuntu) | Use official MongoDB.org community edition packages or not |
 | `rocket_chat_mongodb_org_version`   | 3.4   | Version string of official packages to install |
 | `rocket_chat_mongodb_service_name` | `mongod` | The name of the systemd service unit and mongodb config file in /etc |
