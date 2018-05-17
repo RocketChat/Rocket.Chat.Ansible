@@ -2,7 +2,7 @@ upstream rocket_chat {
         server 127.0.0.1:{{ rocket_chat_service_port }};
 }
 server {
-        listen  80;
+        listen  {{ rocket_chat_nginx_listen_port }};
         server_name {{ rocket_chat_service_host }};
 {% if rocket_chat_include_letsencrypt|bool %}
         location /.well-known/acme-challenge/ {
@@ -16,7 +16,7 @@ server {
 }
 
 server {
-        listen 443 ssl{% if nginx_http2_module.rc == 0 %} http2{% endif %};
+        listen {{ rocket_chat_nginx_listen_ssl_port }} ssl{% if nginx_http2_module.rc == 0 %} http2{% endif %};
         server_name {{ rocket_chat_service_host }};
 
         ssl_certificate {{ rocket_chat_ssl_cert_path }};
