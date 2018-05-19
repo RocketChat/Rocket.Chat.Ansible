@@ -25,7 +25,7 @@
     register: result
     ignore_errors: true
   - assert:
-      that: result|succeeded
+      that: result is succeeded
       msg: >
         Check your sudo configuration to ensure that your connecting user
         can assume the identities of other users without prompting.
@@ -72,7 +72,7 @@
           }}"
       state: present
     register: result
-    until: result | succeeded
+    until: result is succeeded
     retries: 2
 
   - name: Ensure link /bin/node -> /bin/nodejs exists
@@ -178,8 +178,8 @@
     #notify: Upgrade Rocket.Chat
     register: result
     retries: 2
-    until: result | succeeded
-    changed_when: (result|changed)
+    until: result is succeeded
+    changed_when: (result is changed)
                   or (not rocket_chat_tarball_check_checksum)
 
   - name: Verify Rocket.Chat binary tarball with GPG
@@ -196,7 +196,7 @@
   - name: Upgrade Rocket.Chat
     include: upgrade.yml
     when:
-      - result|changed
+      - result is changed
       - rocket_chat_deploy_state.stat.exists
     tags:
       - upgrade

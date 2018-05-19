@@ -37,7 +37,7 @@
     -subj "/CN={{ rocket_chat_letsencrypt_domain | default(rocket_chat_service_host) }}"
     -out {{ rocket_chat_letsencrypt_csr }}
   when:
-    - (key_gen_result | changed) or
+    - (key_gen_result is changed) or
       not csr_path.stat.exists
   register: csr_gen_result
 
@@ -59,4 +59,4 @@
 - name: Run acme-tiny_renew.sh (first run cert creation) [Let's Encrypt!]
   shell: /etc/cron.monthly/acme-tiny_renew.sh
   notify: Reload the Nginx service
-  when: (csr_gen_result | changed) or rocket_chat_letsencrypt_force_renew
+  when: (csr_gen_result is changed) or rocket_chat_letsencrypt_force_renew
