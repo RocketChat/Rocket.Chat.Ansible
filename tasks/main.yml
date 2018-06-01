@@ -164,7 +164,7 @@
       register: get_pgp_asc_result
       until: (get_pgp_asc_result is succeeded)
       retries: 2
-    when: (rocket_Chat_tarball_check_pgp | bool)
+    when: (rocket_chat_tarball_check_pgp | bool)
     tags: pgp
 
   - name: Fetch the Rocket.Chat binary tarball
@@ -196,7 +196,7 @@
                  rocket.chat-{{ rocket_chat_version }}.tgz
     args:
       chdir: "{{ rocket_chat_application_path }}"
-    when: (rocket_Chat_tarball_check_pgp | bool)
+    when: (rocket_chat_tarball_check_pgp | bool)
     changed_when: false
     tags: pgp
 
