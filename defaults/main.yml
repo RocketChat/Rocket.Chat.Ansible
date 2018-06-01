@@ -13,7 +13,7 @@ rocket_chat_tarball_sha256sum: 0
 rocket_chat_tarball_gpg_key: 0E163286C20D07B9787EBE9FD7F9D0414FD08104
 rocket_chat_tarball_gpg_keyserver: ha.pool.sks-keyservers.net
 rocket_chat_tarball_check_checksum: false
-rocket_Chat_tarball_check_pgp: true
+rocket_chat_tarball_check_pgp: true
 rocket_chat_tarball_fetch_timeout: 100
 rocket_chat_tarball_validate_remote_cert: true
 rocket_chat_pgp_command: gpg2
