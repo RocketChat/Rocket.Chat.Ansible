@@ -77,6 +77,28 @@
         Check your sudo configuration to ensure that your connecting user
         can assume the identities of other users without prompting.
 
+  - name: "Configure /etc/hosts"
+    lineinfile:
+      dest: /etc/hosts
+      line:  "{{ item.line }}"
+      regexp: "{{ item.regexp }}"
+      insertafter: "{{ item.insertafter | default(omit) }}"
+      insertbefore: "{{ item.insertbefore | default(omit) }}"
+      backrefs: "{{ item.backrefs | default(True) }}"
+    when: ansible_virtualization_type != "docker"
+    with_items:
+      - regexp: '^127\.0\.0\.1(.*){{ ansible_nodename }}(.*)'
+        line:   '127.0.0.1 \1 \2'
+      - regexp: '^127\.0\.0\.1(.*){{ ansible_hostname }}(.*)'
+        line:   '127.0.0.1 \1 \2'
+      - regexp: '^127\.0\.0\.1[ ]*([^ ].*)[ ]+localhost[ ]+([^ ].*)'
+        line:   '127.0.0.1    localhost \1 \2'
+      - regexp: '^127\.0\.1\.1'
+        line:   "127.0.1.1    {{ ansible_nodename }} {{ ansible_hostname }}"
+        insertafter: '^127\.0\.0\.1'
+        backrefs: no
+    register: hosts_change_result
+
   - import_tasks: mongodb.yml
     when: (rocket_chat_include_mongodb | bool)
     tags: mongodb
@@ -107,14 +129,6 @@
 
   - import_tasks: nodejs.yml
     tags: nodejs
-
-  - name: "Configure /etc/hosts"
-    lineinfile:
-      dest: /etc/hosts
-      line:  "127.0.1.1    {{ ansible_fqdn }} {{ ansible_nodename }}"
-      regexp: '^127\.0\.1\.1'
-      insertbefore: BOF
-    when: ((ansible_virtualization_type | lower) != "docker")
 
   - name: Check to see if this is the initial Rocket.Chat deployment
     stat:
