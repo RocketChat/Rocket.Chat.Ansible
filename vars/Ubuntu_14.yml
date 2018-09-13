@@ -4,5 +4,4 @@ rocket_chat_service_template:
   src: rocketchat_upstart.j2
   dest: /etc/init/rocketchat.conf
 
-rocket_chat_mongodb_apt_repo: "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse"
 rocket_chat_tarball_validate_remote_cert: false

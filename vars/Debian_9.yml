@@ -1,0 +1,6 @@
+---
+rocket_chat_mongodb_service_name: mongodb
+rocket_chat_mongodb_org_pkgs: false
+
+rocket_chat_dist_specific_packages:
+  - g++

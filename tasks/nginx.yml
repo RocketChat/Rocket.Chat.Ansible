@@ -4,7 +4,9 @@
   - name: Grant Nginx permissions to proxy requests to an upstream [SELinux]
     shell: setsebool httpd_can_network_connect on -P
     changed_when: false
-    when: ansible_selinux.status | default(None) == "enabled"
+    when:
+      - ('status' in ansible_selinux)
+      - (ansible_selinux.status == "enabled")
 
   - name: Ensure Nginx is present
     package:
@@ -41,8 +43,12 @@
       src: "{{ item.src }}"
       dest: "{{ item.dest }}"
     when:
-      - not rocket_chat_ssl_generate_certs|bool
-      - rocket_chat_ssl_deploy_data|bool
+      - not (rocket_chat_ssl_generate_certs | bool)
+      - (rocket_chat_ssl_deploy_data | bool)
+      - (rocket_chat_ssl_key_file is defined)
+      - (rocket_chat_ssl_cert_file is defined)
+      - (rocket_chat_ssl_key_file)
+      - (rocket_chat_ssl_cert_file)
     with_items:
       - src: "{{ rocket_chat_ssl_key_file }}"
         dest: "{{ rocket_chat_ssl_key_path }}"
@@ -59,8 +65,8 @@
       -out {{ rocket_chat_ssl_cert_path }}
       -days 3650
     when:
-      - rocket_chat_include_letsencrypt|bool
-        or rocket_chat_ssl_generate_certs|bool
+      - (rocket_chat_include_letsencrypt | bool)
+        or (rocket_chat_ssl_generate_certs | bool)
     args:
       creates: "{{ rocket_chat_ssl_key_path }}"
     notify: Reload the Nginx service
@@ -70,18 +76,22 @@
     copy:
       src: "{{ rocket_chat_nginx_pfs_file }}"
       dest: "{{ rocket_chat_nginx_pfs_key_path }}"
-    when: (not rocket_chat_nginx_generate_pfs_key|bool) or
-          (rocket_chat_nginx_pfs_file is defined)
+    when:
+      - (rocket_chat_nginx_pfs_file is defined)
+      - (rocket_chat_nginx_pfs_file)
+      - (rocket_chat_nginx_pfs_file | exists)
     notify: Reload the Nginx service
+    tags: pfs
 
   - name: Ensure the PFS key has been generated (this can take a while!)
     shell: >-
       openssl dhparam -out {{ rocket_chat_nginx_pfs_key_path }}
       {{ rocket_chat_nginx_pfs_key_numbits }}
-    when: rocket_chat_nginx_generate_pfs_key|bool
+    when: (rocket_chat_nginx_generate_pfs_key | bool)
     args:
       creates: "{{ rocket_chat_nginx_pfs_key_path }}"
     notify: Reload the Nginx service
+    tags: pfs
 
   - name: Ensure the Nginx service is running/enabled
     service:

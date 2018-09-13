@@ -1,6 +1,24 @@
 ---
 # tasks/main.yml: Main tasks for RocketChat.Ansible
 
+  - include_vars: "{{ item }}"
+    with_first_found:
+      - "{{ ansible_distribution }}.yml"
+      - "{{ ansible_os_family }}.yml"
+    tags:
+      - vars
+      - always
+
+  - include_vars: "{{ item }}"
+    with_first_found:
+      # Below is for example: Fedora_2x.yml = 20-29
+      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version[:1] ~ 'x' }}.yml"
+      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+      - "{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yml"
+    tags:
+      - vars
+      - always
+
   - name: Ensure the Rocket.Chat service group is present
     group:
       name: "{{ rocket_chat_service_group }}"
@@ -18,47 +36,80 @@
       state: present
       system: true
 
+  - name: Ensure APT cache has been updated recently
+    apt:
+      update_cache: yes
+      cache_valid_time: 3600
+    when: ((ansible_pkg_mgr | lower) == "apt")
+
+  - name: Install EPEL for RHEL based distros (CentOS/RHEL)
+    block:
+
+      - name: Ensure the EPEL repository is present
+        package:
+          name: epel-release
+          state: present
+
+      - name: Ensure the EPEL repository GPG key is imported
+        rpm_key:
+          key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+          state: present
+
+    when: ((ansible_distribution | lower) == "centos")
+            or ((ansible_distribution | lower) == "redhat")
+    tags: repo
+
+  # https://docs.ansible.com/ansible/latest/become.html#becoming-an-unprivileged-user
+  - name: Install acl controls
+    package:
+      name: acl
+      state: present
+
   - name: Check for adequate privilege escalation rights
     ping:
     become: yes
     become_user: "{{ rocket_chat_service_user }}"
-    register: result
     ignore_errors: true
+    register: priv_check_result
   - assert:
-      that: result is succeeded
+      that: priv_check_result is succeeded
       msg: >
         Check your sudo configuration to ensure that your connecting user
         can assume the identities of other users without prompting.
 
-  - include_vars: "{{ item }}"
-    with_first_found:
-      - "{{ ansible_distribution }}.yml"
-      - "{{ ansible_os_family }}.yml"
-    tags: vars
+  - name: "Configure /etc/hosts"
+    lineinfile:
+      dest: /etc/hosts
+      line:  "{{ item.line }}"
+      regexp: "{{ item.regexp }}"
+      insertafter: "{{ item.insertafter | default(omit) }}"
+      insertbefore: "{{ item.insertbefore | default(omit) }}"
+      backrefs: "{{ item.backrefs | default(True) }}"
+    when: ansible_virtualization_type != "docker"
+    with_items:
+      - regexp: '^127\.0\.0\.1(.*){{ ansible_nodename }}(.*)'
+        line:   '127.0.0.1 \1 \2'
+      - regexp: '^127\.0\.0\.1(.*){{ ansible_hostname }}(.*)'
+        line:   '127.0.0.1 \1 \2'
+      - regexp: '^127\.0\.0\.1[ ]*([^ ].*)[ ]+localhost[ ]+([^ ].*)'
+        line:   '127.0.0.1    localhost \1 \2'
+      - regexp: '^127\.0\.1\.1'
+        line:   "127.0.1.1    {{ ansible_nodename }} {{ ansible_hostname }}"
+        insertafter: '^127\.0\.0\.1'
+        backrefs: no
+    register: hosts_change_result
 
-  - include_vars: "{{ item }}"
-    with_first_found:
-      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
-      # Below is for example: Fedora_2x.yml = 20-29
-      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version[:1] ~ 'x' }}.yml"
-      - "{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yml"
-    tags: vars
-
-  - include: repo_RedHat.yml
-    when:
-      - ansible_os_family|lower == "redhat"
-      - not ansible_distribution|lower == "fedora"
-    tags: repo
-
-  - name: Ensure APT cache has been updated recently
-    apt:
-      update_cache: yes
-      #cache_valid_time: 3600
-    when: ansible_pkg_mgr == "apt"
-
-  - include: mongodb.yml
-    when: rocket_chat_include_mongodb|bool
+  - import_tasks: mongodb.yml
+    when: (rocket_chat_include_mongodb | bool)
     tags: mongodb
+
+  - name: Redefine rocket_chat_dep_packages to add dist specific packages if needed
+    set_fact:
+      rocket_chat_dep_packages:
+        "{{ rocket_chat_dep_packages | union(rocket_chat_dist_specific_packages) | unique }}"
+    when:
+      - (rocket_chat_dist_specific_packages is defined)
+      - (rocket_chat_dist_specific_packages)
 
   - name: Ensure Rocket.Chat dependencies are installed
     package:
@@ -71,54 +122,13 @@
               )
           }}"
       state: present
-    register: result
-    until: result is succeeded
+    register: dep_install_result
+    until: dep_install_result is succeeded
     retries: 2
+    tags: packages
 
-  - name: Ensure link /bin/node -> /bin/nodejs exists
-    file:
-      src: /bin/node
-      dest: /bin/nodejs
-      state: link
-    when: ansible_os_family == "RedHat"
-
-  - name: Ensure n (NodeJS) is installed (bootstrap correct version of NodeJS)
-    npm:
-      name: n
-      global: true
-      executable: "{{ rocket_chat_npm_dist }}"
-
-  - name: Check to see if n has installed the required binaries in {{ rocket_chat_node_prefix }}
-    stat:
-      path: "{{ rocket_chat_node_path }}"
-    register: n_node_bin
-
-  - name: "Install the supported NodeJS environment via n [Version: {{ rocket_chat_node_version }}]"
-    shell: n {{ rocket_chat_node_version }}
-    when: not n_node_bin.stat.exists|bool
-
-  - name: Check to see if the proper npm version has already been installed
-    command: "{{ rocket_chat_npm_path }} --version"
-    changed_when: false
-    register: current_npm_version
-
-  - name: "Install the supported NPM version via npm [Version: {{ rocket_chat_npm_version }}]"
-    npm:
-      name: npm
-      version: "{{ rocket_chat_npm_version }}"
-      path: "{{ rocket_chat_node_prefix }}/lib"
-      executable: "{{ rocket_chat_npm_path }}"
-    environment:
-      PATH: "{{ rocket_chat_node_prefix }}/bin:{{ ansible_env.PATH }}"
-    when: current_npm_version != rocket_chat_npm_version
-
-  - name: "Configure /etc/hosts"
-    lineinfile:
-      dest: /etc/hosts
-      line:  "127.0.0.1    localhost {{ ansible_fqdn }} {{ ansible_nodename }} {{ ansible_hostname }}"
-      regexp: '^127\.0\.0\.1'
-      insertbefore: BOF
-    when: ansible_virtualization_type != "docker"
+  - import_tasks: nodejs.yml
+    tags: nodejs
 
   - name: Check to see if this is the initial Rocket.Chat deployment
     stat:
@@ -129,14 +139,6 @@
     set_fact:
       rocket_chat_upgraded: false
 
-  - name: Ensure acl-tools are present [Ubuntu 16]
-    package:
-      name: acl
-      state: present
-    when:
-      - ansible_distribution == "Ubuntu"
-      - ansible_distribution_major_version == "16"
-
   - name: Setup PGP for verifying the Rocket.Chat tarball
     block:
 
@@ -145,8 +147,9 @@
         {{ rocket_chat_pgp_command }} \
             --keyserver "{{ rocket_chat_tarball_gpg_keyserver }}" \
             --recv-keys "{{ rocket_chat_tarball_gpg_key }}"
-      register: add_key
-      changed_when: "'not changed' not in add_key.stderr"
+      changed_when: "'not changed' not in key_recv_result.stderr"
+      register: key_recv_result
+      until:  key_recv_result is succeeded
       retries: 4
 
     - name: Fetch the Rocket.Chat binary tarball PGP signature
@@ -158,16 +161,17 @@
         validate_certs: "{{ rocket_chat_tarball_validate_remote_cert }}"
         owner: "{{ rocket_chat_service_user }}"
         group: "{{ rocket_chat_service_group }}"
+      register: get_pgp_asc_result
+      until: get_pgp_asc_result is succeeded
       retries: 2
-
-    when: rocket_Chat_tarball_check_pgp
+    when: (rocket_Chat_tarball_check_pgp | bool)
     tags: pgp
 
   - name: Fetch the Rocket.Chat binary tarball
     get_url:
       url: "{{ rocket_chat_tarball_remote }}"
       checksum: "{{ (rocket_chat_tarball_check_checksum == false) | ternary(omit, 'sha256: ' + (rocket_chat_tarball_sha256sum|string)) }}"
-      force: "{{ (rocket_chat_tarball_check_checksum == false) | ternary('yes', omit) }}"
+      force: yes
       dest: "{{ rocket_chat_application_path }}/rocket.chat-{{ rocket_chat_version }}.tgz"
       timeout: "{{ rocket_chat_tarball_fetch_timeout }}"
       validate_certs: "{{ rocket_chat_tarball_validate_remote_cert }}"
@@ -176,11 +180,14 @@
     # Temp fix for ansible/ansible#15915 ( Broken include in handlers )
     # https://github.com/ansible/ansible/issues/15915
     #notify: Upgrade Rocket.Chat
-    register: result
+    register: download_result
+    until: download_result is succeeded
     retries: 2
-    until: result is succeeded
-    changed_when: (result is changed)
-                  or (not rocket_chat_tarball_check_checksum)
+    changed_when: (download_result is changed)
+                   or (not (rocket_chat_tarball_check_checksum | bool))
+    tags:
+      - download
+      - pgp
 
   - name: Verify Rocket.Chat binary tarball with GPG
     shell: |
@@ -189,15 +196,16 @@
                  rocket.chat-{{ rocket_chat_version }}.tgz
     args:
       chdir: "{{ rocket_chat_application_path }}"
-    when: rocket_Chat_tarball_check_pgp
+    when: (rocket_Chat_tarball_check_pgp | bool)
     changed_when: false
     tags: pgp
 
   - name: Upgrade Rocket.Chat
-    include: upgrade.yml
+    include_tasks: upgrade.yml
     when:
-      - result is changed
-      - rocket_chat_deploy_state.stat.exists
+      - download_result is changed
+      - ('stat' in rocket_chat_deploy_state)
+      - (rocket_chat_deploy_state.stat.exists | bool)
     tags:
       - upgrade
 
@@ -231,10 +239,10 @@
       src: /var/log/upstart/rocketchat.log
       state: link
       force: yes
-
     when:
-      - ansible_distribution == "Ubuntu"
-      - ansible_distribution_major_version == "14"
+      - ((ansible_distribution | lower) == "ubuntu")
+      - ((ansible_distribution_major_version | int) == "14")
+    tags: build
 
   - name: Ensure the Rocket.Chat application data permissions are correct
     command: >-
@@ -243,14 +251,6 @@
     args:
       warn: no
     tags: build
-
-  - include_vars: "{{ item }}"
-    with_first_found:
-      - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
-      - "{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yml"
-      - "{{ ansible_distribution }}.yml"
-      - "{{ ansible_os_family }}.yml"
-    tags: service
 
   - name: Deploy the Rocket.Chat service file
     template:
@@ -263,23 +263,12 @@
 
   - meta: flush_handlers
 
-  - name: Ensure the MongoDB replSets have been initiated
-    shell: >-
-      mongo --eval 'rs.initiate()' &&
-      touch .mongo_rs_initialised
-    become: yes
-    become_user: mongodb
-    args:
-      executable: /bin/bash
-      chdir: /var/lib/mongodb
-      creates: /var/lib/mongodb/.mongo_rs_initialised
-    when: rocket_chat_include_mongodb|bool
-
   - name: Restart the Rocket.Chat service [UPGRADE]
     service:
       name: rocketchat
       state: restarted
-    when: rocket_chat_upgraded|bool
+    when: (rocket_chat_upgraded | bool)
+    tags: service
 
   - name: Ensure the Rocket.Chat service is running/enabled
     service:
@@ -288,10 +277,12 @@
       enabled: true
     tags: service
 
-  - include: nginx.yml
-    when: rocket_chat_include_nginx|bool
+  - import_tasks: nginx.yml
+    when: (rocket_chat_include_nginx | bool)
     tags: nginx
 
-  - include: letsencrypt.yml
-    when: rocket_chat_include_letsencrypt|bool
+  - import_tasks: letsencrypt.yml
+    when: (rocket_chat_include_letsencrypt | bool)
     tags: letsencrypt
+
+  - meta: flush_handlers
