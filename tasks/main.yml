@@ -72,7 +72,7 @@
     ignore_errors: true
     register: priv_check_result
   - assert:
-      that: priv_check_result is succeeded
+      that: (priv_check_result is succeeded)
       msg: >
         Check your sudo configuration to ensure that your connecting user
         can assume the identities of other users without prompting.
@@ -123,7 +123,7 @@
           }}"
       state: present
     register: dep_install_result
-    until: dep_install_result is succeeded
+    until: (dep_install_result is succeeded)
     retries: 2
     tags: packages
 
@@ -149,7 +149,7 @@
             --recv-keys "{{ rocket_chat_tarball_gpg_key }}"
       changed_when: "'not changed' not in key_recv_result.stderr"
       register: key_recv_result
-      until:  key_recv_result is succeeded
+      until:  (key_recv_result is succeeded)
       retries: 4
 
     - name: Fetch the Rocket.Chat binary tarball PGP signature
@@ -162,7 +162,7 @@
         owner: "{{ rocket_chat_service_user }}"
         group: "{{ rocket_chat_service_group }}"
       register: get_pgp_asc_result
-      until: get_pgp_asc_result is succeeded
+      until: (get_pgp_asc_result is succeeded)
       retries: 2
     when: (rocket_Chat_tarball_check_pgp | bool)
     tags: pgp
@@ -181,7 +181,7 @@
     # https://github.com/ansible/ansible/issues/15915
     #notify: Upgrade Rocket.Chat
     register: download_result
-    until: download_result is succeeded
+    until: (download_result is succeeded)
     retries: 2
     changed_when: (download_result is changed)
                    or (not (rocket_chat_tarball_check_checksum | bool))
@@ -203,7 +203,7 @@
   - name: Upgrade Rocket.Chat
     include_tasks: upgrade.yml
     when:
-      - download_result is changed
+      - ( download_result is changed)
       - ('stat' in rocket_chat_deploy_state)
       - (rocket_chat_deploy_state.stat.exists | bool)
     tags:

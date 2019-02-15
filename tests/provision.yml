@@ -77,7 +77,7 @@
           async: 10
           poll: 0
           when:
-            - (api_pre_check | succeeded) and (api_check | succeeded)
+            - (api_pre_check is succeeded) and (api_check is succeeded)
             - ((ansible_virtualization | default(None) | lower) != "docker")
             - (lookup('pipe','command -v vagrant') | search('vagrant$'))
 
