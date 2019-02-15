@@ -261,7 +261,25 @@
       - Restart the Rocket.Chat service
     tags: service
 
+  - name: Deploy the Rocket.Chat@ service file
+    template:
+      src: "{{ rocket_chat_service_template_at.src }}"
+      dest: "{{ rocket_chat_service_template_at.dest }}"
+    notify:
+      - Update the Rocket.Chat service configuration
+      - Restart the Rocket.Chat@ services
+    tags: service
+    when: rocket_chat_service_extra_instances
+
   - meta: flush_handlers
+
+  - name: Stop the Rocket.Chat@ services [UPGRADE]
+    service:
+      name: "rocketchat@{{ item }}"
+      state: restarted
+    when: (rocket_chat_upgraded | bool)
+    with_list: "{{ rocket_chat_service_extra_instances }}"
+    tags: service
 
   - name: Restart the Rocket.Chat service [UPGRADE]
     service:
@@ -275,6 +293,14 @@
       name: rocketchat
       state: started
       enabled: true
+    tags: service
+
+  - name: Ensure the Rocket.Chat@ services are running/enabled
+    service:
+      name: "rocketchat@{{ item }}"
+      state: started
+      enabled: true
+    with_list: "{{ rocket_chat_service_extra_instances }}"
     tags: service
 
   - import_tasks: nginx.yml

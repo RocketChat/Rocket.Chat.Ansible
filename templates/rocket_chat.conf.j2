@@ -1,5 +1,8 @@
 upstream rocket_chat {
         server 127.0.0.1:{{ rocket_chat_service_port }};
+{% for port in rocket_chat_service_extra_instances %}
+        server 127.0.0.1:{{ port }};
+{% endfor %}
 }
 server {
 {% if ansible_default_ipv6.gateway is defined %}
