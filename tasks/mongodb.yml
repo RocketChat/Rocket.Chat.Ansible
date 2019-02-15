@@ -98,7 +98,7 @@
       executable: /bin/bash
     register: replSet_result
     changed_when:
-      - not (replSet_result.stdout | search(' Object'))
+      - not (replSet_result.stdout is search(' Object'))
       - ('ok' in (replSet_result.stdout | from_json))
       - (((replSet_result.stdout | from_json).ok | int) == 1)
 
