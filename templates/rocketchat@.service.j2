@@ -13,7 +13,7 @@ Group={{ rocket_chat_service_group }}
 Environment=MONGO_URL=mongodb://{{ rocket_chat_mongodb_URI }}
 Environment=MONGO_OPLOG_URL=mongodb://{{ rocket_chat_mongodb_server }}:{{ rocket_chat_mongodb_port }}/local
 Environment=ROOT_URL=https://{{ rocket_chat_service_host }}
-Environment=PORT={{ rocket_chat_service_port }}
+Environment=PORT=%I
 {% for variable, value in rocket_chat_service_environment.iteritems() %}
 Environment={{ variable }}={{ value }}
 {% endfor -%}
@@ -21,4 +21,4 @@ WorkingDirectory={{ rocket_chat_application_path }}
 ExecStart={{ rocket_chat_node_path }} {{ rocket_chat_application_path }}/bundle/main.js
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=rocketchat.service

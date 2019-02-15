@@ -1,7 +1,13 @@
 upstream rocket_chat {
         server 127.0.0.1:{{ rocket_chat_service_port }};
+{% for port in rocket_chat_service_extra_instances %}
+        server 127.0.0.1:{{ port }};
+{% endfor %}
 }
 server {
+{% if ansible_default_ipv6.gateway is defined %}
+        listen [::]:{{ rocket_chat_nginx_listen_port }} ipv6only=on;
+{% endif %}
         listen  {{ rocket_chat_nginx_listen_port }};
         server_name {{ rocket_chat_service_host }};
 {% if rocket_chat_include_letsencrypt|bool %}
@@ -16,6 +22,9 @@ server {
 }
 
 server {
+{% if ansible_default_ipv6.gateway is defined %}
+        listen [::]:{{ rocket_chat_nginx_listen_ssl_port }} ssl ipv6only=on{% if nginx_http2_module.rc == 0 %} http2{% endif %};
+{% endif %}
         listen {{ rocket_chat_nginx_listen_ssl_port }} ssl{% if nginx_http2_module.rc == 0 %} http2{% endif %};
         server_name {{ rocket_chat_service_host }};
 

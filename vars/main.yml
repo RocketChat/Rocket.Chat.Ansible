@@ -1,0 +1,22 @@
+---
+# rocket_chat_mongodb_repl_result_obj: "\
+#   {{ replSet_result['stdout_lines'][\
+#       ((replSet_result['stdout_lines'].index('{'))|int):\
+#       ((replSet_result['stdout_lines'].index('}'))|int)+1]\
+#         | join | from_json }}"
+
+rocket_chat_mongodb_URI: "\
+  {% set temp_out =
+      rocket_chat_mongodb_server ~ ':' ~ rocket_chat_mongodb_port -%}
+  {% if rocket_chat_mongodb_user and rocket_chat_mongodb_password -%}
+      {% set temp_out =
+          rocket_chat_mongodb_user
+              ~ ':' ~ rocket_chat_mongodb_password
+              ~ '@' ~ temp_out -%}
+  {% endif -%}
+  {% set temp_out =
+      temp_out ~ '/' ~ rocket_chat_mongodb_database -%}
+  {% if (rocket_chat_mongodb_use_tls | bool) == true -%}
+      {% set temp_out = temp_out ~ '?ssl=true' -%}
+  {% endif -%}
+  {{ temp_out }}"

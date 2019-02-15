@@ -28,6 +28,7 @@ Supported Platforms
 - Jessie (8)
 
 ### Ubuntu
+- Bionic Beaver: 18.04 LTS
 - Xenial: 16.04 LTS
 - Trusty: 14.04 LTS
 
@@ -60,16 +61,24 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 | `rocket_chat_service_group` | `rocketchat` | The name of the primary group for the `rocket_chat_service_user` user |
 | `rocket_chat_service_host` | `"{{ ansible_fqdn }}"` | The FQDN of the Rocket.Chat system |
 | `rocket_chat_service_port` | 3000 | The TCP port Rocket.Chat listens on |
+| `rocket_chat_service_extra_instances` | `[]` | List of TCP port numbers for additional rocketchat service instances to handle more users on one machine |
 | `rocket_chat_node_version` | `4.5.0` | The version of NodeJS to install that `n` understands |
 | `rocket_chat_node_prefix` | `/usr/local/n/versions/node/{{ rocket_chat_node_version }}` | The path to the `node` binary directory that n installs |
 | `rocket_chat_npm_dist` | `/usr/bin/npm` | The path to the original `npm` binary, before n installs any Node versions |
 | `rocket_chat_include_mongodb` | true | A boolean value that determines whether or not to deploy MongoDB |
 | `rocket_chat_mongodb_keyserver` | keyserver.ubuntu.com | The GPG key server to use when importing the MongoDB repo key |
 | `rocket_chat_mongodb_gpg_key` | `7F0CEB10` | The GPG key fingerprint to import for the MongoDB repo |
+| `rocket_chat_mongodb_user` | not used by default | Username to be used when connecting to MongoDB. If you set this, you should also define `rocket_chat_mongodb_password`, otherwise no user/pass is used to connect to MongoDB |
+| `rocket_chat_mongodb_password` | not used by default | Password to be used when connecting to MongoDB. If you set this, you should also define `rocket_chat_mongodb_user`, otherwise no user/pass is used to connect to MongoDB |
 | `rocket_chat_mongodb_server` | 127.0.0.1 | The IP/FQDN of the MongoDB host |
 | `rocket_chat_mongodb_port` | 27017 | The TCP port to contact the MongoDB host host via |
+| `rocket_chat_mongodb_database` | rocketchat |  The MongoDB database to be used for Rocket.Chat |
+| `rocket_chat_mongodb_use_tls`   | false  | Whether or not to use TLS to connect to the MongoDB DB  |
 | `rocket_chat_mongodb_packages` | `mongodb` | The name of the MongoDB package(s) to install (differs for different distros - see `vars/`) |
 | `rocket_chat_mongodb_config_template` | [`mongod.conf.j2`](templates/mongod.conf.j2) | The `/etc/mongod.conf` template to deploy |
+| `rocket_chat_mongodb_org_pkgs` | false &#124; true (Debian/Ubuntu) | Use official MongoDB.org community edition packages or not |
+| `rocket_chat_mongodb_org_version`   | 3.4   | Version string of official packages to install |
+| `rocket_chat_mongodb_service_name` | `mongod` | The name of the systemd service unit and mongodb config file in /etc |
 | `rocket_chat_include_nginx`| true | A boolean value that determines whether or not to deploy Nginx |
 | `rocket_chat_ssl_generate_certs` | true | A boolean value that determines whether or not to generate the Nginx SSL certs |
 | `rocket_chat_ssl_key_path` | `/etc/nginx/rocket_chat.key` | The destination path for the Nginx SSL private key |

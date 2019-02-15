@@ -1,55 +1,110 @@
 ---
 
+# The intent of this playbook is to be run from Vagrant or from a CI like Travis
+# or Gitlab, but mostly vagrant. The purpose of the structure of this playbooks is
+# so that vagrant can loop through all of the supported boxes in the Vagrantfile
+# and pass/fail them based on whether or not the VM still exists and is paused.
+# Whereas, since there is a viable status check - successful plays need not keep
+# a VM behind. The suspended VMs can thus be started and inspected for problems.
+# They are paused to conserve resources on computers that can only handle a few
+# VMs at a time. Here we are utilizing the ability of ansible to run both local
+# tasks (to manage vagrant) on the provisining system, and capture errors in the
+# "rescue:" block. (to keep vagrant from exiting on an ansible error.)
+#
+#                                                             - Michael Goodwin
+
 - name: Apply the Rocket.Chat role to all chat_servers
   hosts: "{{ host_name | default('chat_servers') }}"
   become: yes
 
-  pre_tasks:
+  vars:
+    rocket_chat_tarball_check_checksum: false
+    rocket_chat_service_port: 3000
+    rocket_chat_service_host: localhost
+    rocket_chat_automatic_upgrades: true
+    # Below PEM file is provided so we don't have to wait for it to generate.
+    rocket_chat_nginx_pfs_file: dhparam_INSECURE.pem
+    # Below is an example of deploying an old version of Rocket.Chat:
+    # rocket_chat_version: 0.59.4
+    # rocket_chat_npm_version: 3.10.9
+    # rocket_chat_node_version: 4.8.4
 
-    - name: "Drop in permissive sudoers file for user: {{ ansible_user }}"
-      lineinfile:
-        dest: /etc/sudoers.d/{{ ansible_user }}
-        state: present
-        create: yes
-        regexp: '^%{{ ansible_user }}.*'
-        line: '%{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
-        validate: visudo -cf %s
+  tasks:
 
-  roles:
-    - role: "{{ role_name | default('../..') }}"
-      rocket_chat_tarball_check_checksum: false
-      rocket_chat_service_host: localhost
-      rocket_chat_automatic_upgrades: true
-      # Below PEM file is provided so we don't have to wait for it to generate.
-      rocket_chat_nginx_pfs_file: dhparam_INSECURE.pem
-      # Below is an example of deploying an old version of Rocket.Chat:
-      # rocket_chat_version: 0.59.4
-      # rocket_chat_npm_version: 3.10.9
-      # rocket_chat_node_version: 4.8.4
+    - name: MAIN BLOCK
+      block:
+      - name: "Drop in permissive sudoers file for user: {{ ansible_user }}"
+        lineinfile:
+          dest: /etc/sudoers.d/{{ ansible_user }}
+          state: present
+          create: yes
+          regexp: '^%{{ ansible_user }}.*'
+          line: '%{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
+          validate: visudo -cf %s
 
-  post_tasks:
+      - name: Include the Rocket.Chat role
+        include_role:
+          name: "{{ role_name | default('../..') }}"
 
-    - block:
-      - name: Wait for the Rocket.Chat nodejs service to come online
-        wait_for:
-          port: "{{ rocket_chat_service_port }}"
-          host: localhost
-          state: started
-        retries: 1
+      - name: API CHECK BLOCK
+        block:
+        - name: Wait for the Rocket.Chat NodeJS service to come online
+          wait_for:
+            port: "{{ rocket_chat_service_port }}"
+            host: localhost
+            state: started
+            timeout: 30
+          register: api_pre_check
 
-      - name: Do a basic status check of the API
-        uri:
-          url: "{{ item }}"
-          validate_certs: no
-        with_items:
-          - https://localhost/api/v1/info
-          - http://localhost/api/v1/info
-        register: api_check
-        failed_when:
-         - (api_check.status|int != 200)
-           or (api_check.msg|string is not search('^OK '))
-           or (api_check.json.success|bool != True)
-      rescue:
-        - name: Output debug information when the check fails
-          debug: var=api_check
-      tags: check
+        - name: Do a basic status check of the API
+          uri:
+            url: "{{ item }}"
+            validate_certs: no
+          with_items:
+            - https://localhost/api/v1/info
+            - http://localhost/api/v1/info
+          register: api_check
+          failed_when:
+            - (api_check.status|int != 200)
+               or (api_check.msg|string is not search('^OK '))
+               or (api_check.json.success|bool != True)
+          when: (api_pre_check | succeeded)
+
+        - name: Destroy the last successful vagrant box
+          local_action: shell
+            sleep 5 && vagrant destroy -f "{{ inventory_hostname }}"
+          become: no
+          async: 10
+          poll: 0
+          when:
+            - (api_pre_check is succeeded) and (api_check is succeeded)
+            - ((ansible_virtualization | default(None) | lower) != "docker")
+            - (lookup('pipe','command -v vagrant') | search('vagrant$'))
+
+        # We use YAML anchoring to duplicate this below
+        # because Ansible does not supported nested rescue.
+        rescue: &rescue
+          - name: Output debug information when the check fails
+            debug: var="{{ item }}"
+            when:
+              - (api_pre_check is defined)
+              - (api_check is defined)
+            with_items:
+              - (api_pre_check | default(None))
+              - (api_check | default(None))
+
+          - name: Stop the last failed vagrant box (in order to continue)
+            local_action: shell
+              sleep 5 && vagrant suspend "{{ inventory_hostname }}"
+            become: no
+            async: 10
+            poll: 0
+            when:
+              - ((ansible_virtualization | default(None) | lower) != "docker")
+              - (lookup('pipe','command -v vagrant') | search('vagrant$'))
+        tags: check
+        # API BLOCK END
+
+      rescue: *rescue
+
+      # MAIN BLOCK END

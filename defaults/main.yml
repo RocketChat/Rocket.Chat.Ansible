@@ -22,6 +22,7 @@ rocket_chat_service_group: rocketchat
 rocket_chat_service_host: "{{ ansible_fqdn }}"
 rocket_chat_service_port: 3000
 rocket_chat_service_environment: {}
+rocket_chat_service_extra_instances: []
 rocket_chat_node_version: 8.9.4
 rocket_chat_node_prefix: /usr/local/n/versions/node/{{ rocket_chat_node_version }}
 rocket_chat_node_path: "{{ rocket_chat_node_prefix }}/bin/node"
@@ -31,12 +32,23 @@ rocket_chat_npm_dist: /usr/bin/npm
 
 # MongoDB settings
 rocket_chat_mongodb_packages: mongodb
+rocket_chat_mongodb_service_name: mongod
+rocket_chat_mongodb_service_user: mongodb
 rocket_chat_include_mongodb: true
 rocket_chat_mongodb_keyserver: hkp://keyserver.ubuntu.com:80
-rocket_chat_mongodb_gpg_key: EA312927
+rocket_chat_mongodb_gpg_key: 0C49F3730359A14518585931BC711F9BA15703C6
 rocket_chat_mongodb_server: 127.0.0.1
 rocket_chat_mongodb_port: 27017
+rocket_chat_mongodb_config: /etc/mongod.conf
 rocket_chat_mongodb_config_template: mongod.conf.j2
+# Currently only for Debian/Ubuntu based
+rocket_chat_mongodb_org_pkgs: false
+rocket_chat_mongodb_org_version: 3.4
+# MongoDB connection settings:
+rocket_chat_mongodb_database: rocketchat
+rocket_chat_mongodb_use_tls: false
+rocket_chat_mongodb_user: ~
+rocket_chat_mongodb_password: ~
 
 # nginx settings
 rocket_chat_include_nginx: true
