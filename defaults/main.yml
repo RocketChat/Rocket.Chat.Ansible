@@ -5,8 +5,9 @@ rocket_chat_upgrade_backup: true
 rocket_chat_upgrade_backup_path: "{{ rocket_chat_application_path }}"
 rocket_chat_application_path: /var/lib/rocket.chat
 rocket_chat_version: stable
-rocket_chat_tarball_remote: https://download.rocket.chat/{{ rocket_chat_version }}
-rocket_chat_tarball_sha256sum: 35bdf90350ad3a0789edcbebe51e421b1f82b06c22278b504f2215fa0e962b56
+rocket_chat_tarball_remote: https://releases.rocket.chat/latest/download
+# SHA256 is version 0.61.1
+rocket_chat_tarball_sha256sum: 9274a6ce514074a0aefb5ee5caf57305454b96c093bb7bfbbf4af975f9c8bcb8
 rocket_chat_tarball_check_checksum: true
 rocket_chat_tarball_fetch_timeout: 100
 rocket_chat_tarball_validate_remote_cert: true
@@ -14,9 +15,12 @@ rocket_chat_service_user: rocketchat
 rocket_chat_service_group: rocketchat
 rocket_chat_service_host: "{{ ansible_fqdn }}"
 rocket_chat_service_port: 3000
-rocket_chat_node_version: 4.8.4
-rocket_chat_node_path: /usr/local/n/versions/node/{{ rocket_chat_node_version }}/bin
-rocket_chat_node_orig_npm: /usr/bin/npm
+rocket_chat_node_version: 8.9.4
+rocket_chat_node_prefix: /usr/local/n/versions/node/{{ rocket_chat_node_version }}
+rocket_chat_node_path: "{{ rocket_chat_node_prefix }}/bin/node"
+rocket_chat_npm_version: 5.6.0
+rocket_chat_npm_path: "{{ rocket_chat_node_prefix }}/bin/npm"
+rocket_chat_npm_dist: /usr/bin/npm
 
 # MongoDB settings
 rocket_chat_mongodb_packages: mongodb
@@ -41,3 +45,14 @@ rocket_chat_nginx_generate_pfs_key: true
 rocket_chat_nginx_pfs_key_numbits: 2048
 rocket_chat_nginx_pfs_key_path: /etc/nginx/rocket_chat.pem
 rocket_chat_nginx_pfs_file: ~
+
+# letsencrypt settings
+rocket_chat_include_letsencrypt: false
+rocket_chat_letsencrypt_email: ~
+rocket_chat_letsencrypt_account_key: /etc/nginx/acme-tiny_account.key
+rocket_chat_letsencrypt_csr: /etc/nginx/acme-tiny_{{ rocket_chat_service_host }}.csr
+rocket_chat_letsencrypt_domain: "{{ rocket_chat_service_host }}"
+rocket_chat_letsencrypt_acmetiny_path: /opt/acme-tiny
+rocket_chat_letsencrypt_wellknown_path: /var/www/letsencrypt
+rocket_chat_letsencrypt_ca_cert: https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem
+rocket_chat_letsencrypt_force_renew: false

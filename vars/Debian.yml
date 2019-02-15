@@ -6,6 +6,8 @@ rocket_chat_dep_packages:
   - npm
   - make
   - wget
+  # This seems to install something on Docker that causes a failure in the tests
+  - cron
 
 rocket_chat_mongodb_packages:
   - mongodb-org-server

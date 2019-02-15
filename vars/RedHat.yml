@@ -5,7 +5,10 @@ rocket_chat_dep_packages:
   - nodejs
   - npm
   - make
+  - gcc-c++
   - wget
+  - crontabs
+  - policycoreutils-python
 
 rocket_chat_mongodb_packages:
   - mongodb

@@ -20,7 +20,7 @@ Features
 - __Optional automatic upgrades [requires Ansible 2.0]:__
     If a new version of [Rocket.Chat](http://rocket.chat) is released, or if you want to follow development for testing purposes, simply update the `rocket_chat_version` to whichever release you wish to deploy (see [the Rocket.Chat releases page](https://rocket.chat/releaes), set `rocket_chat_automatic_upgrades` to `true` and let this role do the rest!
     If there's a change to the code deployed to your [Rocket.Chat](http://rocket.chat) server (either because of a remote change to the `rocket_chat_version` you're following, 'latest' or 'develop' for instance, or because you set a new `rocket_chat_version` to fetch), this role will handle the upgrade and redeployment of the [Rocket.Chat](http://rocket.chat) service, keeping your data in tact.
-	_Note: This functionality requires Ansible 2.0. See how to fetch the 2.0 version of this role in the [Install from Ansible Galaxy secion](#install-the-ansible-20-version-of-this-role)_
+	_Note: This functionality requires Ansible 2.0. See how to fetch the 2.0 version of this role in the [Install from Ansible Galaxy section](#install-the-ansible-20-version-of-this-role)_
 
 Supported Platforms
 -------------------
@@ -61,8 +61,8 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 | `rocket_chat_service_host` | `"{{ ansible_fqdn }}"` | The FQDN of the Rocket.Chat system |
 | `rocket_chat_service_port` | 3000 | The TCP port Rocket.Chat listens on |
 | `rocket_chat_node_version` | `4.5.0` | The version of NodeJS to install that `n` understands |
-| `rocket_chat_node_path` | `/usr/local/n/versions/node/{{ rocket_chat_node_version }}/bin` | The path to the `node` binary directory that n installs |
-| `rocket_chat_node_orig_npm` | `/usr/bin/npm` | The path to the original `npm` binary, before n installs any Node versions |
+| `rocket_chat_node_prefix` | `/usr/local/n/versions/node/{{ rocket_chat_node_version }}` | The path to the `node` binary directory that n installs |
+| `rocket_chat_npm_dist` | `/usr/bin/npm` | The path to the original `npm` binary, before n installs any Node versions |
 | `rocket_chat_include_mongodb` | true | A boolean value that determines whether or not to deploy MongoDB |
 | `rocket_chat_mongodb_keyserver` | keyserver.ubuntu.com | The GPG key server to use when importing the MongoDB repo key |
 | `rocket_chat_mongodb_gpg_key` | `7F0CEB10` | The GPG key fingerprint to import for the MongoDB repo |
