@@ -6,9 +6,9 @@ upstream rocket_chat {
 }
 server {
 {% if ansible_default_ipv6.gateway is defined %}
-        listen [::]:80 ipv6only=on;
+        listen [::]:{{ rocket_chat_nginx_listen_port }} ipv6only=on;
 {% endif %}
-        listen  80;
+        listen  {{ rocket_chat_nginx_listen_port }};
         server_name {{ rocket_chat_service_host }};
 {% if rocket_chat_include_letsencrypt|bool %}
         location /.well-known/acme-challenge/ {
@@ -23,9 +23,9 @@ server {
 
 server {
 {% if ansible_default_ipv6.gateway is defined %}
-        listen [::]:443 ssl ipv6only=on{% if nginx_http2_module.rc == 0 %} http2{% endif %};
+        listen [::]:{{ rocket_chat_nginx_listen_ssl_port }} ssl ipv6only=on{% if nginx_http2_module.rc == 0 %} http2{% endif %};
 {% endif %}
-        listen 443 ssl{% if nginx_http2_module.rc == 0 %} http2{% endif %};
+        listen {{ rocket_chat_nginx_listen_ssl_port }} ssl{% if nginx_http2_module.rc == 0 %} http2{% endif %};
         server_name {{ rocket_chat_service_host }};
 
         ssl_certificate {{ rocket_chat_ssl_cert_path }};

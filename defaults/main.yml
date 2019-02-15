@@ -63,6 +63,8 @@ rocket_chat_nginx_generate_pfs_key: true
 rocket_chat_nginx_pfs_key_numbits: 2048
 rocket_chat_nginx_pfs_key_path: /etc/nginx/rocket_chat.pem
 rocket_chat_nginx_pfs_file: ~
+rocket_chat_nginx_listen_port: 80
+rocket_chat_nginx_listen_ssl_port: 443
 
 # letsencrypt settings
 rocket_chat_include_letsencrypt: false

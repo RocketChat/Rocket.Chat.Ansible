@@ -91,7 +91,8 @@ All variables have sane defaults set in [`defaults/main.yml`](defaults/main.yml)
 | `rocket_chat_nginx_pfs_key_numbits` | 2048 | Numbits to pass to OpenSSL when generating a PFS key file |
 | `rocket_chat_nginx_pfs_key_path` | `/etc/nginx/rocket_chat.pem` | The destination path for the Nginx PFS key file |
 | `rocket_chat_nginx_pfs_file` | `~` | If not using PFS key generation, this is the path to the Nginx PFS key on the Ansible control node, for deployment |
-
+| `rocket_chat_nginx_listen_ssl_port` | `443` | The SSL port on which Ngnix listens to |
+| `rocket_chat_nginx_listen_port` | `80` | The port on which Ngnix listens to |
 
 Some variables differ between operating systems/distributions.
 These are set in the `vars/` directory, typically in a file named after the distribution.
