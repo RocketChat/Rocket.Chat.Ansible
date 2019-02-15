@@ -64,7 +64,7 @@
   - name: Ensure MongoDB Server is installed
     package:
       name: "{{ rocket_chat_mongodb_packages }}"
-      state: "{{ (rocket_chat_mongodb_repo_state | changed) | ternary('latest','present') }}"
+      state: "{{ (rocket_chat_mongodb_repo_state is changed) | ternary('latest','present') }}"
 
   - name: Deploy MongoDB service configuration
     template:
@@ -98,7 +98,7 @@
       executable: /bin/bash
     register: replSet_result
     changed_when:
-      - not (replSet_result.stdout | search(' Object'))
+      - not (replSet_result.stdout is search(' Object'))
       - ('ok' in (replSet_result.stdout | from_json))
       - (((replSet_result.stdout | from_json).ok | int) == 1)
 
@@ -111,8 +111,8 @@
     become: yes
     become_user: "{{ rocket_chat_mongodb_service_user }}"
     when:
-      - (hosts_change_result | changed)
-      - ((replSet_result is undefined) or (not (replSet_result | changed)))
+      - (hosts_change_result is changed)
+      - ((replSet_result is undefined) or (not (replSet_result is changed)))
     args:
       executable: /bin/bash
     notify:
