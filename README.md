@@ -28,6 +28,7 @@ Supported Platforms
 - Jessie (8)
 
 ### Ubuntu
+- Bionic Beaver: 18.04 LTS
 - Xenial: 16.04 LTS
 - Trusty: 14.04 LTS
 

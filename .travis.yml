@@ -36,6 +36,14 @@ env:
     run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
     EXTRA_VARS='{"role_name":"Rocket.Chat.Ansible","host_name":"localhost"}'
     VERBOSE='-vv'
+  - >
+    dist=ubuntu
+    ver=18.04
+    container_id=$(mktemp)
+    init=/sbin/init
+    run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    EXTRA_VARS='{"role_name":"Rocket.Chat.Ansible","host_name":"localhost"}'
+    VERBOSE='-vv'
 
 services:
   - docker
