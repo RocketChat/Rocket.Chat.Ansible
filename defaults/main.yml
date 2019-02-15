@@ -29,6 +29,7 @@ rocket_chat_mongodb_keyserver: hkp://keyserver.ubuntu.com:80
 rocket_chat_mongodb_gpg_key: EA312927
 rocket_chat_mongodb_server: 127.0.0.1
 rocket_chat_mongodb_port: 27017
+rocket_chat_mongodb_use_tls: false
 rocket_chat_mongodb_config_template: mongod.conf.j2
 
 # nginx settings
