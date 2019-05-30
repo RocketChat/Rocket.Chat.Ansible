@@ -89,9 +89,9 @@
   - name: Ensure the MongoDB replSets have been initiated
     shell: >-
       mongo --quiet --eval
-      'rs.initiate({_id:"{{ rocket_chat_mongodb_repl_setname }}",
+      'JSON.stringify(rs.initiate({_id:"{{ rocket_chat_mongodb_repl_setname }}",
       members: [{"_id":1, "host":
-      "{{ rocket_chat_mongodb_server }}:{{ rocket_chat_mongodb_port }}"}]})'
+      "{{ rocket_chat_mongodb_server }}:{{ rocket_chat_mongodb_port }}"}]}))'
     become: yes
     become_user: "{{ rocket_chat_mongodb_service_user }}"
     args:
