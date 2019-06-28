@@ -15,7 +15,7 @@ Environment=MONGO_OPLOG_URL=mongodb://{{ rocket_chat_mongodb_server }}:{{ rocket
 Environment=ROOT_URL=https://{{ rocket_chat_service_host }}
 Environment=PORT=%I
 Environment=DEPLOY_PLATFORM=ansible
-{% for variable, value in rocket_chat_service_environment.iteritems() %}
+{% for variable, value in rocket_chat_service_environment.items() %}
 Environment={{ variable }}={{ value }}
 {% endfor -%}
 WorkingDirectory={{ rocket_chat_application_path }}
