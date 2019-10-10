@@ -1,7 +1,7 @@
 ---
 rocket_chat_mongodb_org_version: 4.0
 rocket_chat_mongodb_gpg_key: 9DA31620334BD75D9DCB49F368818C72E52529D4
-rocket_chat_mongodb_service_name: mongodb
+rocket_chat_mongodb_service_name: mongod
 rocket_chat_mongodb_org_pkgs: true
 rocket_chat_mongodb_packages:
   - mongodb-org
