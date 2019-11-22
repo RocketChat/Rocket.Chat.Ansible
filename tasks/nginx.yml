@@ -25,6 +25,12 @@
     changed_when: false
     failed_when: false
 
+  - name: Deactivate default Nginx site.
+    file:
+      path: /etc/nginx/sites-enabled/default
+      state: absent
+    notify: Reload the Nginx service
+
   - name: Deploy Nginx configuration
     template:
       src: "{{ item.src }}"
