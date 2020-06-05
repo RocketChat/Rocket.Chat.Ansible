@@ -25,7 +25,8 @@ Features
 Supported Platforms
 -------------------
 ### Debian
-- Jessie (8)
+- Strect (9)
+- Buster (10)
 
 ### Ubuntu
 - Bionic Beaver: 18.04 LTS
