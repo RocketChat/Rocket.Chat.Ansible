@@ -1,0 +1,11 @@
+---
+rocket_chat_mongodb_org_version: 4.2
+rocket_chat_mongodb_gpg_key: E162F504A20CDF15827F718D4B7C549A058F8B6B
+rocket_chat_mongodb_service_name: mongod
+rocket_chat_mongodb_org_pkgs: true
+rocket_chat_mongodb_packages:
+  - mongodb-org
+  - mongodb-org-server
+
+rocket_chat_dist_specific_packages:
+  - g++
