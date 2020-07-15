@@ -1,0 +1,29 @@
+---
+- hosts: all
+
+  pre_tasks:
+    - name: Ensure build dependencies are installed (RedHat)
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - "@Development tools"
+        - tar
+        - unzip
+        - sudo
+        - which
+      when: ansible_os_family == 'RedHat'
+
+    - name: Ensure build dependencies are installed (Debian)
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - build-essential
+        - unzip
+        - tar
+        - sudo
+      when: ansible_os_family == 'Debian'
+
+  roles:
+    - Rocket.Chat.Ansible

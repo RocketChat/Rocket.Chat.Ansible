@@ -1,50 +1,40 @@
-# Dockerfile.ubuntu
 FROM ubuntu:18.04
 
-RUN systemctl mask -- \
-    -.mount \
-    dev-mqueue.mount \
-    dev-hugepages.mount \
-    etc-hosts.mount \
-    etc-hostname.mount \
-    etc-resolv.conf.mount \
-    proc-bus.mount \
-    proc-irq.mount \
-    proc-kcore.mount \
-    proc-sys-fs-binfmt_misc.mount \
-    proc-sysrq\\\\x2dtrigger.mount \
-    sys-fs-fuse-connections.mount \
-    sys-kernel-config.mount \
-    sys-kernel-debug.mount \
-    tmp.mount \
- \
- && systemctl mask -- \
-    console-getty.service \
-    display-manager.service \
-    getty-static.service \
-    getty\@tty1.service \
-    hwclock-save.service \
-    ondemand.service \
-    systemd-logind.service \
-    systemd-remount-fs.service \
- \
- && ln -sf /lib/systemd/system/multi-user.target /etc/systemd/system/default.target \
- \
-&& ln -sf /lib/systemd/system/halt.target /etc/systemd/system/sigpwr.target
+ENV pip_packages "ansible"
 
-RUN apt-get update -qq -y
-RUN apt-get install -qq -y python-software-properties software-properties-common \
-	rsyslog systemd systemd-cron sudo
+# Install dependencies.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       apt-utils \
+       locales \
+       python3-setuptools \
+       python3-pip \
+       software-properties-common git-core\
+       rsyslog systemd systemd-cron sudo iproute2 \
+    && rm -Rf /var/lib/apt/lists/* \
+    && rm -Rf /usr/share/doc && rm -Rf /usr/share/man \
+    && apt-get clean
 RUN sed -i 's/^\($ModLoad imklog\)/#\1/' /etc/rsyslog.conf
-#ADD etc/rsyslog.d/50-default.conf /etc/rsyslog.d/50-default.conf
+
+# Fix potential UTF-8 errors with ansible-test.
+RUN locale-gen en_US.UTF-8
+
+# Install Ansible via Pip.
+RUN pip3 install $pip_packages
 
 # Install Ansible
-RUN add-apt-repository -y ppa:ansible/ansible
-RUN apt-get update -y
-RUN apt-get install -y ansible git-core
-# Install Ansible inventory file
+# RUN add-apt-repository -y ppa:ansible/ansible
+# RUN apt-get update -y
+# RUN apt-get install -y ansible git-core
+
+# Install Ansible inventory file.
+RUN mkdir -p /etc/ansible
 RUN echo "[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
 
-VOLUME ["/sys/fs/cgroup"]
-VOLUME ["/run"]
-CMD ["/sbin/init"]
+# Remove unnecessary getty and udev targets that result in high CPU usage when using
+# multiple containers with Molecule (https://github.com/ansible/molecule/issues/1104)
+RUN rm -f /lib/systemd/system/systemd*udev* \
+  && rm -f /lib/systemd/system/getty.target
+
+VOLUME ["/sys/fs/cgroup", "/tmp", "/run"]
+CMD ["/lib/systemd/systemd"]
