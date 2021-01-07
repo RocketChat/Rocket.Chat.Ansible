@@ -52,11 +52,18 @@
 
       - name: Ensure the EPEL repository GPG key is imported
         rpm_key:
-          key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+          key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
           state: present
 
     when: ((ansible_distribution | lower) == "centos")
             or ((ansible_distribution | lower) == "redhat")
+    tags: repo
+
+  - include: repo_RedHat_8.yml
+    when:
+      - ansible_os_family|lower == "redhat"
+      - not ansible_distribution|lower == "fedora"
+      - ansible_distribution_major_version == "8"
     tags: repo
 
   # https://docs.ansible.com/ansible/latest/become.html#becoming-an-unprivileged-user
