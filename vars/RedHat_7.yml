@@ -7,4 +7,4 @@ rocket_chat_service_template_at:
   src: rocketchat@.service.j2
   dest: /usr/lib/systemd/system/rocketchat@.service
 rocket_chat_tarball_validate_remote_cert: true
-rocket_chat_dep_packages: "{{ rocket_chat_dep_packages + ['python3-policycoreutils'] }}"
+rocket_chat_dep_packages: "{{ rocket_chat_dep_packages + ['policycoreutils-python'] }}"
