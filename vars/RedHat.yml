@@ -8,7 +8,6 @@ rocket_chat_dep_packages:
   - gcc-c++
   - wget
   - crontabs
-  - policycoreutils-python
   - gnupg2
 
 rocket_chat_mongodb_packages:

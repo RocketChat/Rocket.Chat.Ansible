@@ -1,0 +1,14 @@
+---
+# tasks/repo_RedHat.yml: RedHat based distro repository configuration for RocketChat.Ansible
+  - name: Clean existing repo nodejs & npm
+    yum:
+      name:
+        - nodejs
+        - npm
+      state: absent
+
+# Bad situation nodejs:12 packages npm version which only supports <=nodejs11
+# newer node uses old npm to install supported npm version
+# /usr/local/n/versions/node/12.18.4/bin/node /usr/local/n/versions/node/8.11.4/bin/npm i -g npm@latest
+  - name: Install newer nodejs v12
+    shell: dnf module install -y nodejs:12
