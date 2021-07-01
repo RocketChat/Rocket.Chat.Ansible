@@ -25,16 +25,17 @@ Features
 Supported Platforms
 -------------------
 ### Debian
-- Strect (9)
+- Strecth (9)
 - Buster (10)
 
 ### Ubuntu
+- Focal Fossa: 20.04 LTS
 - Bionic Beaver: 18.04 LTS
 - Xenial: 16.04 LTS
-- Trusty: 14.04 LTS
 
 ### EL (RHEL/CentOS)
 - 7
+- 8
 
 If you'd like to see your distribution/operating system supported, please [raise an issue](https://github.com/RocketChat/Rocket.Chat.Ansible/issues)!
 
