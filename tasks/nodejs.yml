@@ -38,7 +38,7 @@
   register: n_node_bin
 
 - name: "Install the supported NodeJS environment via n [Version: {{ rocket_chat_node_version }}]"
-  shell: n {{ rocket_chat_node_version }}
+  shell: '{{ rocket_chat_n_path }} {{ rocket_chat_node_version }}'
   when: ('stat' in n_node_bin)
          and (not (n_node_bin.stat.exists | bool))
 

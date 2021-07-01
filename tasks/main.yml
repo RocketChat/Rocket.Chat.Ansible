@@ -52,7 +52,7 @@
 
       - name: Ensure the EPEL repository GPG key is imported
         rpm_key:
-          key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+          key: "{{ rocket_chat_epel_key }}"
           state: present
 
     when: ((ansible_distribution | lower) == "centos")

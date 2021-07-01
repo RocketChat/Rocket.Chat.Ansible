@@ -85,7 +85,7 @@
     when:
       - (rocket_chat_nginx_pfs_file is defined)
       - (rocket_chat_nginx_pfs_file)
-      - (rocket_chat_nginx_pfs_file | exists)
+      - (rocket_chat_nginx_pfs_file is exists)
     notify: Reload the Nginx service
     tags: pfs
 

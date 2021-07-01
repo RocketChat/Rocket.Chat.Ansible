@@ -25,16 +25,17 @@ Features
 Supported Platforms
 -------------------
 ### Debian
-- Strect (9)
+- Strecth (9)
 - Buster (10)
 
 ### Ubuntu
+- Focal Fossa: 20.04 LTS
 - Bionic Beaver: 18.04 LTS
 - Xenial: 16.04 LTS
-- Trusty: 14.04 LTS
 
 ### EL (RHEL/CentOS)
 - 7
+- 8
 
 If you'd like to see your distribution/operating system supported, please [raise an issue](https://github.com/RocketChat/Rocket.Chat.Ansible/issues)!
 
@@ -118,7 +119,7 @@ Set in [`vars/RedHat.yml`](vars/RedHat.yml)
 | `rocket_chat_mongodb_dbpath` | `/var/lib/mongodb` | The path for MongoDB to store its databases |
 | `rocket_chat_nginx_process_user` | `nginx` | The user for that will be used to spawn the Nginx server process |
 
-### RHEL/CentOS 7 variables
+### RHEL/CentOS 7/8 variables
 Set in [`vars/RedHat_7.yml`](vars/RedHat_7.yml)
 
 |     Name     |     Default Value    |    Description     |
@@ -128,6 +129,7 @@ Set in [`vars/RedHat_7.yml`](vars/RedHat_7.yml)
 | `  src` | `rocketchat.service.j2` | The source template to deploy for the Rocket.Chat service manifest |
 | `  dest` | `/usr/lib/systemd/system/rocketchat.service` | The destination to deploy the Rocket.Chat service manifest to |
 | `rocket_chat_tarball_validate_remote_cert` | false | A boolean value that determines wether or not to validate the SSL certs for the Rocket.Chat tarball remote |
+| `rocket_chat_epel_key` | `/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7` | EPEL repository GPG key to be used |
 
 ### Debian variables
 Set in [`vars/Debian.yml`](vars/Debian.yml)

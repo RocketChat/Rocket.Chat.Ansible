@@ -3,3 +3,5 @@
 rocket_chat_dist_specific_packages:
   - nodejs
   - npm
+
+rocket_chat_mongodb_service_name: mongod

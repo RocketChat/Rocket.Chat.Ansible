@@ -1,0 +1,12 @@
+---
+rocket_chat_mongodb_org_pkgs: false
+rocket_chat_dep_packages:
+  - git
+  - graphicsmagick
+  - nodejs
+  - make
+  - wget
+  - cron
+  - gnupg2
+  - g++
+rocket_chat_mongodb_service_name: mongodb

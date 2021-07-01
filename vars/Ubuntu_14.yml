@@ -1,7 +1,0 @@
----
-rocket_chat_service_update_command: initctl reload-configuration
-rocket_chat_service_template:
-  src: rocketchat_upstart.j2
-  dest: /etc/init/rocketchat.conf
-
-rocket_chat_tarball_validate_remote_cert: false

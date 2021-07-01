@@ -11,7 +11,7 @@ rocket_chat_tarball_asc_remote:  https://releases.rocket.chat/{{ rocket_chat_ver
 # Using the sha256sum is deprecated in favor of GPG verifying
 rocket_chat_tarball_sha256sum: 0
 rocket_chat_tarball_gpg_key: 0E163286C20D07B9787EBE9FD7F9D0414FD08104
-rocket_chat_tarball_gpg_keyserver: ha.pool.sks-keyservers.net
+rocket_chat_tarball_gpg_keyserver: keyserver.ubuntu.com
 rocket_chat_tarball_check_checksum: false
 rocket_chat_tarball_check_pgp: true
 rocket_chat_tarball_fetch_timeout: 100
@@ -23,7 +23,7 @@ rocket_chat_service_host: "{{ ansible_fqdn }}"
 rocket_chat_service_port: 3000
 rocket_chat_service_environment: {}
 rocket_chat_service_extra_instances: []
-rocket_chat_node_version: 12.16.1
+rocket_chat_node_version: 12.22.1
 rocket_chat_node_prefix: /usr/local/n/versions/node/{{ rocket_chat_node_version }}
 rocket_chat_node_path: "{{ rocket_chat_node_prefix }}/bin/node"
 rocket_chat_npm_version: 6.14.0
@@ -76,3 +76,4 @@ rocket_chat_letsencrypt_acmetiny_path: /opt/acme-tiny
 rocket_chat_letsencrypt_wellknown_path: /var/www/letsencrypt
 rocket_chat_letsencrypt_ca_cert: https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem
 rocket_chat_letsencrypt_force_renew: false
+rocket_chat_n_path: 'n'

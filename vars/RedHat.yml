@@ -17,17 +17,19 @@ rocket_chat_mongodb_packages:
 rocket_chat_mongodb_repl_setname: 001-rs
 rocket_chat_mongodb_repl_lines: 'replSet={{ rocket_chat_mongodb_repl_setname }}'
 rocket_chat_mongodb_fork: true
-rocket_chat_mongodb_pidfile_path: /var/run/mongodb/mongodb.pid
+rocket_chat_mongodb_pidfile_path: /var/run/mongodb/mongod.pid
 rocket_chat_mongodb_logpath: /var/log/mongodb/mongod.log
 rocket_chat_mongodb_unixsocketprefix: /var/run/mongodb
-rocket_chat_mongodb_dbpath: /var/lib/mongodb
-rocket_chat_mongodb_org_pkgs: false
+rocket_chat_mongodb_dbpath: /var/lib/mongo
+rocket_chat_mongodb_org_pkgs: true
+rocket_chat_mongodb_service_name: mongod
+rocket_chat_mongodb_service_user: mongod
 
 rocket_chat_nginx_process_user: nginx
 
 rocket_chat_mongodb_rpm_repo:
-  name: mongodb-org-3.4
-  desc: MongoDB 3.4 Repository
-  baseurl: https://repo.mongodb.org/yum/amazon/2013.03/mongodb-org/3.4/x86_64/
-  pgp_key: https://www.mongodb.org/static/pgp/server-3.4.asc
+  name: mongodb-org-4.4
+  desc: MongoDB 4.4 Repository
+  baseurl: https://repo.mongodb.org/yum/redhat/8/mongodb-org/4.4/x86_64/
+  pgp_key: https://www.mongodb.org/static/pgp/server-4.4.asc
   gpgcheck: true
