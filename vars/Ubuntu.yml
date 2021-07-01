@@ -15,6 +15,7 @@ rocket_chat_mongodb_apt_repo: "\
   {{ ansible_distribution_release | lower }}/mongodb-org/\
   {{ rocket_chat_mongodb_org_version }} multiverse"
   
+rocket_chat_mongodb_service_name: mongod
 rocket_chat_mongodb_packages:
   - mongodb
   - mongodb-server

@@ -1,2 +1,3 @@
 ---
 rocket_chat_mongodb_org_pkgs: false
+rocket_chat_mongodb_service_name: mongodb

@@ -42,6 +42,11 @@
           line: '%{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
           validate: visudo -cf %s
 
+      - name: Copy PEM file
+        copy:
+          src: "{{ rocket_chat_nginx_pfs_file }}"
+          dest: "{{ rocket_chat_nginx_pfs_file }}"
+
       - name: Include the Rocket.Chat role
         include_role:
           name: "{{ role_name | default('../..') }}"
@@ -53,7 +58,7 @@
             port: "{{ rocket_chat_service_port }}"
             host: localhost
             state: started
-            timeout: 30
+            timeout: 60
           register: api_pre_check
 
         - name: Do a basic status check of the API
@@ -68,7 +73,7 @@
             - (api_check.status|int != 200)
                or (api_check.msg|string is not search('^OK '))
                or (api_check.json.success|bool != True)
-          when: (api_pre_check | succeeded)
+          when: (api_pre_check is succeeded)
 
         - name: Destroy the last successful vagrant box
           local_action: shell
@@ -79,7 +84,7 @@
           when:
             - (api_pre_check is succeeded) and (api_check is succeeded)
             - ((ansible_virtualization | default(None) | lower) != "docker")
-            - (lookup('pipe','command -v vagrant') | search('vagrant$'))
+            - (lookup('pipe','command -v vagrant') is search('vagrant$'))
 
         # We use YAML anchoring to duplicate this below
         # because Ansible does not supported nested rescue.
@@ -101,7 +106,7 @@
             poll: 0
             when:
               - ((ansible_virtualization | default(None) | lower) != "docker")
-              - (lookup('pipe','command -v vagrant') | search('vagrant$'))
+              - (lookup('pipe','command -v vagrant') is search('vagrant$'))
         tags: check
         # API BLOCK END
 

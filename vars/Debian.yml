@@ -8,6 +8,7 @@ rocket_chat_dep_packages:
   # This seems to install something on Docker that causes a failure in the tests
   - cron
   - gnupg2
+  - dirmngr
 
 rocket_chat_mongodb_org_pkgs: true
 rocket_chat_mongodb_apt_repo: "\

@@ -7,10 +7,21 @@ rocket_chat_service_template_at:
   src: rocketchat@.service.j2
   dest: /usr/lib/systemd/system/rocketchat@.service
 rocket_chat_tarball_validate_remote_cert: true
-rocket_chat_epel_key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+rocket_chat_epel_key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
 rocket_chat_mongodb_rpm_repo:
   name: mongodb-org-4.4
   desc: MongoDB 4.4 Repository
-  baseurl: https://repo.mongodb.org/yum/redhat/7/mongodb-org/4.4/x86_64/
+  baseurl: https://repo.mongodb.org/yum/redhat/8/mongodb-org/4.4/x86_64/
   pgp_key: https://www.mongodb.org/static/pgp/server-4.4.asc
   gpgcheck: true
+rocket_chat_dep_packages:
+  - git
+  - GraphicsMagick
+  - nodejs
+  - npm
+  - make
+  - gcc-c++
+  - wget
+  - crontabs
+  - gnupg2
+rocket_chat_n_path: /usr/local/bin/n
