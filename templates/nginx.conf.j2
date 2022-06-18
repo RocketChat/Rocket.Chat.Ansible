@@ -38,4 +38,7 @@ http {
     # See http://nginx.org/en/docs/ngx_core_module.html#include
     # for more information.
     include /etc/nginx/conf.d/*.conf;
+
+    # Setting maximum file upload size to 100MB
+    client_max_body_size 100M;
 }
