@@ -12,6 +12,11 @@
     path: "{{ rocket_chat_npm_dist }}"
   register: dist_npm_bin
 
+- name: check for (n) installed
+  shell: command -v n
+  register: n_exists
+  ignore_errors: yes
+
 - name: Ensure node-version-manager (n) is installed (NPM)
   npm:
     name: n
@@ -19,6 +24,7 @@
     executable: "{{ rocket_chat_npm_dist }}"
   when: ('stat' in dist_npm_bin)
          and (dist_npm_bin.stat.exists | bool)
+         and n_exists is failed
 
 - name: Bootstrap node-version-manager from GitHub
   get_url:
