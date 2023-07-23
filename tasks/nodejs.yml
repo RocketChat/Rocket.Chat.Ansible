@@ -25,6 +25,7 @@
   when: ('stat' in dist_npm_bin)
          and (dist_npm_bin.stat.exists | bool)
          and n_exists is failed
+
 - name: Bootstrap node-version-manager from GitHub
   get_url:
     url: https://raw.githubusercontent.com/tj/n/master/bin/n
